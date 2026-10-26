@@ -1,0 +1,16 @@
+# DEVELOPED BY CARROTSTUDIO software house
+# Local data: database, password, downloaded maps and Wikipedia
+/data/**
+!/data/maps/
+!/data/zim/
+!/data/**/.gitkeep
+
+# Downloaded by scripts/prepare.sh and scripts/download-map.sh
+/campanile/web/vendor/
+/campanile/certs/
+/tools/
+/dist/
+
+__pycache__/
+*.pyc
+.DS_Store

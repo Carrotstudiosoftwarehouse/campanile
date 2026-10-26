@@ -1,0 +1,63 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="map.page">Mappa &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <script src="/vendor/pmtiles.js"></script>
+  <script src="/vendor/basemaps.js"></script>
+  <script type="module" src="/map.js"></script>
+</head>
+<body class="map-page">
+  <header class="topbar">
+    <a class="brand" href="/">Campanile</a>
+  </header>
+  <main class="map-main">
+    <h1 class="visually-hidden" data-i18n="map.page">Mappa</h1>
+    <div id="map-message" class="hidden"></div>
+    <div id="map"></div>
+    <section id="route" class="route hidden" aria-live="polite" aria-labelledby="route-title">
+      <h2 id="route-title" class="visually-hidden" data-i18n="route.title">Percorso</h2>
+      <div class="route-modes" id="route-modes" role="group">
+        <button type="button" class="secondary" data-mode="foot" data-i18n="route.foot">A piedi</button>
+        <button type="button" class="secondary" data-mode="car" data-i18n="route.car">In auto</button>
+        <button type="button" class="secondary route-x" id="route-close" aria-label="Chiudi" data-i18n-aria="route.close">&#10005;</button>
+      </div>
+      <p id="route-help" class="route-help hidden"></p>
+      <div id="route-result" class="hidden">
+        <p class="route-summary" id="route-summary"></p>
+        <p class="meta"><span id="route-made"></span> <span data-i18n="route.caution">Percorso indicativo: segui i cartelli e le strade aperte.</span></p>
+        <div class="route-more">
+          <details>
+            <summary data-i18n="route.steps">Indicazioni</summary>
+            <ol class="route-steps" id="route-steps"></ol>
+          </details>
+          <button type="button" class="link" id="route-from" data-i18n="route.change">Cambia partenza</button>
+        </div>
+      </div>
+    </section>
+    <!-- At the bottom, as in the phone's own maps app: one bar that opens the search. -->
+    <div class="find sheet" role="search">
+      <button type="button" class="sheet-bar" id="find-open" aria-expanded="false" aria-controls="find-more">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        <span data-i18n="search.open">Cerca un luogo</span>
+      </button>
+      <div class="sheet-more" id="find-more">
+        <div class="sheet-top"><button type="button" class="link" id="find-close" data-i18n="close">Chiudi</button></div>
+        <input type="search" id="find-q" placeholder="Cerca una via, un paese, una farmacia" data-i18n-ph="search.placeholder" aria-label="Cerca nella mappa" data-i18n-aria="search.label" enterkeyhint="search" autocomplete="off" spellcheck="false">
+        <div class="results hidden" id="find-results" aria-live="polite"></div>
+        <div class="chips" id="find-chips"></div>
+        <button type="button" id="route-add" class="route-add hidden" data-i18n="route.add">Aggiungi destinazione</button>
+        <div class="sheet-maps hidden" id="map-choice">
+          <label for="map-select" data-i18n="map.pick">Mappa da mostrare</label>
+          <select id="map-select"></select>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

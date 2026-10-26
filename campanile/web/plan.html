@@ -1,0 +1,71 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="plan.page">Piano famigliare &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/plan.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <h1 data-i18n="plan.title">Piano famigliare di emergenza</h1>
+    <p class="subtitle" data-i18n="plan.subtitle">Si compila con calma, prima. Si stampa, se ne d&agrave; una copia a ogni persona della famiglia.</p>
+
+    <div class="note no-print">
+      <span data-i18n="plan.note.a">Quello che scrivi qui</span> <strong data-i18n="plan.note.b">non viene inviato al Campanile</strong><span data-i18n="plan.note.c">, e non resta nemmeno nel telefono: solo in questa pagina finché è aperta. Stampalo prima di chiuderla.</span>
+    </div>
+
+    <form id="plan">
+      <div class="panel">
+        <h2 data-i18n="plan.people">Persone</h2>
+        <div id="members"></div>
+        <button type="button" class="secondary" id="add-member" data-i18n="plan.add">+ Aggiungi persona</button>
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="plan.meeting">Punti di ritrovo</h2>
+        <label for="meeting-near"><span data-i18n="plan.near">Vicino a casa</span> <small data-i18n="plan.near.hint">(se non si pu&ograve; stare in casa)</small></label>
+        <input type="text" id="meeting-near" data-field="meeting_near" maxlength="200">
+        <label for="meeting-far"><span data-i18n="plan.far">Fuori dal quartiere</span> <small data-i18n="plan.far.hint">(se il quartiere va lasciato)</small></label>
+        <input type="text" id="meeting-far" data-field="meeting_far" maxlength="200">
+        <label for="waiting-area" data-i18n="plan.waiting">Area di attesa del piano comunale di protezione civile</label>
+        <input type="text" id="waiting-area" data-field="waiting_area" maxlength="200" placeholder="Si trova sul sito del tuo Comune" data-i18n-ph="plan.waiting.ph">
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="plan.contacts">Contatti</h2>
+        <label for="outside-contact" data-i18n="plan.outside">Una persona lontana da qui, che tutti chiamano per dire come stanno</label>
+        <input type="text" id="outside-contact" data-field="outside_contact" maxlength="200">
+        <label for="doctor" data-i18n="plan.doctor">Medico di famiglia</label>
+        <input type="text" id="doctor" data-field="doctor" maxlength="200">
+        <label for="other-contacts"><span data-i18n="plan.other">Altri numeri utili</span> <small data-i18n="plan.other.hint">(vicini, scuola, lavoro)</small></label>
+        <textarea id="other-contacts" data-field="other_contacts" maxlength="1000"></textarea>
+        <p class="meta" data-i18n="plan.emergency">Emergenza: 112, numero unico europeo, gratuito, in tutti i paesi dell'Unione.</p>
+      </div>
+
+      <div class="panel">
+        <h2 data-i18n="plan.health">Salute e cose da portare</h2>
+        <label for="medicines" data-i18n="plan.medicines">Medicinali indispensabili e dosi</label>
+        <textarea id="medicines" data-field="medicines" maxlength="1000"></textarea>
+        <label for="documents" data-i18n="plan.documents">Dove sono i documenti (e le copie)</label>
+        <textarea id="documents" data-field="documents" maxlength="1000"></textarea>
+        <label for="pets" data-i18n="plan.pets">Animali domestici</label>
+        <input type="text" id="pets" data-field="pets" maxlength="200">
+        <label for="notes" data-i18n="plan.notes">Altre note</label>
+        <textarea id="notes" data-field="notes" maxlength="2000"></textarea>
+      </div>
+    </form>
+
+    <div class="no-print">
+      <button type="button" id="print" data-i18n="plan.print">Stampa</button>
+      <button type="button" class="secondary" id="clear" data-i18n="plan.clear">Cancella tutto</button>
+      <p class="result" id="result"></p>
+    </div>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang no-print" id="lang-switch"></nav></footer>
+</body>
+</html>

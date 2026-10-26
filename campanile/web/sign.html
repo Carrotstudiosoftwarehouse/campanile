@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="sign.page">Cartello &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/sign.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <div class="note no-print">
+      <span data-i18n="sign.howto">Stampa questo cartello e appendilo vicino al Campanile. Scrivi qui sotto il nome della rete Wi-Fi che stai usando (quello dell'hotspot del telefono o del Raspberry).</span>
+      <label for="network-name" data-i18n="sign.network">Nome della rete Wi-Fi</label>
+      <input type="text" id="network-name" maxlength="32" value="Campanile">
+      <button type="button" id="print" data-i18n="sign.print">Stampa il cartello</button>
+      <p data-i18n="sign.address">L'indirizzo del portatile cambia con la rete: stampa il cartello quando la rete del giorno &egrave; pronta, o ricopia l'indirizzo a mano. Quello del Raspberry non cambia mai.</p>
+      <p><a href="/guide.html" data-i18n="guide.link">Guida per chi lo gestisce</a></p>
+      <nav class="lang" id="lang-switch"></nav>
+    </div>
+
+    <article class="sign">
+      <h1 data-i18n="sign.title">Internet non funziona?</h1>
+      <p class="tagline" data-i18n="sign.tagline">Qui trovi informazioni e aiuto nella tua zona. Gratis. Non serve credito telefonico n&eacute; un'app.</p>
+      <ol>
+        <li><span data-i18n="sign.step1">Collegati alla rete Wi-Fi</span> <strong id="printed-network">Campanile</strong></li>
+        <li><span data-i18n="sign.step2">Inquadra il codice con la fotocamera oppure apri</span> <strong id="address-text"></strong></li>
+      </ol>
+      <div id="qr" class="qr" role="img" aria-label="Codice QR con l'indirizzo del Campanile" data-i18n-aria="sign.qr"></div>
+      <p><strong data-i18n="sign.find">Trovi: cosa sta succedendo &middot; chiedere o offrire aiuto &middot; sto bene &middot; mappa</strong></p>
+      <p class="small-print" data-i18n="sign.noinstall">Il Campanile non ti chieder&agrave; mai di installare app o programmi.</p>
+      <p class="small-print" data-i18n="sign.danger">In pericolo immediato chiama il 112.</p>
+    </article>
+  </main>
+</body>
+</html>

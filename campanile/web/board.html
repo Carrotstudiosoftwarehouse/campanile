@@ -1,0 +1,82 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="board.page">Bacheca &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/board.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <h1 id="title" data-i18n="board.title">Bacheca del quartiere</h1>
+    <p class="subtitle" id="intro" data-i18n="board.intro">Chi chiede aiuto e chi lo offre, tra vicini. La leggono tutti quelli collegati al Campanile: non il Comune, non i soccorsi.</p>
+    <p><a href="#post-form" id="write-link" data-i18n="board.write">Scrivi un annuncio &darr;</a></p>
+
+    <section id="mine-section" class="hidden">
+      <h2 id="mine-title" data-i18n="board.mine">I tuoi annunci</h2>
+      <p class="meta" id="mine-sub" data-i18n="board.mine.sub">Pubblicati da questo telefono. Quando non servono pi&ugrave;, chiudili.</p>
+      <div id="mine"></div>
+    </section>
+
+    <h2 id="list-title" data-i18n="board.list">Annunci dei vicini</h2>
+    <div class="filters" id="filters">
+      <select id="filter-kind" aria-label="Tipo" data-i18n-aria="board.filter.kind">
+        <option value="" data-i18n="board.filter.all">Tutti gli annunci</option>
+        <option value="offer" data-i18n="board.filter.offer">Chi offre aiuto</option>
+        <option value="need" data-i18n="board.filter.need">Chi chiede aiuto</option>
+      </select>
+      <select id="filter-category" aria-label="Categoria" data-i18n-aria="board.filter.category">
+        <option value="" data-i18n="board.filter.allcat">Tutte le categorie</option>
+      </select>
+    </div>
+    <p class="meta" id="list-status"></p>
+    <div id="list"></div>
+    <button type="button" class="secondary hidden" id="show-all"></button>
+
+    <h2 id="form-title" data-i18n="board.form">Pubblica un annuncio</h2>
+    <form class="panel" id="post-form">
+      <label for="kind" id="kind-label" data-i18n="board.form.what">Che cosa vuoi fare?</label>
+      <select id="kind" required>
+        <option value="" data-i18n="board.form.choose">Scegli&hellip;</option>
+        <option value="need" data-i18n="kind.need">Chiedo aiuto</option>
+        <option value="offer" data-i18n="kind.offer">Offro aiuto</option>
+      </select>
+      <label for="category" data-i18n="board.form.category">Categoria</label>
+      <select id="category" required></select>
+      <label for="text"><span data-i18n="board.form.text">Descrizione</span> <small data-i18n="board.form.text.hint">(max 500 caratteri)</small></label>
+      <textarea id="text" maxlength="500" required placeholder="Es.: 20 litri d'acqua potabile in bottiglia" data-i18n-ph="board.form.text.ph"></textarea>
+      <label for="area"><span data-i18n="board.form.area">Zona</span> <small data-i18n="board.form.area.hint">(quartiere o via, non l'indirizzo completo)</small></label>
+      <input type="text" id="area" maxlength="80" required placeholder="Es.: piazza del mercato" data-i18n-ph="board.form.area.ph">
+      <label for="contact"><span data-i18n="board.form.contact">Come trovarti</span> <small data-i18n="board.form.contact.hint">(chiunque lo legger&agrave;)</small></label>
+      <input type="text" id="contact" maxlength="120" required placeholder="Es.: Marco, davanti alla farmacia ore 10-12" data-i18n-ph="board.form.contact.ph">
+      <p class="meta" data-i18n="board.form.public">Lo vedranno tutti nella bacheca del quartiere, insieme alla zona e a come trovarti.</p>
+      <button type="submit" data-i18n="board.form.submit">Pubblica in bacheca</button>
+      <p class="result" id="post-result"></p>
+    </form>
+
+    <div class="panel hidden" id="receipt">
+      <strong id="receipt-title" data-i18n="board.published">Annuncio pubblicato nella bacheca del quartiere.</strong>
+      <span data-i18n="board.receipt">Lo trovi in cima a questa pagina. Per chiuderlo da un altro telefono servono numero e codice:</span>
+      <div><span data-i18n="receipt.number">Numero:</span> <span class="code" id="receipt-id"></span></div>
+      <div><span data-i18n="receipt.code">Codice:</span> <span class="code" id="receipt-code"></span></div>
+    </div>
+
+    <details>
+      <summary data-i18n="board.other">Vuoi chiudere un annuncio da un altro telefono?</summary>
+      <form class="panel" id="close-form">
+        <label for="close-id" data-i18n="board.other.number">Numero dell'annuncio</label>
+        <input type="number" id="close-id" min="1" required inputmode="numeric">
+        <label for="close-code" data-i18n="board.other.code">Codice</label>
+        <input type="text" id="close-code" required autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX">
+        <button type="submit" data-i18n="board.other.submit">Chiudi annuncio</button>
+        <p class="result" id="close-result"></p>
+      </form>
+    </details>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang" id="lang-switch"></nav></footer>
+</body>
+</html>

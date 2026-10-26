@@ -1,0 +1,53 @@
+# DEVELOPED BY CARROTSTUDIO software house
+name: "Resoconto di una prova · Test report"
+description: "Hai provato il Campanile? Raccontaci com'è andata. · You tried Campanile? Tell us how it went."
+title: "[Prova / Test] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Grazie! Ogni prova ci aiuta, anche quella in cui **tutto funziona**.
+        Thank you! Every test helps, even the one where **everything works**.
+  - type: dropdown
+    id: dove
+    attributes:
+      label: "Su cosa l'hai provato? · What did you run it on?"
+      multiple: true
+      options:
+        - "Portatile Mac · Mac laptop"
+        - "Portatile Windows · Windows laptop"
+        - "Portatile Linux · Linux laptop"
+        - "Raspberry Pi (con hotspot · with hotspot)"
+        - "Raspberry Pi (senza hotspot · without hotspot)"
+        - "Altro · Other"
+    validations:
+      required: true
+  - type: input
+    id: dispositivi
+    attributes:
+      label: "Quali telefoni si sono collegati? · Which phones connected?"
+      placeholder: "Es. / e.g.: iPhone 13 (iOS 18), Samsung A52 (Android 14)"
+    validations:
+      required: true
+  - type: checkboxes
+    id: funziona
+    attributes:
+      label: "Cosa ha funzionato? · What worked?"
+      options:
+        - label: "Il portale si è aperto da solo (Raspberry) · The portal opened by itself (Raspberry)"
+        - label: "Codice QR del cartello · QR code on the sign"
+        - label: "Avvisi ufficiali · Official notices"
+        - label: "Bacheca offro / cerco · I offer / I need board"
+        - label: "Sto bene · I'm safe"
+        - label: "Mappa offline · Offline map"
+        - label: "Wikipedia offline"
+        - label: "Piano famigliare · Family plan"
+  - type: textarea
+    id: problemi
+    attributes:
+      label: "Cosa non ha funzionato o cosa aggiusteresti? · What didn't work, or what would you fix?"
+      description: "Errori, frasi poco chiare, pulsanti scomodi. Gli screenshot aiutano. · Errors, unclear wording, awkward buttons. Screenshots help."
+  - type: input
+    id: quanti
+    attributes:
+      label: "Quante persone collegate insieme, più o meno? · Roughly how many people connected at once?"

@@ -1,0 +1,61 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="guide.page">Guida &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/guide.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main class="guide">
+    <h1 data-i18n="guide.title">Guida per chi accende il Campanile</h1>
+    <p class="subtitle" data-i18n="guide.subtitle">Una pagina. Stampala e tienila accanto al Campanile.</p>
+    <p class="no-print"><button type="button" id="print" data-i18n="guide.print">Stampa la guida</button></p>
+
+    <ol class="steps">
+      <li>
+        <h2 data-i18n="guide.on">Accendilo</h2>
+        <p><strong data-i18n="guide.laptop">Portatile:</strong> <span data-i18n="guide.on.laptop">doppio clic su &laquo;Avvia Campanile (Windows)&raquo; o &laquo;Avvia Campanile (Mac)&raquo;. Se chiede il permesso per la rete, anche per &laquo;kiwix-serve&raquo;, rispondi Consenti. Lascia aperta la finestra nera: chiudendola si spegne.</span></p>
+        <p><strong data-i18n="guide.pi">Raspberry:</strong> <span data-i18n="guide.on.pi">attaccalo alla corrente e aspetta due minuti. Crea da solo la Wi-Fi aperta &laquo;Campanile&raquo;.</span></p>
+      </li>
+      <li>
+        <h2 data-i18n="guide.net">Fai la rete (solo portatile)</h2>
+        <p data-i18n="guide.net.text">Senza internet, attiva l'hotspot di un telefono e collegaci il portatile. Tutti gli altri si collegano a quell'hotspot.</p>
+      </li>
+      <li>
+        <h2 data-i18n="guide.sign">Appendi il cartello</h2>
+        <p><span data-i18n="guide.sign.text">Si stampa dalla pagina Cartello: ha il codice QR con l'indirizzo giusto.</span> <a class="no-print" href="/sign.html" data-i18n="guide.sign.link">Apri il cartello</a></p>
+      </li>
+      <li>
+        <h2 data-i18n="guide.notices">Pubblica gli avvisi</h2>
+        <p data-i18n="guide.notices.where">Dalla pagina di gestione, e solo dal Campanile stesso:</p>
+        <p><strong data-i18n="guide.laptop">Portatile:</strong> <span class="url">http://localhost:8080/admin.html</span> &middot; <span data-i18n="guide.notices.laptop">la password &egrave; nella finestra nera.</span></p>
+        <p><strong data-i18n="guide.pi">Raspberry:</strong> <span class="url">http://localhost/admin.html</span> &middot; <span data-i18n="guide.notices.pi">la password &egrave; stata mostrata alla fine dell'installazione.</span></p>
+        <p data-i18n="guide.notices.how">Scrivi solo cose verificate: cosa, dove, quando. &laquo;Urgente&raquo; solo per un pericolo.</p>
+        <p data-i18n="guide.notices.roads">Una strada allagata o crollata? Toccala sulla mappa della gestione, a met&agrave; del tratto: i percorsi la eviteranno.</p>
+      </li>
+      <li>
+        <h2 data-i18n="guide.daily">Ogni giorno</h2>
+        <p data-i18n="guide.daily.review">Guarda gli annunci in attesa e togli quelli falsi o superati. Riapri le strade tornate percorribili.</p>
+        <p data-i18n="guide.daily.power">Tieni carica la batteria: power bank, e di giorno un pannello solare.</p>
+        <p data-i18n="guide.daily.restart">Se si spegne, riaccendilo: avvisi, annunci e nomi restano salvati.</p>
+      </li>
+    </ol>
+
+    <div class="note">
+      <strong data-i18n="guide.never">Mai:</strong>
+      <ul>
+        <li data-i18n="guide.never.password">dare la password a qualcuno, o scriverla da un telefono collegato alla Wi-Fi: viaggerebbe in chiaro.</li>
+        <li data-i18n="guide.never.data">chiedere o pubblicare dati sensibili: chiunque sia collegato pu&ograve; leggere tutto.</li>
+        <li data-i18n="guide.never.install">installare un programma preso da una rete Wi-Fi: chiunque pu&ograve; chiamarla &laquo;Campanile&raquo;. Altri Campanili si fanno con una chiavetta, data di persona.</li>
+      </ul>
+    </div>
+    <p class="small-print" data-i18n="guide.danger">In pericolo immediato chiama il 112.</p>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang" id="lang-switch"></nav></footer>
+</body>
+</html>

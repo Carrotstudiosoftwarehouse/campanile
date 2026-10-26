@@ -1,0 +1,22 @@
+# DEVELOPED BY CARROTSTUDIO software house
+[project]
+name = "campanile"
+version = "0.1.0"
+description = "Offline emergency hub: official notices, help board, \"I am safe\" list and maps, with no internet."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+signing = ["cryptography"]
+
+[tool.ruff]
+target-version = "py39"
+line-length = 100
+src = ["campanile", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "S", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106", "S311"]  # test passwords; seeded randomness on purpose

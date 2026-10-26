@@ -1,0 +1,112 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title data-i18n-title="admin.page">Gestione &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <script src="/vendor/pmtiles.js"></script>
+  <script src="/vendor/basemaps.js"></script>
+  <script type="module" src="/admin.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <h1 data-i18n="admin.title">Gestione del Campanile</h1>
+    <p class="subtitle" data-i18n="admin.subtitle">Per chi gestisce il Campanile: pubblicare avvisi ufficiali e togliere annunci falsi, offensivi o superati.</p>
+    <div class="note" data-i18n="admin.local">Questa pagina funziona solo dal Campanile stesso (il suo schermo, oppure un collegamento SSH): sulla Wi-Fi aperta la password viaggerebbe in chiaro e chiunque nei dintorni potrebbe leggerla.</div>
+    <p><a href="/guide.html" data-i18n="guide.link">Guida per chi lo gestisce</a><span id="setup-link" class="hidden"> &middot; <a href="/setup.html" data-i18n="setup.link">Prepara il Campanile (mappe e medicina)</a></span></p>
+    <form class="panel" id="login">
+      <label for="password" data-i18n="admin.password">Password di amministrazione</label>
+      <input type="password" id="password" required autocomplete="current-password">
+      <button type="submit" data-i18n="admin.login">Entra</button>
+      <p class="result" id="login-result"></p>
+    </form>
+    <div id="admin-panel" class="hidden">
+      <h2 data-i18n="admin.notice">Pubblica un avviso ufficiale</h2>
+      <form class="panel" id="notice-form">
+        <label for="notice-title"><span data-i18n="admin.notice.title">Titolo</span> <small data-i18n="admin.notice.title.hint">(max 120 caratteri)</small></label>
+        <input type="text" id="notice-title" maxlength="120" required placeholder="Es.: Distribuzione acqua" data-i18n-ph="admin.notice.title.ph">
+        <label for="notice-text"><span data-i18n="admin.notice.text">Testo</span> <small data-i18n="admin.notice.text.hint">(max 1000 caratteri)</small></label>
+        <textarea id="notice-text" maxlength="1000" required placeholder="Es.: Oggi alle 16 in piazza del mercato. Portate contenitori." data-i18n-ph="admin.notice.text.ph"></textarea>
+        <label><input type="checkbox" id="notice-urgent"> <span data-i18n="admin.notice.urgent">Urgente (in rosso, sempre in cima)</span></label>
+        <button type="submit" data-i18n="admin.notice.submit">Pubblica avviso</button>
+        <p class="result" id="notice-result"></p>
+      </form>
+      <div id="signed-section" class="hidden">
+        <h2 data-i18n="admin.signed">Pubblica un avviso firmato</h2>
+        <form class="panel" id="signed-form">
+          <label for="signed-text"><span data-i18n="admin.signed.label">Incolla qui l'avviso firmato</span> <small data-i18n="admin.signed.hint">(creato da chi ha la chiave, con scripts/sign-notice.py)</small></label>
+          <textarea id="signed-text" required spellcheck="false"></textarea>
+          <button type="submit" data-i18n="admin.signed.submit">Verifica e pubblica</button>
+          <p class="result" id="signed-result"></p>
+        </form>
+      </div>
+      <h2 data-i18n="admin.cap">Carica un allarme ufficiale (CAP)</h2>
+      <form class="panel" id="cap-form">
+        <p data-i18n="admin.cap.text">Un allarme della protezione civile nel formato standard CAP, quello di IT-alert, salvato come file: diventa un avviso, con la sua fonte e la sua scadenza. La firma digitale dell'allarme, se c'è, non viene controllata: carica solo file di cui ti fidi.</p>
+        <label for="cap-file" data-i18n="admin.cap.file">File dell'allarme (.xml)</label>
+        <input type="file" id="cap-file" accept=".xml,.cap,application/xml,text/xml,application/cap+xml" required>
+        <button type="submit" data-i18n="admin.cap.submit">Controlla e pubblica</button>
+        <p class="result" id="cap-result"></p>
+      </form>
+      <h2 data-i18n="admin.roads">Strade interrotte</h2>
+      <div class="panel">
+        <p data-i18n="admin.roads.text">Tocca sulla mappa una strada interrotta (allagata, crollata, chiusa): tutti i percorsi la eviteranno, e sulle mappe dei telefoni compare in rosso. Si chiude tutto ciò che passa entro 20 metri dal punto toccato, e un ponte o una galleria per tutta la loro larghezza: tocca a metà del tratto, lontano dagli incroci.</p>
+        <label for="road-note"><span data-i18n="admin.roads.note">Nota (facoltativa)</span></label>
+        <input type="text" id="road-note" maxlength="120" placeholder="Es.: allagata" data-i18n-ph="admin.roads.note.ph">
+        <div id="road-map" class="road-map"></div>
+        <p class="result" id="road-result"></p>
+      </div>
+      <div id="roads"></div>
+      <h2 data-i18n="admin.notices">Avvisi pubblicati</h2>
+      <div id="notices"></div>
+      <h2 data-i18n="admin.pending">In attesa di approvazione</h2>
+      <p class="meta" data-i18n="admin.pending.sub">Quando arrivano troppi annunci insieme, i nuovi aspettano qui invece di comparire subito.</p>
+      <div id="pending"></div>
+      <h2 data-i18n="admin.posts">Annunci aperti</h2>
+      <p>
+        <button type="button" class="secondary" data-recent="15" data-i18n="admin.recent15">Chiudi quelli degli ultimi 15 minuti</button>
+        <button type="button" class="secondary" data-recent="60" data-i18n="admin.recent60">Chiudi quelli dell'ultima ora</button>
+      </p>
+      <p class="result" id="bulk-result"></p>
+      <div id="posts"></div>
+      <h2 data-i18n="admin.people">Registro &laquo;sto bene&raquo;</h2>
+      <div class="panel">
+        <p data-i18n="admin.pfif.text">Dopo l'emergenza puoi consegnare i nomi a chi raccoglie le notizie sulle persone disperse, nel formato standard PFIF (quello di Google Person Finder). Il file contiene tutti i nomi, i messaggi e i luoghi: sono dati personali, consegnalo solo a chi ne ha bisogno.</p>
+        <button type="button" class="secondary" id="pfif-export" data-i18n="admin.pfif.submit">Esporta i nomi (PFIF)</button>
+        <p class="result" id="pfif-result"></p>
+      </div>
+      <div id="people"></div>
+      <h2 data-i18n="admin.share">Condividi mappe e Wikipedia con un altro Campanile</h2>
+      <div class="panel">
+        <p data-i18n="admin.share.text">Senza internet, via Wi-Fi: chi riceve scrive, nella sua pagina di preparazione, l'indirizzo e il codice che compaiono qui. Diglieli a voce o mostraglieli. Passano solo mappe e Wikipedia, mai programmi.</p>
+        <button type="button" id="share-start" data-i18n="admin.share.start">Inizia a condividere</button>
+        <div id="share-on" class="hidden">
+          <p class="meta" id="share-status"></p>
+          <p><span data-i18n="admin.share.address">Indirizzo</span>: <strong id="share-address"></strong></p>
+          <p><span data-i18n="admin.share.code">Codice</span>: <strong class="share-code" id="share-code"></strong></p>
+          <button type="button" class="secondary" id="share-stop" data-i18n="admin.share.stop">Ferma la condivisione</button>
+        </div>
+      </div>
+      <h2 data-i18n="admin.time">Ora e registro</h2>
+      <div class="panel">
+        <p id="clock-now"></p>
+        <p class="result error hidden" id="clock-off"></p>
+        <label for="clock-input"><span data-i18n="admin.time.label">Ora giusta</span></label>
+        <input type="datetime-local" id="clock-input">
+        <button type="button" class="secondary" id="clock-set" data-i18n="admin.time.set">Imposta l'ora</button>
+        <p class="result" id="clock-result"></p>
+        <p class="meta" id="keep"></p>
+      </div>
+      <h3 data-i18n="admin.log">Registro della gestione</h3>
+      <div id="log"></div>
+    </div>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang" id="lang-switch"></nav></footer>
+</body>
+</html>

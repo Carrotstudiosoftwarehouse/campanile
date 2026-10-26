@@ -1,0 +1,38 @@
+# DEVELOPED BY CARROTSTUDIO software house
+[Unit]
+Description=Campanile - offline Wikipedia (kiwix-serve)
+After=network.target
+
+[Service]
+Type=simple
+User=campanile
+Group=campanile
+ExecStart=/opt/campanile/raspberry/start-kiwix.sh
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=yes
+# kiwix-serve parses what phones send: if a bug ever let someone run code in it, that code must
+# find no password and no database. It sees both folders empty, except Wikipedia, read-only.
+TemporaryFileSystem=/etc/campanile:ro /var/lib/campanile:ro
+BindReadOnlyPaths=/var/lib/campanile/zim
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+# kiwix-serve 3.7 lists the network interfaces at startup (getifaddrs needs netlink).
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

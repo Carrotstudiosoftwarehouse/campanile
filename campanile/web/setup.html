@@ -1,0 +1,99 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title data-i18n-title="setup.page">Preparazione &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/vendor/maplibre-gl.css">
+  <script src="/vendor/pmtiles.js"></script>
+  <script src="/vendor/basemaps.js"></script>
+  <script type="module" src="/setup.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <h1 data-i18n="setup.title">Prepara il Campanile</h1>
+    <p class="subtitle" data-i18n="setup.subtitle">Da fare adesso, finch&eacute; internet funziona. Poi il Campanile va avanti da solo.</p>
+
+    <form class="panel" id="login">
+      <label for="password" data-i18n="setup.password">Password di gestione (&egrave; scritta nella finestra nera)</label>
+      <input type="password" id="password" required autocomplete="current-password">
+      <button type="submit" data-i18n="admin.login">Entra</button>
+      <p class="result" id="login-result"></p>
+    </form>
+
+    <div id="steps" class="hidden">
+      <div class="panel hidden" id="job" aria-live="polite">
+        <strong id="job-title"></strong>
+        <progress id="job-bar" max="1"></progress>
+        <p class="meta" id="job-text"></p>
+        <p class="result error" id="job-error"></p>
+        <button type="button" class="secondary" id="cancel" data-i18n="setup.cancel">Annulla</button>
+      </div>
+
+      <section class="step" id="step-world">
+        <h2><span class="check" id="world-ok"></span> <span data-i18n="setup.world">1. Mappa del mondo</span></h2>
+        <p data-i18n="setup.world.text">Stati, citt&agrave; e strade principali di tutto il mondo. Serve anche a scegliere la tua zona.</p>
+        <button type="button" data-task="map-world" data-i18n="setup.world.go">Scarica (circa 190 MB)</button>
+      </section>
+
+      <section class="step" id="step-area">
+        <h2><span class="check" id="area-ok"></span> <span data-i18n="setup.area">2. La tua zona, in dettaglio</span></h2>
+        <p data-i18n="setup.area.text">Ogni strada e ogni edificio. Sposta e ingrandisci la mappa finch&eacute; vedi solo la tua zona, poi scarica.</p>
+        <p class="meta" id="area-wait" data-i18n="setup.area.wait">Prima scarica la mappa del mondo.</p>
+        <div class="find inline hidden" id="area-find" role="search">
+          <input type="search" id="area-q" placeholder="Cerca il tuo comune o la citt&agrave; pi&ugrave; vicina" data-i18n-ph="setup.area.find" aria-label="Cerca il tuo comune o la citt&agrave; pi&ugrave; vicina" data-i18n-aria="setup.area.find" enterkeyhint="search" autocomplete="off" spellcheck="false">
+          <div class="results hidden" id="area-results" aria-live="polite"></div>
+        </div>
+        <p class="meta" id="area-where"></p>
+        <div id="area-map" class="setup-map hidden"></div>
+        <button type="button" data-task="map-area" data-i18n="setup.area.go">Scarica questa zona</button>
+        <p class="result" id="area-result"></p>
+      </section>
+
+      <section class="step" id="step-wiki">
+        <h2 data-i18n="setup.wiki">3. Medicina offline</h2>
+        <p data-i18n="setup.wiki.text">Le voci mediche di Wikipedia: malattie, farmaci, primo soccorso. Si leggono senza internet, anche in tutte e due le lingue.</p>
+        <p class="wiki-choice"><button type="button" data-task="wiki" data-lang="it" data-i18n="setup.wiki.it">Scarica in italiano (circa 260 MB)</button> <span class="check" id="wiki-it-ok"></span></p>
+        <p class="wiki-choice"><button type="button" data-task="wiki" data-lang="en" data-i18n="setup.wiki.en">Scarica in inglese (circa 1 GB)</button> <span class="check" id="wiki-en-ok"></span></p>
+        <p class="meta hidden" id="wiki-unsupported" data-i18n="setup.unsupported">Su questo computer non si pu&ograve; fare dal browser: vedi docs/INSTALLAZIONE.md, &laquo;Prepararlo prima&raquo;.</p>
+      </section>
+
+      <section class="step">
+        <h2 data-i18n="setup.last">4. Stampa e appendi</h2>
+        <p><a href="/sign.html" data-i18n="guide.sign.link">Apri il cartello</a> &middot; <a href="/guide.html" data-i18n="guide.link">Guida per chi lo gestisce</a></p>
+      </section>
+
+      <section class="step" id="step-copy">
+        <h2 data-i18n="setup.copy">5. Altri Campanili</h2>
+        <p data-i18n="setup.copy.text">Una chiavetta con tutto: programma, mappe e Wikipedia. Chi la riceve accende un altro Campanile, anche senza internet.</p>
+        <p class="wiki-choice"><button type="button" class="secondary" data-task="extras" data-i18n="setup.copy.extras">Prepara per tutti i computer (circa 250 MB)</button> <span class="check" id="extras-ok"></span></p>
+        <p class="meta" data-i18n="setup.copy.extras.text">Serve internet, una volta: aggiunge Python e la Wikipedia offline per Windows, Mac e Linux, cos&igrave; la chiavetta funziona su qualunque computer.</p>
+        <label for="drive" data-i18n="setup.copy.drive">Chiavetta</label>
+        <select id="drive"></select>
+        <p class="meta" id="copy-size"></p>
+        <p class="meta" id="copy-none" data-i18n="setup.copy.none">Infila una chiavetta USB: comparir&agrave; qui.</p>
+        <button type="button" data-task="copy" data-i18n="setup.copy.go">Copia sulla chiavetta</button>
+        <p class="note" data-i18n="setup.copy.warn">Dalla solo di persona. E non installare mai programmi presi da una rete Wi-Fi: chiunque pu&ograve; chiamarla &laquo;Campanile&raquo;.</p>
+      </section>
+
+      <section class="step" id="step-receive">
+        <h2 data-i18n="setup.receive">6. Senza internet: ricevi da un Campanile vicino</h2>
+        <p data-i18n="setup.receive.text">Collega questo computer alla Wi-Fi dell'altro Campanile e scrivi l'indirizzo e il codice che compaiono nella sua pagina di gestione. Arrivano mappe e Wikipedia, mai programmi.</p>
+        <label for="receive-address" data-i18n="setup.receive.address">Indirizzo dell'altro Campanile</label>
+        <input type="text" id="receive-address" placeholder="http://10.42.0.1" autocomplete="off" spellcheck="false">
+        <label for="receive-code" data-i18n="setup.receive.code">Codice</label>
+        <input type="text" id="receive-code" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" autocapitalize="characters">
+        <button type="button" data-task="receive" data-i18n="setup.receive.go">Ricevi mappe e Wikipedia</button>
+      </section>
+
+      <p class="meta" id="free"></p>
+    </div>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang" id="lang-switch"></nav></footer>
+</body>
+</html>

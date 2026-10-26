@@ -1,0 +1,48 @@
+# DEVELOPED BY CARROTSTUDIO software house
+[Unit]
+Description=Campanile - offline emergency hub
+After=network.target
+
+[Service]
+Type=simple
+User=campanile
+Group=campanile
+EnvironmentFile=/etc/campanile/campanile.env
+# -s: no Python packages from the service's home, which is the data folder.
+ExecStart=/usr/bin/python3 -s /opt/campanile/campanile/server.py \
+    --host 127.0.0.1 \
+    --port 8080 \
+    --behind-proxy \
+    --data /var/lib/campanile \
+    --public-url ${CAMPANILE_PUBLIC_URL} \
+    --hostname ${CAMPANILE_HOSTNAME} \
+    --kiwix-port 8081 \
+    --kiwix-backend-port 8082 \
+    --trusted-keys /etc/campanile/trusted-keys.json \
+    --password-file /etc/campanile/password
+Restart=always
+RestartSec=3
+
+CapabilityBoundingSet=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/var/lib/campanile
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectClock=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

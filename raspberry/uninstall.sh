@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+# DEVELOPED BY CARROTSTUDIO software house
+# Undoes raspberry/install.sh. Keeps data and password unless --purge is given.
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  sudo raspberry/uninstall.sh [--purge]
+
+Removes the Campanile services, the hotspot with its firewall and DNS redirect, and
+/opt/campanile.
+By default the data (/var/lib/campanile) and the admin password (/etc/campanile) are kept,
+so a later install picks up where you left off.
+
+  --purge   also delete the data, the password and the 'campanile' user
+
+If you're connected through the Campanile hotspot, you'll be disconnected.
+The python3, python3-cryptography, kiwix-tools and nginx packages and the Wi-Fi
+country setting are left as they are; Debian's default nginx site is restored.
+USAGE
+}
+
+PURGE=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --purge)   PURGE=1; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *)         usage; echo "ERROR: unknown option: $1" >&2; exit 1 ;;
+  esac
+done
+
+[ "$(id -u)" -eq 0 ] || { echo "ERROR: needs root: sudo $0" >&2; exit 1; }
+
+step() { echo; echo "== $*"; }
+
+step "Services"
+systemctl disable --now campanile.service campanile-kiwix.service campanile-firewall.service 2>/dev/null || true
+rm -f /etc/systemd/system/campanile.service /etc/systemd/system/campanile-kiwix.service \
+  /etc/systemd/system/campanile-firewall.service
+systemctl daemon-reload
+
+step "Web server (nginx)"
+rm -f /etc/nginx/sites-enabled/campanile /etc/nginx/sites-available/campanile
+if [ -e /etc/campanile/nginx-default-was-enabled ] && [ -e /etc/nginx/sites-available/default ]; then
+  ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+  rm -f /etc/campanile/nginx-default-was-enabled
+fi
+if command -v nginx >/dev/null && nginx -t -q 2>/dev/null; then
+  # restart, not reload: reload is asynchronous and old workers would keep serving for a moment
+  systemctl restart nginx.service 2>/dev/null || true
+fi
+
+step "Hotspot and DNS redirect"
+if command -v nmcli >/dev/null; then
+  nmcli connection delete campanile-hotspot >/dev/null 2>&1 || true
+fi
+rm -f /etc/NetworkManager/dnsmasq-shared.d/campanile.conf
+
+step "Code"
+rm -rf /opt/campanile
+
+if [ "$PURGE" -eq 1 ]; then
+  step "Data, password and user"
+  rm -rf /var/lib/campanile /etc/campanile
+  if id campanile >/dev/null 2>&1; then
+    userdel campanile
+  fi
+  echo "Everything removed."
+else
+  echo
+  echo "Kept: /var/lib/campanile (data) and /etc/campanile (password)."
+  echo "To remove them too: sudo raspberry/uninstall.sh --purge"
+fi

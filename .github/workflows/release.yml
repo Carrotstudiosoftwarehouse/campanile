@@ -1,0 +1,44 @@
+# DEVELOPED BY CARROTSTUDIO software house
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions: {}
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # create the release
+      id-token: write  # sign the provenance (Sigstore, through GitHub)
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false  # no token left in .git for later steps
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+      - name: Tests first (a broken build never becomes a release)
+        run: |
+          pip install cryptography
+          python -m unittest discover -s tests
+      - run: scripts/build-package.sh
+      - name: SHA-256 of what is published
+        run: cd dist && sha256sum -- *.zip > SHA256SUMS && cat SHA256SUMS
+      - name: Provenance (which commit and which workflow built the package)
+        # Free on public repositories only.
+        if: ${{ !github.event.repository.private }}
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8  # v4.2.2
+        with:
+          subject-path: dist/*.zip
+      - name: Attach the package to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          notes=".github/release-notes/$GITHUB_REF_NAME.md"
+          if [ -f "$notes" ]; then set -- --notes-file "$notes"; else set -- --generate-notes; fi
+          gh release create "$GITHUB_REF_NAME" dist/*.zip dist/SHA256SUMS "$@" \
+            --title "Campanile $GITHUB_REF_NAME"

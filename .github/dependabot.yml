@@ -1,0 +1,13 @@
+# DEVELOPED BY CARROTSTUDIO software house
+# The workflows pin each action to a commit; this keeps those pins up to date, in one PR a month.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7  # a fresh release gets a week to be found bad first
+    groups:
+      actions:
+        patterns: ["*"]

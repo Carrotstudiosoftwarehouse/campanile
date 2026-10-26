@@ -1,0 +1,67 @@
+<!doctype html>
+<!-- DEVELOPED BY CARROTSTUDIO software house -->
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-i18n-title="safe.page">Sto bene &middot; Campanile</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/safe.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="/">Campanile</a></header>
+  <main>
+    <h1 data-i18n="safe.title">Sto bene</h1>
+    <p class="subtitle" data-i18n="safe.subtitle">Lascia un segno per chi ti cerca, oppure cerca una persona per nome.</p>
+
+    <h2 data-i18n="safe.search">Cerca una persona</h2>
+    <div class="note"><span data-i18n="safe.warning.a">Chiunque pu&ograve; registrare qualunque nome: un risultato qui</span> <strong data-i18n="safe.warning.b">non &egrave; una conferma</strong> <span data-i18n="safe.warning.c">che la persona stia bene. Se puoi, verifica di persona.</span></div>
+    <form class="panel" id="search-form">
+      <label for="q" data-i18n="safe.search.label">Nome e/o cognome</label>
+      <input type="text" id="q" maxlength="80" required minlength="2" autocomplete="off">
+      <button type="submit" data-i18n="safe.search.submit">Cerca</button>
+      <p class="result" id="search-result"></p>
+      <div id="results"></div>
+    </form>
+
+    <h2 data-i18n="safe.register">Registrati</h2>
+    <div class="note" data-i18n="safe.register.note">Chi cerca il tuo nome legger&agrave; questi dati. Scrivi solo ci&ograve; che vuoi far sapere a tutti.</div>
+    <form class="panel" id="safe-form">
+      <label for="name" data-i18n="safe.name">Nome e cognome</label>
+      <input type="text" id="name" maxlength="80" required>
+      <label for="message"><span data-i18n="safe.message">Messaggio</span> <small data-i18n="safe.message.hint">(facoltativo, max 300 caratteri)</small></label>
+      <textarea id="message" maxlength="300" placeholder="Es.: Sto bene, sono con mia sorella." data-i18n-ph="safe.message.ph"></textarea>
+      <label for="place"><span data-i18n="safe.place">Dove ti trovi</span> <small data-i18n="safe.place.hint">(facoltativo, generico)</small></label>
+      <input type="text" id="place" maxlength="80" placeholder="Es.: palestra della scuola" data-i18n-ph="safe.place.ph">
+      <button type="submit" data-i18n="safe.submit">Registra</button>
+      <p class="result" id="safe-result"></p>
+    </form>
+
+    <div class="panel hidden" id="receipt">
+      <strong data-i18n="safe.done">Registrato.</strong>
+      <span data-i18n="safe.receipt">Lo trovi in &laquo;Nomi registrati da questo telefono&raquo;. Per toglierlo da un altro telefono servono numero e codice:</span>
+      <div><span data-i18n="receipt.number">Numero:</span> <span class="code" id="receipt-id"></span></div>
+      <div><span data-i18n="receipt.code">Codice:</span> <span class="code" id="receipt-code"></span></div>
+    </div>
+
+    <section id="mine-section" class="hidden">
+      <h2 data-i18n="safe.mine">Nomi registrati da questo telefono</h2>
+      <div id="mine"></div>
+    </section>
+
+    <details>
+      <summary data-i18n="safe.other">Vuoi togliere un nome da un altro telefono?</summary>
+      <form class="panel" id="remove-form">
+        <label for="remove-id" data-i18n="safe.other.number">Numero</label>
+        <input type="number" id="remove-id" min="1" required inputmode="numeric">
+        <label for="remove-code" data-i18n="safe.other.code">Codice</label>
+        <input type="text" id="remove-code" required autocomplete="off" autocapitalize="characters" placeholder="XXXX-XXXX">
+        <button type="submit" data-i18n="safe.other.submit">Rimuovi</button>
+        <p class="result" id="remove-result"></p>
+      </form>
+    </details>
+  </main>
+  <footer><a href="/" data-i18n="brand.home">Torna al Campanile</a> <nav class="lang" id="lang-switch"></nav></footer>
+</body>
+</html>

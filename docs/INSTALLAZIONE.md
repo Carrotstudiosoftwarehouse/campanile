@@ -1,0 +1,188 @@
+<p align="right"><a href="SETUP.md">English</a> · <b>Italiano</b></p>
+
+# Installare il Campanile
+
+Due modi per farlo funzionare: su un portatile, o su un [Raspberry Pi](#raspberry-pi) come
+stazione fissa.
+
+## Su un portatile (il più semplice)
+
+Serve **Python 3**, gratuito su [python.org](https://www.python.org/downloads/). Su Windows spunta
+*"Add python.exe to PATH"*. Sul Mac vanno bene anche gli strumenti per sviluppatori che propone.
+Se Python manca, il file di avvio dice cosa fare.
+
+1. Scarica il **pacchetto pronto** dalla pagina [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) e scompattalo.
+2. Doppio clic su **Avvia Campanile (Mac)** o **Avvia Campanile (Windows)**.
+3. La prima volta si apre la **pagina di preparazione**. Con internet, scarica la mappa e le voci
+   mediche, un clic ciascuna.
+4. Stampa il **cartello** (il suo codice QR ha l'indirizzo) e la
+   [guida](../campanile/web/guide.html) di una pagina per chi lo gestisce.
+5. Lascia aperta la finestra nera. Chiudendola il Campanile si spegne.
+
+Tutti si collegano **alla stessa Wi-Fi** del portatile. Senza internet, attiva l'**hotspot** di un
+telefono Android (in genere va anche senza SIM o senza dati) e collega lì il portatile e tutti
+gli altri. *Provalo prima con due telefoni. Nella nostra prova l'iPhone voleva i dati accesi,
+l'Android no. Alcuni operatori o modelli lo bloccano.*
+
+> **Primo avvio.** Quando Mac o Windows chiedono se Python può accettare connessioni dalla rete,
+> rispondi **Consenti**. Il Mac lo chiede di nuovo per **kiwix-serve** (Wikipedia offline).
+> **Consenti** anche a lui, o i telefoni non aprono Wikipedia.
+> - Premuto *Rifiuta* su un Mac: *Impostazioni di Sistema → Rete → Firewall → Opzioni*.
+> - Premuto *Annulla* su Windows: dopo un minuto la finestra nera lo dice, e Invio lo sistema.
+> - Il Mac non apre `Avvia Campanile (Mac).command`: *Impostazioni di Sistema → Privacy e sicurezza → Apri comunque*.
+
+## Prepararlo prima, quando internet c'è ancora
+
+**Sul portatile**, la pagina di preparazione (`http://localhost:8080/setup.html`, si apre da sola
+la prima volta) scarica la mappa del mondo, la tua zona con ogni dettaglio (inquadrata dove sei se
+il browser può dirlo, oppure cerchi il tuo comune) e le voci mediche di Wikipedia in italiano,
+inglese o tutte e due. Gli scaricamenti riprendono se interrotti e sono controllati con SHA-256
+(fissati nel codice per i programmi, quello di Kiwix per Wikipedia).
+
+<p align="center">
+  <img src="immagini/setup.png" width="600" alt="Pagina di preparazione: la zona da scaricare, inquadrata dove si trova il computer">
+</p>
+
+**Dal terminale, o per il Raspberry**, con internet, una volta:
+
+```bash
+scripts/prepare.sh                        # librerie (già incluse nel pacchetto pronto)
+scripts/download-map.sh italy-light       # mappa dell'Italia, ~580 MB
+scripts/download-wikipedia.sh medicine    # voci mediche, ~260 MB
+```
+
+| Mappe (`download-map.sh`) | Dimensione | Dettaglio |
+|---|---|---|
+| `world` | ~190 MB | stati, città e strade principali di tutto il mondo |
+| `italy-light` | ~580 MB | strade di tutta Italia |
+| `italy` | ~4,5 GB | ogni strada ed edificio |
+| `custom NOME OVEST,SUD,EST,NORD` | dipende | solo la tua zona, dettaglio pieno |
+
+Per la tua città usa `custom`, ovunque nel mondo (le coordinate si leggono da qualunque mappa
+online). Torino centro (`custom torino 7.64,45.04,7.71,45.09`) pesa circa 7 MB.
+
+| Wikipedia (`download-wikipedia.sh`) | Dimensione in italiano |
+|---|---|
+| `medicine-light` (senza immagini) | ~100 MB |
+| `medicine` | ~260 MB |
+| `essential` (voci più lette, senza immagini) | ~900 MB |
+| `full` (senza immagini) | ~8,4 GB |
+| `full-images` | ~30 GB |
+
+Dimensioni misurate tra il 22 e il 24 ottobre 2026. Per altre lingue aggiungi il codice, come in
+`scripts/download-wikipedia.sh medicine-light en` (inglese, senza immagini, ~1 GB, come nella
+pagina di preparazione). Wikipedia parte da sola. Sul portatile, prima premi una volta un pulsante
+di *Medicina offline* nella pagina di preparazione, per aggiungere il programma che la serve.
+
+La ricerca nella mappa legge ogni mappa una volta sola, in sottofondo, e mette il risultato in
+`data/places/`. Trova vie, luoghi e punti utili (ospedali, farmacie, acqua potabile...) nella tua
+zona, stati e città nella mappa del mondo.
+
+**Poi** compila il piano famigliare e fai una prova con un paio di telefoni. Stampa il cartello in
+anticipo solo per il Raspberry, il cui indirizzo non cambia mai. Quello del portatile cambia con la
+rete, quindi stampa il suo cartello (o ricopia a mano l'indirizzo) quando la rete del giorno è
+pronta.
+
+## Altri Campanili, senza internet
+
+Nella pagina di preparazione, *Altri Campanili*:
+
+1. **Prepara per tutti i computer** (con internet, una volta, circa 250 MB) scarica il programma
+   di Wikipedia per Windows, Mac e Linux, e gli installatori ufficiali di Python.
+2. Infila una chiavetta USB e premi **Copia sulla chiavetta** (programma, mappe e Wikipedia).
+
+Sulla chiavetta, doppio clic su *Avvia Campanile*. Non servono internet né installazioni. Se manca
+Python, la finestra indica il suo installatore sulla chiavetta.
+
+- **La chiavetta si dà di persona.** Mai installare un programma da una rete Wi-Fi: chiunque può
+  chiamarne una «Campanile».
+- **Mai sulla chiavetta:** il database (nomi, annunci, contatti), la password di gestione, niente
+  che non sia in un elenco fisso.
+- **Niente passeggeri nascosti.** Una cartella Campanile già sulla chiavetta si usa solo se
+  contiene soltanto i file del Campanile. Qualunque altra cosa ferma la copia, senza toccare
+  niente, e i collegamenti non si seguono. Provato con tutti i modi che conosciamo per nascondere
+  lì un programma.
+- Sul Raspberry, dal terminale:
+  `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`
+
+**Mappe e Wikipedia via Wi-Fi.** Nella pagina di gestione, *Condividi con un altro Campanile*
+mostra un indirizzo e un codice. Un altro Campanile si collega a questa Wi-Fi e li scrive nella
+sua pagina di preparazione. Arrivano mappe e Wikipedia, mai programmi. L'elenco dei file è firmato
+con il codice, quindi un Campanile finto con lo stesso nome di rete ma senza codice viene
+rifiutato. Gli scaricamenti vanno piano, così i telefoni non restano senza Wi-Fi, e la
+condivisione si ferma dopo due ore.
+
+## Tenerlo acceso
+
+> **ore di autonomia ≈ capacità della batteria in Wh × 0,8 ÷ consumo in watt**
+> (mAh di una power bank × 3,7 ÷ 1000 = Wh)
+
+Una power bank da 20.000 mAh vale circa 74 Wh. A 4 W, un Raspberry va avanti
+74 × 0,8 ÷ 4 ≈ **15 ore**. Il consumo dipende dal modello e da quanti si collegano, quindi
+**misuralo** con un misuratore USB da pochi euro. Un pannello solare pieghevole da 20-30 W con
+uscita USB può ricaricare la power bank di giorno. Sul portatile valgono le stesse regole, con lo
+schermo meno luminoso.
+
+## Raspberry Pi
+
+Un Raspberry Pi 3B+, 4, 5 o Zero 2 W diventa un Campanile sempre pronto. Crea la rete Wi-Fi
+aperta **"Campanile"**, e il portale **si apre da solo** quando un telefono si collega. Consuma
+poco e va avanti con una power bank.
+
+Serve **Raspberry Pi OS** (Bookworm o più recente) con il Wi-Fi integrato, collegato a internet
+**via cavo** (l'hotspot spegne il Wi-Fi da cui sei collegato).
+
+```bash
+sudo apt install -y git
+git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
+scripts/prepare.sh
+scripts/download-map.sh italy-light       # facoltativo
+scripts/download-wikipedia.sh medicine    # facoltativo
+sudo raspberry/install.sh                 # opzioni: --ssid NOME  --country IT  --no-hotspot
+```
+
+`--country` è il codice di due lettere del paese, per le regole del Wi-Fi (per esempio `DE`, `FR`).
+
+L'installazione:
+
+- installa `python3`, `python3-cryptography`, `kiwix-tools` e `nginx` da Debian, e crea l'utente
+  di servizio `campanile`, senza privilegi
+- mette il programma in `/opt/campanile`, i dati in `/var/lib/campanile`, la configurazione in `/etc/campanile`
+- mette **nginx** sulla porta 80 per pagine, mappe e client lenti o ingordi. Il Campanile (porta
+  8080) e Wikipedia (porta 8081) ascoltano solo dentro il Raspberry, protetti da systemd, e
+  partono a ogni accensione
+- crea con NetworkManager la Wi-Fi **aperta** "Campanile" su `10.42.0.1`, e fa rispondere ogni
+  nome di dominio con il Campanile, così i telefoni aprono il portale da soli
+- isola i telefoni tra loro. Un **firewall** sull'hotspot fa raggiungere solo DHCP, DNS e il
+  Campanile, niente altro del Raspberry e nessuna rete dietro di lui
+
+**Per aggiornare**, rilancialo. Dati e password restano. Le mappe aggiunte dopo vanno in
+`/var/lib/campanile/maps` (leggibili da tutti, permessi 644), i file di Wikipedia in
+`/var/lib/campanile/zim` (proprietario `campanile`). Poi `sudo systemctl restart campanile-kiwix`.
+
+**Cosa cambia nella rete:** la connessione NetworkManager `campanile-hotspot`,
+`/etc/NetworkManager/dnsmasq-shared.d/campanile.conf` (reindirizzamento DNS, solo con l'hotspot
+acceso), il firewall `/etc/campanile/firewall.nft` con il servizio `campanile-firewall`. Imposta
+anche il paese del Wi-Fi e sostituisce il sito predefinito di nginx (rimesso com'era alla
+disinstallazione).
+
+**Per togliere tutto:** `sudo raspberry/uninstall.sh` (conserva dati e password) oppure
+`sudo raspberry/uninstall.sh --purge` (cancella anche quelli).
+
+Il Wi-Fi integrato regge un numero limitato di telefoni. Per una piazza intera serve un access
+point esterno.
+
+## Licenze
+
+- Codice del Campanile: [MIT](../LICENSE).
+- Scaricati da `scripts/prepare.sh`, ciascuno con la propria licenza (copiata in
+  `campanile/web/vendor/licenses/`): [MapLibre GL JS](https://maplibre.org),
+  [PMTiles](https://github.com/protomaps/PMTiles) e
+  [Protomaps basemaps](https://github.com/protomaps/basemaps) (BSD-3-Clause), font Noto
+  (SIL OFL 1.1), [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT),
+  [certifi](https://github.com/certifi/python-certifi) (MPL-2.0).
+- Scaricati dalla pagina di preparazione: [go-pmtiles](https://github.com/protomaps/go-pmtiles)
+  (BSD-3-Clause), [kiwix-tools](https://github.com/kiwix/kiwix-tools) (GPL-3.0).
+- Dati: mappe © [OpenStreetMap](https://www.openstreetmap.org/copyright) (ODbL) con ESA
+  WorldCover (CC BY 4.0) tramite [Protomaps](https://protomaps.com). Wikipedia (CC BY-SA 4.0)
+  tramite [Kiwix](https://kiwix.org).

@@ -1,0 +1,27 @@
+# DEVELOPED BY CARROTSTUDIO software house
+name: "Idea o problema · Idea or problem"
+description: "Qualcosa da aggiustare o una funzione utile in emergenza. · Something to fix, or a feature that helps in an emergency."
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Scrivi come ti viene, nessuno giudica. Conta una cosa sola: *aiuta qualcuno quando le cose vanno male?*
+        Write it however you like, nobody judges. One thing matters: *does it help someone when things go wrong?*
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: "Di cosa si tratta? · What is it?"
+      options:
+        - "Qualcosa non funziona · Something is broken"
+        - "Un'idea per una funzione nuova · An idea for a new feature"
+        - "Una frase o una pagina poco chiara · An unclear sentence or page"
+        - "Una traduzione · A translation"
+    validations:
+      required: true
+  - type: textarea
+    id: descrizione
+    attributes:
+      label: "Raccontaci · Tell us"
+      description: "Cosa succede o cosa vorresti, e quando servirebbe. · What happens or what you'd like, and when it would help."
+    validations:
+      required: true

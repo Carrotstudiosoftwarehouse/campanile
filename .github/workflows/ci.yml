@@ -1,0 +1,71 @@
+# DEVELOPED BY CARROTSTUDIO software house
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:  # run by hand, e.g. right after the repository goes public
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.9", "3.11", "3.13"]
+        include:
+          # Windows and macOS behave differently on sockets (measured): they get their own run.
+          - os: windows-latest
+            python: "3.13"
+          - os: macos-latest
+            python: "3.13"
+    env:
+      # The runner is a throwaway machine: let the test change its firewall for real.
+      CAMPANILE_FIREWALL_TEST: ${{ matrix.os == 'windows-latest' && '1' || '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false  # no token left in .git for later steps
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pip install cryptography  # so the signed-notice tests run instead of being skipped
+      - run: python -W error::ResourceWarning -m unittest discover -s tests -v
+
+  quality:
+    name: Lint and formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false  # no token left in .git for later steps
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
+        with:
+          python-version: "3.13"
+      - run: pip install ruff==0.17.1
+      - run: ruff check campanile tests scripts/sign-notice.py
+      - run: ruff format --check campanile tests scripts/sign-notice.py
+      - name: Shellcheck
+        run: shellcheck -S warning scripts/*.sh raspberry/*.sh "Avvia Campanile (Mac).command"
+      - name: JavaScript syntax
+        run: |
+          for f in campanile/web/*.js; do
+            cp "$f" "$RUNNER_TEMP/$(basename "$f" .js).mjs"
+            node --check "$RUNNER_TEMP/$(basename "$f" .js).mjs"
+          done
+          for f in demo/*.js; do node --check "$f"; done  # classic scripts, not modules
+
+  libraries:
+    name: Offline libraries (SHA-256 checks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false  # no token left in .git for later steps
+      - run: scripts/prepare.sh

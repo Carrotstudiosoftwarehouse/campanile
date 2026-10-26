@@ -1,0 +1,4 @@
+# DEVELOPED BY CARROTSTUDIO software house
+* text=auto eol=lf
+*.bat text eol=crlf
+*.png binary

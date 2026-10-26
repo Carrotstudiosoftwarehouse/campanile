@@ -1,0 +1,14 @@
+# DEVELOPED BY CARROTSTUDIO software house
+[Unit]
+Description=Campanile - firewall for the hotspot
+Before=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/campanile/firewall.nft
+ExecStop=/usr/sbin/nft delete table inet campanile
+
+[Install]
+WantedBy=multi-user.target
