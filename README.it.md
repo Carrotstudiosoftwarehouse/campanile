@@ -66,9 +66,13 @@ CAP, PFIF) · [navigatore ed enciclopedia](docs/FUNZIONI.md) · [sicurezza](docs
 
 ## Costruiamolo insieme
 
-Ingegneri, ethical hacker, volontari, chiunque: non serve un titolo né un permesso. Una sola
-regola: deve essere abbastanza semplice per i nostri genitori. Se per usare il Campanile serve
-un ingegnere, non abbiamo finito.
+> **Vuoi dare una mano?** Stiamo costruendo una community di ingegneri, ethical hacker e persone
+> comuni per provare il Campanile su dispositivi veri e portarlo in altri quartieri.
+>
+> Scrivi a **[info@carrotstudio.it](mailto:info@carrotstudio.it)**: raccontaci chi sei e cosa ti piacerebbe provare.
+
+Non serve un titolo né un permesso. Una sola regola: deve essere abbastanza semplice per i nostri
+genitori. Se per usare il Campanile serve un ingegnere, non abbiamo finito.
 
 - **Non sei tecnico?** Provalo con la famiglia o gli amici e raccontaci dove vi siete bloccati.
 - **Sei tecnico?** Parti da [CONTRIBUTING.md](CONTRIBUTING.md) e da ciò che non abbiamo ancora

@@ -1,5 +1,7 @@
 # Contribuire · Contributing
 
+Per collaborare · To collaborate: **[info@carrotstudio.it](mailto:info@carrotstudio.it)**
+
 **Chiunque può contribuire, e nessuno giudica.** Una correzione, una funzione nuova, una
 traduzione, una frase scritta meglio, il resoconto di una prova. Il Campanile deve restare
 **semplice, affidabile e comprensibile da chi non è tecnico**, e ogni modifica risponde a una

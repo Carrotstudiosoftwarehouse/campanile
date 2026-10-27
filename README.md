@@ -65,8 +65,13 @@ Pages in English and Italian, picked from the phone's language. Maps for any are
 
 ## Build it with us
 
-Engineers, ethical hackers, volunteers, anyone: no title or permission needed. One rule: it has to
-be simple enough for our own parents. If it takes an engineer to use Campanile, we're not done.
+> **Want to help?** We're building a community of engineers, ethical hackers and everyday people
+> to test Campanile on real devices and bring it to more neighborhoods.
+>
+> Write to **[info@carrotstudio.it](mailto:info@carrotstudio.it)**: tell us who you are and what you'd like to try.
+
+No title or permission needed. One rule: it has to be simple enough for our own parents. If it
+takes an engineer to use Campanile, we're not done.
 
 - **Not technical?** Try it with family or friends and tell us where you got stuck.
 - **Technical?** Start from [CONTRIBUTING.md](CONTRIBUTING.md) and what we couldn't test yet,
