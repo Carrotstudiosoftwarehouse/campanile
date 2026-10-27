@@ -18,8 +18,11 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python: ["3.9", "3.11", "3.13"]
+        python: ["3.11", "3.13"]
         include:
+          # Our oldest supported Python: no longer built for the newest Ubuntu, so the one before.
+          - os: ubuntu-24.04
+            python: "3.9"
           # Windows and macOS behave differently on sockets (measured): they get their own run.
           - os: windows-latest
             python: "3.13"
