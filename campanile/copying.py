@@ -482,24 +482,39 @@ def _already(files: list[tuple[Path, str]], root: Path) -> int:
 
 
 def check(root: Path) -> list[str]:
-    """Program files of a copy that are missing or of the wrong size (fast, at every start).
+    """Program files of a copy that are missing or damaged (at every start, about a second).
 
-    Only the program: maps and Wikipedia may rightly change after the copy.
+    Only the program: maps and Wikipedia may rightly change after the copy. It finds copies
+    cut short or corrupted; it is no defense against a hostile stick, whose manifest is
+    unsigned: that is why a stick is handed over in person.
     """
     manifest = root / MANIFEST
     if not manifest.is_file():
-        return []
+        # The marker is written first and the manifest last: only the marker means the copy
+        # was cut short. Neither means this is no copy at all, nothing to check.
+        return [MANIFEST] if (root / MARKER).exists() else []
     try:
         files = json.loads(manifest.read_text(encoding="utf-8"))["files"]
     except (OSError, ValueError, KeyError, TypeError):
         return [MANIFEST]
+    if not isinstance(files, dict):
+        return [MANIFEST]
     wrong = []
     for relative, info in files.items():
-        if relative.startswith(("data/", "tools/")):
+        if not isinstance(relative, str) or relative.startswith(("data/", "tools/")):
             continue
         path = root / relative
         try:
-            if path.stat().st_size != info["bytes"]:
+            # Hashed only when it is a real file of this copy: a name pointing outside it
+            # (or at a device that never ends) is damage, not something to read.
+            inside = ".." not in Path(relative).parts and not Path(relative).is_absolute()
+            if (
+                not inside
+                or _is_link(path)
+                or not path.is_file()
+                or path.stat().st_size != info["bytes"]
+                or _sha256(path) != info["sha256"]
+            ):
                 wrong.append(relative)
         except (OSError, KeyError, TypeError):
             wrong.append(relative)

@@ -397,6 +397,36 @@ class TestCheck(CopyCase):
     def test_not_a_copy_nothing_to_check(self):
         self.assertEqual(copying.check(self.root), [])
 
+    # From an outside review (27 Oct 2026): each of these passed, or crashed, before the fix.
+    def test_the_same_size_with_other_content_is_noticed(self):
+        root = self.copy()
+        server = root / "campanile" / "server.py"
+        server.write_bytes(b"x" * server.stat().st_size)
+        self.assertEqual(copying.check(root), ["campanile/server.py"])
+
+    def test_a_copy_cut_short_before_its_manifest_is_noticed(self):
+        root = self.copy()
+        (root / copying.MANIFEST).unlink()  # the marker, written first, is still there
+        self.assertEqual(copying.check(root), [copying.MANIFEST])
+
+    def test_a_manifest_of_the_wrong_shape_is_damage_not_a_crash(self):
+        root = self.copy()
+        for body in ('{"files": []}', '{"files": {"campanile/server.py": 7}}', "[]"):
+            with self.subTest(body=body):
+                (root / copying.MANIFEST).write_text(body)
+                self.assertTrue(copying.check(root))
+
+    def test_a_name_outside_the_copy_is_damage_and_never_read(self):
+        root = self.copy()
+        # The right size: only the guard keeps it from being read.
+        (root.parent / "outside.txt").write_bytes(b"not ours")
+        manifest = json.loads((root / copying.MANIFEST).read_text())
+        manifest["files"]["../outside.txt"] = {"bytes": 8, "sha256": "0" * 64}
+        (root / copying.MANIFEST).write_text(json.dumps(manifest))
+        with mock.patch.object(copying, "_sha256", wraps=copying._sha256) as hashed:
+            self.assertEqual(copying.check(root), ["../outside.txt"])
+        self.assertNotIn(root / "../outside.txt", [c.args[0] for c in hashed.call_args_list])
+
 
 class TestDrives(unittest.TestCase):
     def test_mac_lists_local_volumes_only(self):
