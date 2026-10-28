@@ -1,2 +1,6 @@
 <!-- DEVELOPED BY CARROTSTUDIO software house -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" rx="58" fill="#111"/><path d="M98 86 L128 34 L158 86 Z" fill="#fff"/><path d="M98 94 H158 V218 H98 Z M112 150 V124 A16 16 0 0 1 144 124 V150 Z" fill="#fff" fill-rule="evenodd"/><circle cx="128" cy="134" r="9" fill="#D7261E"/><g fill="none" stroke="#fff" stroke-width="10" stroke-linecap="round"><path d="M176.1 101.6 A58 58 0 0 1 176.1 166.4"/><path d="M79.9 101.6 A58 58 0 0 0 79.9 166.4"/></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="Campanile"><style>@media (prefers-color-scheme: dark){.ink{fill:#F5F3EE}}</style><defs><clipPath id="df"><circle cx="120" cy="120" r="108"/></clipPath>
+<mask id="mf"><rect width="240" height="240" fill="#fff"/><path d="M60 106 L116 52 L216 148 V198 H60 Z" fill="#000"/>
+<rect x="74" y="166" width="200" height="120" rx="27" fill="#fff"/><path d="M152 124 L262 14 V234 Z" fill="#000"/></mask></defs>
+<rect class="ink" width="240" height="240" fill="#1C1C1C" mask="url(#mf)" clip-path="url(#df)"/>
+<circle cx="112" cy="132" r="21" fill="#D7261E"/></svg>

@@ -2,15 +2,12 @@
 
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-bianco.svg">
-    <img src="docs/immagini/logo.svg" height="84" align="absmiddle" alt="">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-it-bianco.svg">
+    <img src="docs/immagini/logo-it.svg" height="96" alt="Campanile. Senza internet. Ancora insieme.">
   </picture>
-  Campanile
 </h1>
 
 [![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-
-### Senza internet. Ancora insieme.
 
 Un punto di informazione e di aiuto per il quartiere che funziona anche quando internet non c'è.
 Per secoli le campane del campanile hanno avvisato il paese dei pericoli e chiamato tutti a

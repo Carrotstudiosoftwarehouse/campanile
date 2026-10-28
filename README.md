@@ -3,14 +3,11 @@
 <h1>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-bianco.svg">
-    <img src="docs/immagini/logo.svg" height="84" align="absmiddle" alt="">
+    <img src="docs/immagini/logo.svg" height="96" alt="Campanile. No internet. Still together.">
   </picture>
-  Campanile
 </h1>
 
 [![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-
-### No internet. Still together.
 
 A neighborhood information and help point that keeps working when the internet is gone. For
 centuries the bells of the campanile, the Italian bell tower, warned the village of danger and
