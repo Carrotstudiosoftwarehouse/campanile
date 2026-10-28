@@ -31,9 +31,9 @@ Campanile's clock, which you can set there (without internet a Raspberry restart
 ### More than one volunteer
 
 With the main password, **Who runs this Campanile** gives each volunteer a password of their own.
-The Campanile makes it (like `K7M2-QX9P-T2PA`) and shows it once: write it down and hand it over.
-They can do everything except add or remove people, and the log shows their name. If someone
-leaves, remove only them: their password stops working at once.
+The Campanile makes it (like `K7M2-QX9P-T2PA-8WNE`) and shows it once: write it down and hand it
+over. They can do everything except add or remove people, and the log shows their name. If
+someone leaves, remove only them: their password stops working at once.
 
 ### Signed notices (optional)
 

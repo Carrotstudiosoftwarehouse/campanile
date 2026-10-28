@@ -387,9 +387,10 @@ class Store:
     # -- the people who run the Campanile --------------------------------------------------
 
     def add_admin(self, name: str) -> tuple[int, str]:
-        """A person with a password of their own. The Campanile makes it, so it is long, random
-        and used nowhere else: a fast hash is enough, and only the hash is kept."""
-        password = new_code(groups=3)
+        """A person with a password of their own. The Campanile makes it, so it is random and
+        used nowhere else, and 16 characters (about 79 bits) are out of reach even for someone
+        who copies the database: a fast hash is enough, and only the hash is kept."""
+        password = new_code(groups=4)
         with self._lock:
             if self._count("SELECT COUNT(*) FROM admins") >= MAX_ADMINS:
                 raise RequestError(503, "too_many_admins", max=MAX_ADMINS)

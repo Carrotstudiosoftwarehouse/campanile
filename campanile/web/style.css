@@ -314,7 +314,8 @@ body.sheet-open .sheet { flex: 1; min-height: 0; overflow-y: auto; }
 .results button strong { display: block; font-weight: 600; }
 .results button span { color: var(--muted); font-size: 0.95rem; }
 .find.inline { padding: 0; border: 0; margin-bottom: 8px; }
-.share-code { font: 700 1.6rem/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.06em; }
+/* smaller on a narrow phone, so a 16-character password stays on one line */
+.share-code { font: 700 min(1.6rem, 5.6vw)/1.3 ui-monospace, "SF Mono", Menlo, Consolas, monospace; letter-spacing: 0.06em; }
 .find.inline .results { left: 0; right: 0; }
 
 /* Family plan */

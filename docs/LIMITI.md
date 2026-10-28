@@ -91,8 +91,9 @@ un limite, diccelo e lo aggiungiamo.
   l'abbiamo mai passato sotto un fuzzer. Ci sono passate anche le richieste di rete (250.000) e la
   verifica delle firme (200.000). Un buon punto da cui cominciare.
 - **Gli strumenti trovano schemi noti, non ogni difetto.** Bandit, Semgrep e axe-core non hanno
-  trovato più niente da correggere. Non è una prova. CodeQL gira a ogni modifica, e ogni suo
-  allarme lo leggiamo nel codice.
+  trovato più niente da correggere. Non è una prova. CodeQL gira a ogni modifica. Dei suoi primi
+  6 allarmi, uno ha portato a una correzione (password più lunghe per chi gestisce un Campanile);
+  gli altri 5 li abbiamo letti nel codice e chiusi, ognuno con il motivo.
 - **Il codice di altri** (Python, nginx, MapLibre, PMTiles, kiwix-serve) ha versioni fissate e
   impronte controllate, e sul Raspberry kiwix-serve gira isolato. Non l'abbiamo revisionato.
 

@@ -32,9 +32,9 @@ Raspberry riparte indietro).
 ### Più di un volontario
 
 Con la password principale, **Chi gestisce il Campanile** dà a ogni volontario una password sua.
-La crea il Campanile (tipo `K7M2-QX9P-T2PA`) e la mostra una volta sola: scrivila e consegnala.
-Può fare tutto tranne aggiungere o togliere persone, e nel registro compare il suo nome. Se
-qualcuno se ne va, togli solo lui: la sua password smette subito di funzionare.
+La crea il Campanile (tipo `K7M2-QX9P-T2PA-8WNE`) e la mostra una volta sola: scrivila e
+consegnala. Può fare tutto tranne aggiungere o togliere persone, e nel registro compare il suo
+nome. Se qualcuno se ne va, togli solo lui: la sua password smette subito di funzionare.
 
 ### Avvisi firmati (facoltativi)
 

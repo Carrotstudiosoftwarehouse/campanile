@@ -649,7 +649,8 @@ class TestPeople(CampanileTestCase):
     def test_a_person_signs_in_with_their_password_and_the_log_names_them(self):
         status, maria = self.add("Maria")
         self.assertEqual(status, 201)
-        self.assertRegex(maria["password"], r"^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$")
+        # 16 characters, about 79 bits: safe even if someone copies the database
+        self.assertRegex(maria["password"], r"^([A-Z2-9]{4}-){3}[A-Z2-9]{4}$")
         typed = maria["password"].lower().replace("-", " ")  # as someone might type it
         self.assertEqual(self.as_person(typed, "/api/admin/me"), (200, {"name": "Maria"}))
         status, _ = self.as_person(typed, "/api/admin/notices", title="Acqua", text="In piazza")
