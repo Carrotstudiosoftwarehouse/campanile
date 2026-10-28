@@ -7,6 +7,7 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
 import sys
 import tempfile
 import unittest
@@ -198,7 +199,8 @@ class TestSignReleaseScript(unittest.TestCase):
             "keygen", "--out", str(keys), passphrases=["short", *["a long passphrase"] * 4]
         )
         main = keys / "campanile-release-main.key"
-        self.assertEqual(main.stat().st_mode & 0o777, 0o600)
+        if os.name == "posix":  # Windows has no such permission bits
+            self.assertEqual(main.stat().st_mode & 0o777, 0o600)
         self.assertIn(b"ENCRYPTED", main.read_bytes())
 
         package = self.tmp / "campanile-0.2.0.zip"
