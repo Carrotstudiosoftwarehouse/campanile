@@ -70,7 +70,10 @@ An automatic check finds only some of the problems. The rest takes people.
 - [ ] **Screen readers**: VoiceOver and TalkBack, tried by people who use them every day
 - [ ] **Plain words**: every sentence on the pages read by someone who finds reading hard
 - [ ] **More languages** (Ukrainian, Arabic, French, German, Spanish...). Each is one block of
-  text in `campanile/web/strings.js`, and each opens a new country
+  text in `campanile/web/strings.js` and one in `campanile/messages.py`, and each opens a new
+  country. Right-to-left languages are ready: pages mirror by themselves, and Arabic street
+  names come out right on the map (checked on Cairo). Only the translation is missing, by a
+  native speaker
 
 **3. Trust the phone can check by itself**
 
@@ -191,7 +194,9 @@ Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano l
 - [ ] **Lettori di schermo**: VoiceOver e TalkBack, provati da chi li usa tutti i giorni
 - [ ] **Parole semplici**: ogni frase delle pagine letta da qualcuno che fa fatica a leggere
 - [ ] **Altre lingue** (ucraino, arabo, francese, tedesco, spagnolo...). Ognuna è un blocco di
-  testo in `campanile/web/strings.js`, e ognuna apre un paese
+  testo in `campanile/web/strings.js` e uno in `campanile/messages.py`, e ognuna apre un paese.
+  Le lingue da destra a sinistra sono pronte: le pagine si rovesciano da sole, e sulla mappa i
+  nomi arabi escono giusti (provato sul Cairo). Manca solo la traduzione, da un madrelingua
 
 **3. Fiducia che il telefono verifica da solo**
 

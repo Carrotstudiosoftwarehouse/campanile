@@ -131,9 +131,8 @@ Roughly in order of importance:
 7. **A password per person**, so the log says who did what.
 8. **Signed updates**, so a Campanile can check a USB stick itself instead of trusting it like a
    house key.
-9. **Right-to-left languages** such as Arabic, which need mirrored pages.
-10. **The navigator**: turn bans, missing from our map files, and a live position, which needs
-    HTTPS.
+9. **The navigator**: turn bans, missing from our map files, and a live position, which needs
+   HTTPS.
 
 ## Help us close them
 

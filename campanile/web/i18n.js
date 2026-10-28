@@ -6,6 +6,8 @@ import { STRINGS } from "/strings.js";
 const AVAILABLE = Object.keys(STRINGS);
 const FALLBACK = "en"; // a phone in a language we don't have yet understands English more often
 const CHOICE_KEY = "campanile-lang";
+// Written right to left: their pages are mirrored.
+const RTL = ["ar", "fa", "he", "ur"];
 
 function detect() {
   try {
@@ -58,6 +60,7 @@ function switcher() {
 
 export function translatePage() {
   document.documentElement.lang = lang;
+  document.documentElement.dir = RTL.includes(lang) ? "rtl" : "ltr";
   switcher();
   const page = document.querySelector("title[data-i18n-title]");
   if (page) document.title = `${t(page.dataset.i18nTitle)} · Campanile`;

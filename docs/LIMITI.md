@@ -152,9 +152,8 @@ Più o meno in ordine di importanza:
 7. **Una password per persona**, così il registro dice chi ha fatto cosa.
 8. **Aggiornamenti firmati**, così il Campanile verifica una chiavetta da solo invece di fidarsene
    come di una chiave di casa.
-9. **Lingue da destra a sinistra** come l'arabo, che vogliono le pagine rovesciate.
-10. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
-    posizione che ti segue, che ha bisogno di HTTPS.
+9. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
+   posizione che ti segue, che ha bisogno di HTTPS.
 
 ## Aiutaci a chiuderli
 

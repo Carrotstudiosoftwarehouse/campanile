@@ -153,5 +153,15 @@ class TestStrings(unittest.TestCase):
         self.assertGreater(len([k for k in keys_in_scripts() if k.startswith("setup.error.")]), 7)
 
 
+class TestLayout(unittest.TestCase):
+    def test_the_style_follows_the_reading_direction(self):
+        # start and end, never left or right: so Arabic gets mirrored pages for free
+        css = (WEB / "style.css").read_text(encoding="utf-8")
+        one_sided = re.findall(
+            r"(?:margin|padding|border)-(?:left|right)|(?:text-align|float):\s*(?:left|right)", css
+        )
+        self.assertEqual(one_sided, [])
+
+
 if __name__ == "__main__":
     unittest.main()
