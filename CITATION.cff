@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Campanile, please cite it as below."
+title: "Campanile"
+abstract: "A neighborhood information and help point that keeps working when the internet is gone: official notices, a help board, an \"I'm safe\" registry, offline maps and offline medical articles, on a laptop or a Raspberry Pi, for any phone with no app."
+type: software
+authors:
+  - name: "CarrotStudio"
+repository-code: "https://github.com/Carrotstudiosoftwarehouse/campanile"
+license: MIT
+keywords:
+  - emergency
+  - offline
+  - disaster preparedness
+  - civil protection
+  - common alerting protocol
+  - raspberry pi
