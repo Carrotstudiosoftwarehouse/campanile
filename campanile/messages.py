@@ -126,6 +126,34 @@ MESSAGES = {
         "en": "Admin only works from the Campanile itself. See docs/ADMIN.md.",
     },
     "wrong_password": {"it": "Password errata.", "en": "Wrong password."},
+    "release_unsigned": {
+        "it": "Questa copia non ha la firma di CarrotStudio.",
+        "en": "This copy has no CarrotStudio signature.",
+    },
+    "release_unreadable": {
+        "it": "La firma di questa copia è illeggibile.",
+        "en": "This copy's signature can't be read.",
+    },
+    "release_unknown_key": {
+        "it": "Questa copia è firmata, ma non da CarrotStudio.",
+        "en": "This copy is signed, but not by CarrotStudio.",
+    },
+    "release_tampered": {
+        "it": "La firma non corrisponde: la copia è stata modificata.",
+        "en": "The signature doesn't match: the copy was changed.",
+    },
+    "release_files_differ": {
+        "it": "Alcuni file non sono quelli firmati: la copia è stata modificata o è incompleta.",
+        "en": "Some files aren't the signed ones: the copy was changed or is incomplete.",
+    },
+    "release_bad_version": {
+        "it": "Il numero di versione non è valido.",
+        "en": "The version number isn't valid.",
+    },
+    "release_not_newer": {
+        "it": "Questa versione non è più nuova di quella installata.",
+        "en": "This version isn't newer than the one installed.",
+    },
     "main_password_only": {
         "it": "Solo la password principale aggiunge o toglie le persone.",
         "en": "Only the main password adds or removes people.",

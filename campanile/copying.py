@@ -184,16 +184,20 @@ def _walk(top: Path):
                 yield path
 
 
+def program_files(root: Path) -> list[tuple[Path, str]]:
+    """The program's own files: what a copy carries and a release signature covers."""
+    return [
+        (path, path.relative_to(root).as_posix()) for name in PROGRAM for path in _walk(root / name)
+    ]
+
+
 def plan(root: Path, data: Path, tools: Path, keys: Path | None, tool_folders, installers):
     """[(source, path on the stick)], from fixed names only.
 
     tool_folders: {folder name: file names} of the programs to take from tools/;
     installers: file names to take from tools/python/.
     """
-    files: list[tuple[Path, str]] = []
-    for name in PROGRAM:
-        for path in _walk(root / name):
-            files.append((path, path.relative_to(root).as_posix()))
+    files = program_files(root)
     for folder, pattern in (("maps", MAP_NAME), ("zim", ZIM_NAME)):
         source = data / folder
         if source.is_dir() and not source.is_symlink():
@@ -253,7 +257,7 @@ def _target(root: Path, relative: str) -> Path:
     return target
 
 
-def _sha256(path: Path, cancelled=lambda: False) -> str:
+def file_sha256(path: Path, cancelled=lambda: False) -> str:
     digest = hashlib.sha256()
     with open(path, "rb") as f:
         while chunk := f.read(CHUNK):
@@ -448,8 +452,8 @@ def copy(
             target = _target(root, relative)
             size = source.stat().st_size
             if target.is_file() and target.stat().st_size == size:
-                digest = _sha256(source, cancelled)
-                if _sha256(target, cancelled) == digest:
+                digest = file_sha256(source, cancelled)
+                if file_sha256(target, cancelled) == digest:
                     listed[relative] = {"bytes": size, "sha256": digest}
                     done(size)
                     continue
@@ -513,7 +517,7 @@ def check(root: Path) -> list[str]:
                 or _is_link(path)
                 or not path.is_file()
                 or path.stat().st_size != info["bytes"]
-                or _sha256(path) != info["sha256"]
+                or file_sha256(path) != info["sha256"]
             ):
                 wrong.append(relative)
         except (OSError, KeyError, TypeError):

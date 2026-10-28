@@ -26,6 +26,11 @@ jobs:
           pip install cryptography
           python -m unittest discover -s tests
       - run: scripts/build-package.sh
+      - name: Signed by CarrotStudio (an unsigned or changed package is never published)
+        run: |
+          unpacked="$(mktemp -d)"
+          unzip -q dist/*.zip -d "$unpacked"
+          python campanile/release.py "$unpacked"/campanile-*
       - name: SHA-256 of what is published
         run: cd dist && sha256sum -- *.zip > SHA256SUMS && cat SHA256SUMS
       - name: Provenance (which commit and which workflow built the package)

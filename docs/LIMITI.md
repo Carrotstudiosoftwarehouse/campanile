@@ -150,7 +150,9 @@ Più o meno in ordine di importanza:
 6. **Un fuzzer guidato dalla copertura** (AFL, Atheris) sul lettore delle mappe e sul costruttore
    delle strade, e un audit di sicurezza esterno.
 7. **Aggiornamenti firmati**, così il Campanile verifica una chiavetta da solo invece di fidarsene
-   come di una chiave di casa.
+   come di una chiave di casa. La firma è pronta, e GitHub pubblicherà solo versioni firmate.
+   Mancano ancora le chiavi vere, e un Campanile installato che controlli la chiavetta prima di
+   aggiornarsi.
 8. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
    posizione che ti segue, che ha bisogno di HTTPS.
 

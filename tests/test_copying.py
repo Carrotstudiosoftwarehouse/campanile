@@ -423,7 +423,7 @@ class TestCheck(CopyCase):
         manifest = json.loads((root / copying.MANIFEST).read_text())
         manifest["files"]["../outside.txt"] = {"bytes": 8, "sha256": "0" * 64}
         (root / copying.MANIFEST).write_text(json.dumps(manifest))
-        with mock.patch.object(copying, "_sha256", wraps=copying._sha256) as hashed:
+        with mock.patch.object(copying, "file_sha256", wraps=copying.file_sha256) as hashed:
             self.assertEqual(copying.check(root), ["../outside.txt"])
         self.assertNotIn(root / "../outside.txt", [c.args[0] for c in hashed.call_args_list])
 

@@ -130,7 +130,8 @@ Roughly in order of importance:
 6. **A coverage-guided fuzzer** (AFL, Atheris) on the map reader and street builder, and an
    external security audit.
 7. **Signed updates**, so a Campanile can check a USB stick itself instead of trusting it like a
-   house key.
+   house key. Signing is ready, and GitHub will publish only signed versions. Still missing: the
+   keys themselves, and an installed Campanile that checks a stick before updating itself.
 8. **The navigator**: turn bans, missing from our map files, and a live position, which needs
    HTTPS.
 

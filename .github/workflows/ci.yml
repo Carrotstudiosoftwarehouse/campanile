@@ -52,8 +52,8 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install ruff==0.17.1
-      - run: ruff check campanile tests scripts/sign-notice.py
-      - run: ruff format --check campanile tests scripts/sign-notice.py
+      - run: ruff check campanile tests scripts/sign-notice.py scripts/sign-release.py
+      - run: ruff format --check campanile tests scripts/sign-notice.py scripts/sign-release.py
       - name: Shellcheck
         run: shellcheck -S warning scripts/*.sh raspberry/*.sh "Avvia Campanile (Mac).command"
       - name: JavaScript syntax

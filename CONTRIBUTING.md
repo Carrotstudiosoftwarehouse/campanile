@@ -85,10 +85,15 @@ tests/            tests: run on Linux, Windows and macOS at every change
 - **Development server:** `python3 campanile/server.py` (this computer only) or
   `python3 campanile/server.py --host 0.0.0.0` (whole network). `--help` lists the options.
 - **Tests:** `python3 -m unittest discover -s tests -v`
-- **Lint:** `ruff check campanile tests scripts/sign-notice.py && ruff format --check campanile tests scripts/sign-notice.py`
+- **Lint:** `ruff check campanile tests scripts/*.py && ruff format --check campanile tests scripts/*.py`
 - **Release package:** `scripts/build-package.sh`. A `v*` tag publishes it to Releases with
   its `SHA256SUMS` and a signed build provenance. `gh attestation verify campanile-0.1.0.zip
   -R Carrotstudiosoftwarehouse/campanile` shows which commit and which workflow built it.
+- **Release signature (maintainers):** CarrotStudio signs every version offline, with a key that
+  never touches a network. Build the package, then `scripts/sign-release.py sign --key ...
+  dist/campanile-VERSION.zip` writes `campanile/release-signature.json`: commit it and tag. The
+  release workflow publishes only a package whose files match that signature
+  (`python3 campanile/release.py FOLDER` checks one by hand).
 - **Online demo:** `scripts/build-demo.sh data/maps/area.pmtiles` builds a static site in
   `dist/demo/`. A service worker plays the server inside each visitor's browser, with invented
   data, nothing shared between visitors and nothing to moderate. Serve it from a domain root.
