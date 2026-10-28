@@ -130,10 +130,6 @@ MESSAGES = {
         "it": "Su questa chiavetta non c'è un Campanile da cui aggiornarsi.",
         "en": "There is no Campanile on this stick to update from.",
     },
-    "update_folder_exists": {
-        "it": "Accanto a questo Campanile c'è già una cartella con il nome della versione nuova.",
-        "en": "Next to this Campanile there is already a folder named after the new version.",
-    },
     "release_unsigned": {
         "it": "Questa copia non ha la firma di CarrotStudio.",
         "en": "This copy has no CarrotStudio signature.",

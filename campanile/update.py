@@ -30,7 +30,8 @@ import messages
 import release
 
 STAGING = ".campanile-update"  # inside this Campanile's folder
-MOVED = ".campanile-moved"  # left in the old folder: the name of the one that replaced it
+MOVED = ".campanile-moved"  # in the old folder, written first: the update's point of no return
+FROM = ".campanile-from"  # in the new folder until it holds everything: the old folder's name
 CARRIED = ("data", "tools")  # what the new version takes over
 INSTALL_OPTIONS = Path("/etc/campanile/install-options")  # saved by raspberry/install.sh
 PLACE = Path("/opt")  # Raspberry: the update is checked here, owned by root, before installing
@@ -82,43 +83,79 @@ def _declared_version(source: Path) -> str | None:
     return version
 
 
-def apply_pending(root: Path, installed: str) -> Path | None:
-    """At start, before anything runs: a prepared update becomes its own folder, and takes
-    over data and tools. Returns that folder, or None if nothing was prepared."""
+def resume(root: Path, installed: str) -> Path | None:
+    """At start, in the old folder, before anything runs: applies a prepared update, or finishes
+    one that a power cut stopped. Returns the folder to start instead of this one, or None.
+
+    Like a database journal: the note in the old folder is written first, then everything only
+    moves forward, so a Campanile never starts empty while its data sits elsewhere."""
     staged = root / STAGING / copying.FOLDER
-    if not staged.is_dir():
-        return None
-    version = release.check(staged, newer_than=installed)  # again: it sat on the disk meanwhile
-    target = root.parent / f"Campanile {version}"
-    if target.exists():
-        raise UpdateError("update_folder_exists")
-    staged.rename(target)
-    moved = []
-    try:
-        for name in CARRIED:
-            if (root / name).exists():
-                (root / name).rename(target / name)
-                moved.append(name)
-        (root / MOVED).write_text(target.name + "\n", encoding="utf-8")
-    except OSError:
-        for name in reversed(moved):  # put everything back as it was
-            (target / name).rename(root / name)
-        target.rename(staged)
-        raise
-    shutil.rmtree(root / STAGING, ignore_errors=True)
+    name = _note(root, MOVED)
+    checked = False
+    if name is None:
+        if not staged.is_dir():
+            return None
+        version = release.check(staged, newer_than=installed)  # again: it sat on the disk
+        name, checked = f"Campanile {version}", True
+        if (root.parent / name).exists():
+            raise UpdateError("update_folder_exists", name)
+        _write_note(staged, FROM, root.name)
+        _write_note(root, MOVED, name)  # the point of no return
+    target = root.parent / name
+    if not target.exists() and staged.is_dir():
+        if not checked:  # stopped right after the point of no return: once more
+            try:
+                release.check(staged, newer_than=installed)
+            except release.ReleaseError:
+                (root / MOVED).unlink()  # nothing has moved yet: as if never started
+                raise
+        staged.rename(target)
+    if not (target / "campanile" / "launch.py").is_file():
+        raise UpdateError("update_folder_missing", name)  # the data may be there
+    _move_into(root, target)
     return target
 
 
-def successor(root: Path) -> Path | None:
-    """The folder that replaced this Campanile, if it was updated."""
+def adopt(root: Path) -> None:
+    """At start, in the new folder: opened before the old one, it finishes the move itself."""
+    old_name = _note(root, FROM)
+    if old_name is None:
+        return
+    old = root.parent / old_name
+    if _note(old, MOVED) != root.name:
+        raise UpdateError("update_unfinished", old_name)
+    _move_into(old, root)
+
+
+def _move_into(old: Path, new: Path) -> None:
+    """Data and tools into the new folder. Run again after a power cut, it finishes the job."""
+    for name in CARRIED:
+        if (old / name).exists():
+            if (new / name).exists():
+                raise UpdateError("update_data_twice", old.name, new.name)  # never merged
+            (old / name).rename(new / name)
+    with contextlib.suppress(FileNotFoundError):
+        (new / FROM).unlink()
+    shutil.rmtree(old / STAGING, ignore_errors=True)
+
+
+def _note(folder: Path, note: str) -> str | None:
+    """The folder name in a note, only if it is a folder right next to this one."""
     try:
-        name = (root / MOVED).read_text(encoding="utf-8").strip()
+        name = (folder / note).read_text(encoding="utf-8").strip()
     except (OSError, UnicodeDecodeError):
         return None
-    folder = root.parent / name
-    if Path(name).name != name or name in ("", ".", ".."):
-        return None  # only a folder right next to this one
-    return folder if (folder / "campanile" / "launch.py").is_file() else None
+    return name if name not in ("", ".", "..") and Path(name).name == name else None
+
+
+def _write_note(folder: Path, note: str, name: str) -> None:
+    """Whole or not at all, even if the power goes in the middle."""
+    part = folder / f"{note}.part"
+    with open(part, "w", encoding="utf-8") as f:
+        f.write(name + "\n")
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(part, folder / note)
 
 
 def main(argv=None) -> int:

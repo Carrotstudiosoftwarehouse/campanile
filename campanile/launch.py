@@ -70,19 +70,38 @@ def watch_firewall() -> None:
         print()
 
 
-def updated(root) -> Path | None:
-    """The newer Campanile to start instead of this one: updated before, or right now."""
-    newer = update.successor(root)
-    if newer is not None:
-        return newer
+# Why nothing starts: this Campanile would start empty while its data sits elsewhere.
+STOPPED = {
+    "update_folder_missing": "Questo Campanile e' stato aggiornato: mappe, Wikipedia e annunci\n"
+    "  sono nella cartella \"{0}\", che qui accanto non c'e' piu'. Rimettila accanto e riapri.",
+    "update_unfinished": "Questo e' un aggiornamento non finito: apri il Campanile dalla cartella\n"
+    '  "{0}", che lo finisce da sola.',
+    "update_data_twice": 'Ci sono dati sia in "{0}" sia in "{1}": per non perdere niente il\n'
+    "  Campanile non parte. Tieni la cartella giusta e sposta altrove l'altra.",
+}
+
+
+def updated(root: Path) -> Path | None:
+    """Finishes any update before anything runs. Returns the newer folder to start instead, or
+    None; raises UpdateError or OSError when nothing may start."""
+    update.adopt(root)
     try:
-        return update.apply_pending(root, server.VERSION)
+        return update.resume(root, server.VERSION)
     except release.ReleaseError:
         shutil.rmtree(root / update.STAGING, ignore_errors=True)
         print("  ATTENZIONE: l'aggiornamento preparato non e' piu' quello firmato da CarrotStudio:")
-        print("  e' stato scartato. Resta la versione di prima.")
-    except (OSError, update.UpdateError) as e:
-        print(f"  L'aggiornamento non e' riuscito, resta la versione di prima. ({e})")
+        print("  e' stato scartato. Parte la versione di prima.")
+    except update.UpdateError as e:
+        if e.args[0] != "update_folder_exists":
+            raise
+        print(
+            f"  L'aggiornamento e' pronto, ma qui accanto c'e' gia' una cartella \"{e.args[1]}\":"
+        )
+        print("  spostala altrove e riapri il Campanile. Intanto parte la versione di prima.")
+    except OSError:
+        if (root / update.MOVED).exists():
+            raise  # past the point of no return: only forward, at the next start
+        print("  L'aggiornamento non e' riuscito: parte la versione di prima.")
     print()
     return None
 
@@ -90,7 +109,15 @@ def updated(root) -> Path | None:
 def main() -> int:
     # Flush every line, even when the output goes to a file: "fixed" must never sit in a buffer.
     sys.stdout.reconfigure(line_buffering=True)
-    newer = updated(server.HERE.parent)
+    try:
+        newer = updated(server.HERE.parent)
+    except update.UpdateError as e:
+        print("\n  " + STOPPED[e.args[0]].format(*e.args[1:]) + "\n")
+        return 1
+    except OSError:
+        print("\n  L'aggiornamento non e' finito (un file in uso?). Chiudi le altre finestre e")
+        print("  riapri il Campanile: riparte da dove si era fermato. Niente e' perso.\n")
+        return 1
     if newer is not None:
         print(f'  Campanile aggiornato: parte dalla cartella "{newer.name}".')
         try:  # the same window, the same Python: only the folder changes

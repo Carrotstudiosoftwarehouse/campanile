@@ -7,6 +7,9 @@ import contextlib
 import importlib.util
 import io
 import json
+import os
+import re
+import shutil
 import sys
 import tempfile
 import unittest
@@ -107,71 +110,185 @@ class TestStage(UpdateTestCase):
         self.assertEqual(e.exception.args[0], "release_not_newer")
 
 
+class PowerCut(BaseException):
+    """The power goes: nothing of ours may catch it."""
+
+
 class TestApply(UpdateTestCase):
-    def test_data_and_tools_move_into_the_new_folder_and_the_old_one_hands_over(self):
-        self.stage()
-        new = update.apply_pending(self.installed, "0.1.0")
-        self.assertEqual(new, self.tmp / "Campanile 0.2.0")
+    def new(self) -> Path:
+        return self.tmp / "Campanile 0.2.0"
+
+    def assert_finished(self):
+        new = self.new()
         self.assertEqual((new / "data" / "campanile.db").read_text(encoding="utf-8"), "posts")
         self.assertTrue((new / "tools" / "k" / "kiwix-serve").is_file())
         self.assertFalse((self.installed / "data").exists())
+        self.assertFalse((self.installed / "tools").exists())
         self.assertFalse((self.installed / update.STAGING).exists())
-        self.assertEqual(update.successor(self.installed), new)
+        self.assertFalse((new / update.FROM).exists())
         self.assertEqual(release.check(new), "0.2.0")
-        self.assertIsNone(update.apply_pending(self.installed, "0.1.0"))  # nothing left to do
+
+    def test_data_and_tools_move_into_the_new_folder(self):
+        self.stage()
+        self.assertEqual(update.resume(self.installed, "0.1.0"), self.new())
+        self.assert_finished()
+        self.assertEqual(update.resume(self.installed, "0.1.0"), self.new())  # hands over again
+
+    def test_a_power_cut_at_any_step_is_finished_at_the_next_start(self):
+        steps = [("replace", update.FROM), ("replace", update.MOVED), ("rename", "Campanile 0.2.0")]
+        steps += [("rename", name) for name in update.CARRIED]
+        for kind, at in steps:
+            with self.subTest(power_cut_at=at):
+                self.setUp()
+                self.stage()
+                real = getattr(os if kind == "replace" else Path, kind)
+
+                def cut(source, target, real=real, at=at):
+                    if Path(target).name == at:
+                        raise PowerCut()
+                    return real(source, target)
+
+                power = mock.patch.object(os if kind == "replace" else Path, kind, cut)
+                with power, self.assertRaises(PowerCut):
+                    update.resume(self.installed, "0.1.0")
+                self.assertEqual(update.resume(self.installed, "0.1.0"), self.new())
+                self.assert_finished()
+
+    def test_the_new_folder_opened_first_finishes_the_move_itself(self):
+        self.stage()
+        rename = Path.rename
+
+        def cut(source, target):
+            if Path(target).name == "data":
+                raise PowerCut()
+            return rename(source, target)
+
+        with mock.patch.object(Path, "rename", cut), self.assertRaises(PowerCut):
+            update.resume(self.installed, "0.1.0")
+        update.adopt(self.new())
+        self.assert_finished()
+
+    def test_a_folder_that_was_never_committed_takes_nothing(self):
+        self.stage()
+        orphan = self.tmp / "Campanile 9.9.9"
+        program(orphan, "9.9.9")
+        (orphan / update.FROM).write_text(self.installed.name, encoding="utf-8")
+        with self.assertRaises(update.UpdateError) as e:
+            update.adopt(orphan)
+        self.assertEqual(e.exception.args, ("update_unfinished", self.installed.name))
+        self.assertTrue((self.installed / "data" / "campanile.db").is_file())
+
+    def test_never_starts_empty_when_the_new_folder_is_gone(self):
+        self.stage()
+        update.resume(self.installed, "0.1.0")
+        shutil.rmtree(self.new())
+        with self.assertRaises(update.UpdateError) as e:
+            update.resume(self.installed, "0.1.0")
+        self.assertEqual(e.exception.args, ("update_folder_missing", "Campanile 0.2.0"))
+
+    def test_data_in_both_folders_is_never_merged(self):
+        self.stage()
+        update.resume(self.installed, "0.1.0")
+        write(self.installed, {"data/campanile.db": "other posts"})
+        with self.assertRaises(update.UpdateError) as e:
+            update.resume(self.installed, "0.1.0")
+        self.assertEqual(e.exception.args[0], "update_data_twice")
+        self.assertEqual((self.new() / "data" / "campanile.db").read_text("utf-8"), "posts")
 
     def test_the_stick_changing_after_the_check_changes_nothing(self):
         self.stage()
         (self.stick / "Campanile" / "README.md").write_text("swapped later", encoding="utf-8")
-        new = update.apply_pending(self.installed, "0.1.0")
+        new = update.resume(self.installed, "0.1.0")
         self.assertEqual((new / "README.md").read_text(encoding="utf-8"), "Campanile")
 
     def test_a_prepared_copy_changed_before_the_start_is_refused(self):
         folder, _ = self.stage()
         (folder / "campanile" / "launch.py").write_text("steal()", encoding="utf-8")
         with self.assertRaises(release.ReleaseError):
-            update.apply_pending(self.installed, "0.1.0")
+            update.resume(self.installed, "0.1.0")
         self.assertTrue((self.installed / "data" / "campanile.db").is_file())
 
-    def test_a_failure_halfway_puts_everything_back(self):
-        self.stage()
-        rename = Path.rename
+    def test_changed_after_the_point_of_no_return_is_undone_before_anything_moves(self):
+        folder, _ = self.stage()
+        replace = os.replace
 
-        def unplugged(path, target):
-            if Path(target).name == "tools":
-                raise OSError("the disk went away")
-            return rename(path, target)
+        def cut(source, target):
+            replace(source, target)
+            if Path(target).name == update.MOVED:
+                raise PowerCut()
 
-        with mock.patch.object(Path, "rename", unplugged), self.assertRaises(OSError):
-            update.apply_pending(self.installed, "0.1.0")
+        with mock.patch.object(os, "replace", cut), self.assertRaises(PowerCut):
+            update.resume(self.installed, "0.1.0")
+        (folder / "campanile" / "launch.py").write_text("steal()", encoding="utf-8")
+        with self.assertRaises(release.ReleaseError):
+            update.resume(self.installed, "0.1.0")
+        self.assertFalse((self.installed / update.MOVED).exists())
         self.assertTrue((self.installed / "data" / "campanile.db").is_file())
-        self.assertTrue((self.installed / "tools").is_dir())
-        self.assertTrue((self.installed / update.STAGING / copying.FOLDER).is_dir())
-        self.assertFalse((self.tmp / "Campanile 0.2.0").exists())
-        self.assertIsNone(update.successor(self.installed))
 
     def test_the_note_names_only_a_folder_next_door(self):
-        for name in ("", "..", "../elsewhere", "/etc", "Missing"):
+        for name in ("", "..", "../elsewhere", "/etc"):
             (self.installed / update.MOVED).write_text(name, encoding="utf-8")
-            self.assertIsNone(update.successor(self.installed), name)
+            self.assertIsNone(update.resume(self.installed, "0.1.0"), name)
 
 
 class TestLaptopStart(UpdateTestCase):
-    def test_at_start_the_update_is_applied_and_handed_over(self):
-        self.stage()
-        out = io.StringIO()
-        with contextlib.redirect_stdout(out):
-            self.assertEqual(launch.updated(self.installed), self.tmp / "Campanile 0.2.0")
-        console = io.TextIOWrapper(io.BytesIO(), encoding="utf-8")  # main() sets line buffering
+    def start(self):
+        """launch.main() in the old folder, up to the hand-over or the refusal."""
+        out = io.BytesIO()
+        console = io.TextIOWrapper(out, encoding="utf-8")  # main() sets line buffering
         with contextlib.ExitStack() as stack:
             stack.enter_context(
                 mock.patch.object(launch.server, "HERE", self.installed / "campanile")
             )
             call = stack.enter_context(mock.patch.object(launch.subprocess, "call", return_value=0))
+            server = stack.enter_context(mock.patch.object(launch.server, "main"))
             stack.enter_context(contextlib.redirect_stdout(console))
-            self.assertEqual(launch.main(), 0)
+            code = launch.main()
+            console.flush()
+        return code, call, server, out.getvalue().decode()
+
+    def test_at_start_the_update_is_applied_and_handed_over(self):
+        self.stage()
+        code, call, server, _ = self.start()
         new_launcher = self.tmp / "Campanile 0.2.0" / "campanile" / "launch.py"
+        self.assertEqual(code, 0)
         call.assert_called_once_with([sys.executable, str(new_launcher)])
+        server.assert_not_called()
+
+    def test_a_locked_file_stops_everything_and_the_next_start_finishes(self):
+        self.stage()
+        rename = Path.rename
+
+        def locked(source, target):
+            if Path(target).name == "tools":
+                raise PermissionError("in use")
+            return rename(source, target)
+
+        with mock.patch.object(Path, "rename", locked):
+            code, call, server, said = self.start()
+        self.assertEqual(code, 1)
+        self.assertIn("Niente e' perso", said)
+        call.assert_not_called()
+        server.assert_not_called()  # nothing started, so nothing started empty
+        self.assertFalse((self.installed / "data").exists())
+        code, call, _, _ = self.start()
+        self.assertEqual(code, 0)
+        self.assertTrue((self.tmp / "Campanile 0.2.0" / "tools" / "k" / "kiwix-serve").is_file())
+
+    def test_the_new_folder_gone_stops_and_says_where_the_data_is(self):
+        self.stage()
+        self.start()
+        shutil.rmtree(self.tmp / "Campanile 0.2.0")
+        code, _, server, said = self.start()
+        self.assertEqual(code, 1)
+        self.assertIn('"Campanile 0.2.0"', said)
+        server.assert_not_called()
+        self.assertFalse((self.installed / "data").exists())  # no empty database here
+
+    def test_every_refusal_has_its_words(self):
+        source = Path(update.__file__).read_text(encoding="utf-8")
+        raised = set(re.findall(r'UpdateError\(\s*"(\w+)"', source))
+        self.assertEqual(raised - {"update_folder_exists"}, set(launch.STOPPED))
 
     def test_a_tampered_prepared_copy_is_thrown_away_and_the_old_version_starts(self):
         folder, _ = self.stage()
