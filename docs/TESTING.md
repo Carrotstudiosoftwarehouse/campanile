@@ -9,9 +9,9 @@ from reading the code. *(review)* marks findings from our own adversarial review
 
 ### Automated tests and CI
 
-- **335 automated tests** pass on macOS (Python 3.14), Linux (Python 3.9, no network) and Windows 11 ARM64, and in CI on every change (Linux with Python 3.9, 3.11, 3.13, Windows, macOS). Server (board, sto bene (I'm safe), notices, CAP, PFIF, codes, limits, Range, path traversal, captive portal, connection cap, local-only admin, full disk, network errors, smuggled requests, internet names), search and hostile maps, navigator, USB copy and prepared sticks, sharing, launchers, signed notices, nginx, setup, languages, Windows firewall.
+- **399 automated tests** pass on macOS (Python 3.14) and Linux (Python 3.9 and 3.13), run on the unzipped 0.1.0 package, and in CI on every change (Linux with Python 3.9, 3.11, 3.13, Windows, macOS). Server (board, sto bene (I'm safe), notices, CAP, PFIF, codes, limits, Range, path traversal, captive portal, connection cap, local-only admin, full disk, network errors, smuggled requests, internet names), search and hostile maps, navigator, USB copy and prepared sticks, sharing, launchers, signed notices, signed versions, updating from a stick, one password per person, nginx, setup, languages, Windows firewall.
 - **They catch broken defenses**: 3 planted faults (no path containment, Range ignored, any code accepted) make them fail.
-- **Windows 11 ARM64** (Python 3.13): 291 green before the navigator review fixes, 48 skipped (Mac and Linux only). CI runs all 335 on GitHub's Windows runner, firewall attack and planted `py.bat` included.
+- **Windows 11 ARM64** (Python 3.13): 291 green before the navigator review fixes, 48 skipped (Mac and Linux only). CI runs all of them on GitHub's Windows runner, firewall attack and planted `py.bat` included.
 - **shellcheck** (7 scripts, Debian Trixie) and **ruff**: clean.
 - **Bandit, Semgrep** (48 files) and a DOM sink search (`innerHTML`, `eval`...): nothing. Bandit's hits are intentional (processes started with an argument list, listening on all interfaces on the laptop). Both tools first caught bugs planted in a decoy file.
 

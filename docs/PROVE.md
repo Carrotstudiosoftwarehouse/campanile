@@ -10,9 +10,9 @@ revisioni da attaccante.
 
 ### Test automatici e CI
 
-- **335 test automatici** superati su macOS (Python 3.14), Linux (Python 3.9, senza rete) e Windows 11 ARM64, e sulla CI a ogni modifica (Linux con Python 3.9, 3.11, 3.13, Windows, macOS). Server (bacheca, sto bene, avvisi, CAP, PFIF, codici, limiti, Range, attraversamento di percorso, captive portal, tetto alle connessioni, gestione solo locale, disco pieno, errori di rete, richieste nascoste, nomi di internet), ricerca e mappe ostili, navigatore, copia su chiavetta e chiavette preparate, condivisione, file di avvio, avvisi firmati, nginx, preparazione, lingue, firewall di Windows.
+- **399 test automatici** superati su macOS (Python 3.14) e Linux (Python 3.9 e 3.13), eseguiti sul pacchetto 0.1.0 scompattato, e sulla CI a ogni modifica (Linux con Python 3.9, 3.11, 3.13, Windows, macOS). Server (bacheca, sto bene, avvisi, CAP, PFIF, codici, limiti, Range, attraversamento di percorso, captive portal, tetto alle connessioni, gestione solo locale, disco pieno, errori di rete, richieste nascoste, nomi di internet), ricerca e mappe ostili, navigatore, copia su chiavetta e chiavette preparate, condivisione, file di avvio, avvisi firmati, versioni firmate, aggiornamento da chiavetta, una password per persona, nginx, preparazione, lingue, firewall di Windows.
 - **I test individuano le difese rotte**: 3 guasti introdotti apposta (contenimento dei percorsi tolto, Range ignorato, qualunque codice accettato) li fanno fallire.
-- **Windows 11 ARM64** (Python 3.13): 291 verdi prima delle correzioni della revisione del navigatore, 48 saltati (solo per Mac e Linux). La CI fa girare tutti i 335 sul Windows di GitHub, compresi l'attacco al firewall e il `py.bat` infilato.
+- **Windows 11 ARM64** (Python 3.13): 291 verdi prima delle correzioni della revisione del navigatore, 48 saltati (solo per Mac e Linux). La CI li fa girare tutti sul Windows di GitHub, compresi l'attacco al firewall e il `py.bat` infilato.
 - **shellcheck** (7 script, Debian Trixie) e **ruff**: puliti.
 - **Bandit, Semgrep** (48 file) e una ricerca dei punti pericolosi del DOM (`innerHTML`, `eval`...): niente. Quanto segnala Bandit è voluto (programmi avviati con lista di argomenti, ascolto su tutte le interfacce sul portatile). Entrambi gli strumenti hanno prima trovato gli errori piantati in un file civetta.
 
