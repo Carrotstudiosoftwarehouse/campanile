@@ -87,6 +87,28 @@ genitori. Se per usare il Campanile serve un ingegnere, non abbiamo finito.
 
 Come un estintore: lo prepari con calma e speri di non usarlo mai.
 
+## Progetti amici
+
+Piccoli progetti con la stessa idea: aiutare le persone quando internet non c'è. Ognuno è dei suoi
+autori; li colleghiamo perché insieme arrivano più lontano. Hai costruito qualcosa di simile?
+Scrivicelo, e lo aggiungiamo qui.
+
+- **[OFFGRID](https://github.com/lyle-leif/OFFGRID)**: una mappa offline e un assistente IA che
+  gira su un portatile, per Batangas, nelle Filippine.
+- **[Prometheus Station](https://github.com/Guillain-RDCDE/Prometheus-Station)**: una scatola a
+  batteria che serve tutta Wikipedia senza internet e senza rete.
+- **[ConnectBox](https://github.com/ConnectBox/connectbox-pi)**: un Raspberry Pi che condivide
+  contenuti offline. Il loro [portale offline](https://github.com/ConnectBox/simple-offline-captive-portal)
+  ci ha insegnato come si comportano i telefoni Android su una Wi-Fi senza internet.
+- **[PirateBox](https://github.com/teklynk/piratebox)**: un Raspberry Pi che diventa un punto Wi-Fi
+  offline e anonimo per scambiarsi file, tornato a nuova vita.
+- **[MeshBoard](https://github.com/VeggieVampire/MeshBoard)**: una bacheca che viaggia sulle radio
+  Meshtastic.
+- **[Algeria Fire Map](https://github.com/MoussaabBadla/algeria-fire-map)**: gli incendi in Algeria
+  visti dal satellite, in tempo reale.
+- **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: una mappa offline dei punti di
+  aiuto durante le emergenze in Cile.
+
 ## Come è fatto
 
 Fatto da CarrotStudio, con l'aiuto di un assistente IA per il codice. Ogni modifica è provata, e
