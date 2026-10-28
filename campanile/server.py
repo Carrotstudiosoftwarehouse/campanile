@@ -691,7 +691,7 @@ class Handler(BaseHTTPRequestHandler):
             ensure_ascii=False,
         )
         notice_id = self.cfg.store.add_signed_notice(notice, signer, sig_hash, document)
-        self.cfg.store.log("signed_notice", f"{signer}: {notice['title']}")
+        self._log("signed_notice", f"{signer}: {notice['title']}")
         return self._json(201, {"id": notice_id, "signer": signer})
 
     def _publish_cap(self, document):
@@ -709,7 +709,7 @@ class Handler(BaseHTTPRequestHandler):
             source=clean_text(alert["source"], "source", 120),
         )
         notice_id = self.cfg.store.add_cap_notice(alert)
-        self.cfg.store.log("cap_notice", f"{alert['source']}: {alert['title']}")
+        self._log("cap_notice", f"{alert['source']}: {alert['title']}")
         return self._json(
             201, {"id": notice_id, "title": alert["title"], "source": alert["source"]}
         )
@@ -732,17 +732,18 @@ class Handler(BaseHTTPRequestHandler):
         key = "admin:" + self._ip
         if cfg.wrong_code_limit.blocked(key):
             raise RequestError(429, "too_many_wrong")
-        password = data.get("password")
-        if not isinstance(password, str) or not hmac.compare_digest(
-            # surrogatepass: a lone surrogate must be a wrong password, not a crash
-            password.encode("utf-8", "surrogatepass"),
-            cfg.admin_password.encode(),
-        ):
+        who = self._admin_name(data.get("password"))
+        if who is None:
             cfg.wrong_code_limit.record(key)
             raise RequestError(403, "wrong_password")
+        self._who = who
 
         if path.startswith("/api/setup/"):
             return self._setup(path, data)
+        if path == "/api/admin/me":
+            return self._json(200, {"name": who})
+        if path.startswith("/api/admin/people"):
+            return self._people(path, data)
         if path == "/api/admin/roads/close":
             lon, lat = _coordinate(data.get("lon"), 180), _coordinate(data.get("lat"), 90)
             note = clean_text(data.get("note"), "note", 120, required=False)
@@ -751,7 +752,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise RequestError(404, "no_street_here")
             road = cfg.store.add_closed_road(lon, lat, street["name"], note)
             cfg.routes.reload_closed(cfg.store)
-            cfg.store.log("road_closed", street["name"])
+            self._log("road_closed", street["name"])
             reply = {"id": road, **{k: street[k] for k in ("name", "lines", "open")}}
             return self._json(201, reply)
         if path == "/api/admin/roads/open":
@@ -759,15 +760,15 @@ class Handler(BaseHTTPRequestHandler):
             if not cfg.store.open_road(road):
                 raise RequestError(404, "item_not_found")
             cfg.routes.reload_closed(cfg.store)
-            cfg.store.log("road_opened", f"#{road}")
+            self._log("road_opened", f"#{road}")
             return self._json(200, {"ok": True})
         if path == "/api/admin/share/start":
             cfg.share.start()
-            cfg.store.log("share_started")
+            self._log("share_started")
             return self._json(200, cfg.share.state())
         if path == "/api/admin/share/stop":
             cfg.share.stop()
-            cfg.store.log("share_stopped")
+            self._log("share_stopped")
             return self._json(200, cfg.share.state())
         if path == "/api/admin/log":
             days = {k: v // 86400 for k, v in cfg.store.keep.items()}
@@ -779,7 +780,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise RequestError(400, "bad_time")
             before = cfg.store.now()
             now = cfg.store.set_clock(real)
-            cfg.store.log("clock_set", f"{now - before:+d}")  # seconds: the page says them
+            self._log("clock_set", f"{now - before:+d}")  # seconds: the page says them
             return self._json(200, {"now": now})
         if path == "/api/admin/share/state":
             return self._json(200, cfg.share.state())
@@ -800,7 +801,7 @@ class Handler(BaseHTTPRequestHandler):
             title = clean_text(data.get("title"), "title", 120)
             text = clean_text(data.get("text"), "text", 1000, multiline=True)
             notice_id = cfg.store.add_notice(title, text, data.get("urgent") is True)
-            cfg.store.log("notice", title)
+            self._log("notice", title)
             return self._json(201, {"id": notice_id})
         if path == "/api/admin/cap":
             return self._publish_cap(data.get("cap"))
@@ -808,13 +809,13 @@ class Handler(BaseHTTPRequestHandler):
             people = cfg.store.all_safe()
             domain = f"campanile-{cfg.store.instance()}.invalid"  # .invalid: never a real site
             document = pfif.export(people, domain, cfg.store.now(), cfg.store.keep["safe"])
-            cfg.store.log("pfif_export", str(len(people)))
+            self._log("pfif_export", str(len(people)))
             return self._json(200, {"pfif": document.decode(), "count": len(people)})
         if path == "/api/admin/approve":
             post = parse_id(data.get("id"))
             if not cfg.store.approve_post(post):
                 raise RequestError(404, "pending_not_found")
-            cfg.store.log("approved", f"#{post}")
+            self._log("approved", f"#{post}")
             return self._json(200, {"ok": True})
         if path in ("/api/admin/close-device", "/api/admin/remove-device-safe"):
             device = data.get("device")
@@ -822,10 +823,10 @@ class Handler(BaseHTTPRequestHandler):
                 raise RequestError(400, "bad_device")
             if path == "/api/admin/close-device":
                 closed = cfg.store.close_device_posts(device)
-                cfg.store.log("device_closed", f"{device}: {closed}")
+                self._log("device_closed", f"{device}: {closed}")
                 return self._json(200, {"closed": closed})
             removed = cfg.store.remove_device_safe(device)
-            cfg.store.log("device_safe_removed", f"{device}: {removed}")
+            self._log("device_safe_removed", f"{device}: {removed}")
             return self._json(200, {"removed": removed})
         if path == "/api/admin/close-recent":
             minutes = data.get("minutes")
@@ -836,15 +837,49 @@ class Handler(BaseHTTPRequestHandler):
             ):
                 raise RequestError(400, "bad_minutes")
             closed = cfg.store.close_recent_posts(minutes)
-            cfg.store.log("recent_closed", f"{minutes} min: {closed}")
+            self._log("recent_closed", f"{minutes} min: {closed}")
             return self._json(200, {"closed": closed})
         if path == "/api/admin/delete":
             table, item = data.get("table"), parse_id(data.get("id"))
             if not cfg.store.delete(table, item):
                 raise RequestError(404, "item_not_found")
-            cfg.store.log("deleted", f"{table} #{item}")
+            self._log("deleted", f"{table} #{item}")
             return self._json(200, {"ok": True})
         raise RequestError(404, "unknown_api")
+
+    def _admin_name(self, password) -> str | None:
+        """'' for the main password, a person's name for theirs, None for anything else."""
+        if not isinstance(password, str):
+            return None
+        # surrogatepass: a lone surrogate must be a wrong password, not a crash
+        if hmac.compare_digest(
+            password.encode("utf-8", "surrogatepass"), self.cfg.admin_password.encode()
+        ):
+            return ""
+        return self.cfg.store.admin_by_password(password)
+
+    def _people(self, path: str, data: dict):
+        """Only the main password adds or removes the people who run the Campanile."""
+        if self._who:
+            raise RequestError(403, "main_password_only")
+        db = self.cfg.store
+        if path == "/api/admin/people":
+            return self._json(200, {"people": db.admins()})
+        if path == "/api/admin/people/add":
+            name = clean_text(data.get("name"), "name", 40)
+            person, password = db.add_admin(name)
+            self._log("person_added", name)
+            return self._json(201, {"id": person, "name": name, "password": password})
+        if path == "/api/admin/people/remove":
+            name = db.remove_admin(parse_id(data.get("id")))
+            if name is None:
+                raise RequestError(404, "item_not_found")
+            self._log("person_removed", name)
+            return self._json(200, {"ok": True})
+        raise RequestError(404, "unknown_api")
+
+    def _log(self, action: str, detail: str = "") -> None:
+        self.cfg.store.log(action, detail, who=self._who)
 
     def _setup(self, path: str, data: dict):
         setup = self.cfg.setup

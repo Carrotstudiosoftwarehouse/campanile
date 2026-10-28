@@ -93,6 +93,17 @@
           <button type="button" class="secondary" id="share-stop" data-i18n="admin.share.stop">Ferma la condivisione</button>
         </div>
       </div>
+      <div id="team-section" class="hidden">
+        <h2 data-i18n="admin.team">Chi gestisce il Campanile</h2>
+        <form class="panel" id="team-form">
+          <p data-i18n="admin.team.text">Dai a ogni volontario una password sua: il registro dirà chi ha fatto cosa, e se qualcuno se ne va togli solo la sua. La crea il Campanile e si vede una volta sola.</p>
+          <label for="team-name"><span data-i18n="admin.team.name">Nome</span></label>
+          <input type="text" id="team-name" maxlength="40" required autocomplete="off">
+          <button type="submit" data-i18n="admin.team.add">Aggiungi</button>
+          <p class="result" id="team-result"></p>
+        </form>
+        <div id="team"></div>
+      </div>
       <h2 data-i18n="admin.time">Ora e registro</h2>
       <div class="panel">
         <p id="clock-now"></p>

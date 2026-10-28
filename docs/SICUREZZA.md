@@ -14,8 +14,9 @@ English version: [THREAT-MODEL.md](THREAT-MODEL.md).
   passa mai sulla Wi-Fi.
 - **Niente resta per sempre.** Gli annunci si cancellano dopo 14 giorni, i nomi dopo 60
   (modificabili all'avvio), dal database, non nascosti (provato).
-- **Le azioni di chi gestisce restano scritte**: cosa e quando, mai chi (una sola password per
-  tutti). Si tengono le ultime 1.000.
+- **Le azioni di chi gestisce restano scritte**: cosa, quando e chi, perché ogni volontario può
+  avere una password sua (la crea il Campanile, e se ne tiene solo l'impronta). Si tengono le
+  ultime 1.000.
 - **Chi gestisce può correggere l'orologio**, che il Raspberry perde senza internet (non ha batteria
   per l'orologio). Al massimo a un anno dall'ora del computer, e resta scritto. Lo seguono gli orari
   degli annunci, la cancellazione di quelli vecchi, gli avvisi firmati e l'ora dei telefoni

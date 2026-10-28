@@ -25,9 +25,16 @@ Se qualcuno inonda la bacheca, la gestione mostra i nuovi annunci **in attesa di
 può chiudere in un clic tutti quelli di un dispositivo o degli ultimi 15 o 60 minuti.
 
 Gli annunci si cancellano da soli dopo 14 giorni, i nomi di "sto bene" dopo 60 (`--post-days` e
-`--safe-days` li cambiano, 0 li tiene). La gestione mostra anche il registro di cosa ha fatto chi
-gestisce e quando, e l'orologio del Campanile, che lì si può correggere (senza internet il
+`--safe-days` li cambiano, 0 li tiene). La gestione mostra anche il registro di cosa è stato fatto,
+quando e da chi, e l'orologio del Campanile, che lì si può correggere (senza internet il
 Raspberry riparte indietro).
+
+### Più di un volontario
+
+Con la password principale, **Chi gestisce il Campanile** dà a ogni volontario una password sua.
+La crea il Campanile (tipo `K7M2-QX9P-T2PA`) e la mostra una volta sola: scrivila e consegnala.
+Può fare tutto tranne aggiungere o togliere persone, e nel registro compare il suo nome. Se
+qualcuno se ne va, togli solo lui: la sua password smette subito di funzionare.
 
 ### Avvisi firmati (facoltativi)
 

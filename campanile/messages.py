@@ -126,6 +126,18 @@ MESSAGES = {
         "en": "Admin only works from the Campanile itself. See docs/ADMIN.md.",
     },
     "wrong_password": {"it": "Password errata.", "en": "Wrong password."},
+    "main_password_only": {
+        "it": "Solo la password principale aggiunge o toglie le persone.",
+        "en": "Only the main password adds or removes people.",
+    },
+    "admin_name_taken": {
+        "it": "C'è già una persona con questo nome.",
+        "en": "Someone already has this name.",
+    },
+    "too_many_admins": {
+        "it": "Si possono aggiungere al massimo {max} persone.",
+        "en": "You can add at most {max} people.",
+    },
     "signed_required": {
         "it": "Su questo Campanile gli avvisi ufficiali devono essere firmati.",
         "en": "On this Campanile official notices must be signed.",

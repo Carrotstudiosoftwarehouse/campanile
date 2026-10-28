@@ -30,6 +30,7 @@ POST_DAYS = 14
 SAFE_DAYS = 60
 FORGET_EVERY = 60  # seconds between looks for what has expired
 MAX_LOG = 1000  # entries of what the admin did; older ones go
+MAX_ADMINS = 50  # people with a password of their own
 MAX_OFFSET = 400 * 86400  # seconds the Campanile's clock may be set away from the computer's
 MAX_ID = 2**63 - 1  # the largest number SQLite can store
 
@@ -93,6 +94,12 @@ CREATE TABLE IF NOT EXISTS settings (
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS admins (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    key_hash TEXT NOT NULL UNIQUE,
+    created INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS closed_roads (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     lon REAL NOT NULL,
@@ -116,6 +123,7 @@ ADDED_COLUMNS = (
     ("posts", "device", "TEXT"),
     ("posts", "pending", "INTEGER NOT NULL DEFAULT 0"),
     ("safe", "device", "TEXT"),
+    ("admin_log", "who", "TEXT NOT NULL DEFAULT ''"),  # '' is the main password
 )
 
 
@@ -214,10 +222,10 @@ def disk_full(error: Exception) -> bool:
     return getattr(error, "sqlite_errorcode", None) == 13 or "disk is full" in str(error)
 
 
-def new_code() -> str:
+def new_code(groups: int = 2) -> str:
     """Like K7M2-QX9P. With the limit on wrong attempts, nobody guesses it."""
-    raw = "".join(secrets.choice(CODE_ALPHABET) for _ in range(8))
-    return f"{raw[:4]}-{raw[4:]}"
+    raw = "".join(secrets.choice(CODE_ALPHABET) for _ in range(4 * groups))
+    return "-".join(raw[i : i + 4] for i in range(0, len(raw), 4))
 
 
 def hash_code(code: str) -> str:
@@ -355,12 +363,12 @@ class Store:
         """The journal still holds deleted text in earlier copies of its pages: empty it."""
         self._db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
 
-    def log(self, action: str, detail: str = "") -> None:
-        """What the admin did, and when: one password for everyone, so never who."""
+    def log(self, action: str, detail: str = "", who: str = "") -> None:
+        """What was done, when and by whom: a person's name, or '' for the main password."""
         with self._lock:
             self._db.execute(
-                "INSERT INTO admin_log (at, action, detail) VALUES (?, ?, ?)",
-                (self.now(), action, detail[:200]),
+                "INSERT INTO admin_log (at, action, detail, who) VALUES (?, ?, ?, ?)",
+                (self.now(), action, detail[:200], who),
             )
             self._db.execute(
                 "DELETE FROM admin_log WHERE id <= (SELECT MAX(id) FROM admin_log) - ?",
@@ -371,9 +379,51 @@ class Store:
     def admin_log(self, limit: int = 50) -> list[dict]:
         with self._lock:
             rows = self._db.execute(
-                "SELECT at, action, detail FROM admin_log ORDER BY id DESC LIMIT ?", (limit,)
+                "SELECT at, action, detail, who FROM admin_log ORDER BY id DESC LIMIT ?",
+                (limit,),
             ).fetchall()
         return [dict(r) for r in rows]
+
+    # -- the people who run the Campanile --------------------------------------------------
+
+    def add_admin(self, name: str) -> tuple[int, str]:
+        """A person with a password of their own. The Campanile makes it, so it is long, random
+        and used nowhere else: a fast hash is enough, and only the hash is kept."""
+        password = new_code(groups=3)
+        with self._lock:
+            if self._count("SELECT COUNT(*) FROM admins") >= MAX_ADMINS:
+                raise RequestError(503, "too_many_admins", max=MAX_ADMINS)
+            try:
+                cur = self._db.execute(
+                    "INSERT INTO admins (name, key_hash, created) VALUES (?, ?, ?)",
+                    (name, hash_code(password), self.now()),
+                )
+            except sqlite3.IntegrityError:
+                raise RequestError(409, "admin_name_taken") from None
+            self._db.commit()
+        return cur.lastrowid, password
+
+    def remove_admin(self, admin_id: int) -> str | None:
+        """Their password stops working from the next request. Their name, or None."""
+        with self._lock:
+            row = self._db.execute("SELECT name FROM admins WHERE id = ?", (admin_id,)).fetchone()
+            if row:
+                self._db.execute("DELETE FROM admins WHERE id = ?", (admin_id,))
+                self._db.commit()
+        return row["name"] if row else None
+
+    def admins(self) -> list[dict]:
+        with self._lock:
+            rows = self._db.execute("SELECT id, name, created FROM admins ORDER BY name").fetchall()
+        return [dict(r) for r in rows]
+
+    def admin_by_password(self, password: str) -> str | None:
+        """The name of the person with this password, or None."""
+        with self._lock:
+            row = self._db.execute(
+                "SELECT name FROM admins WHERE key_hash = ?", (hash_code(password),)
+            ).fetchone()
+        return row["name"] if row else None
 
     def _count(self, sql: str) -> int:
         return self._db.execute(sql).fetchone()[0]

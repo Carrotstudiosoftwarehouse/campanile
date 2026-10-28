@@ -143,6 +143,13 @@ class TestStrings(unittest.TestCase):
         listed = re.search(r"CATEGORIES = \[(.*?)\]", source, re.S).group(1)
         self.assertEqual(tuple(re.findall(r'"(\w+)"', listed)), store.CATEGORIES)
 
+    def test_every_action_in_the_log_has_its_words(self):
+        source = (WEB.parent / "server.py").read_text(encoding="utf-8")
+        actions = set(re.findall(r'self\._log\("(\w+)"', source))
+        self.assertGreater(len(actions), 14)  # the search sees the calls
+        for lang, strings in catalog().items():
+            self.assertEqual(sorted(a for a in actions if f"log.{a}" not in strings), [], lang)
+
     def test_the_marker_finds_what_it_should(self):
         # Self-check of the parser above: a blind parser would make the tests pass on nothing.
         found = marked(WEB / "board.html")

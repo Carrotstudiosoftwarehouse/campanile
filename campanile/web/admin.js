@@ -117,10 +117,44 @@ async function loadLog() {
   fill("log", r.log.map((e) => {
     const seconds = Number.parseInt(e.detail, 10);
     const detail = e.action === "clock_set" && !Number.isNaN(seconds) ? shift(seconds) : e.detail;
+    const who = e.who || t("log.main");
     return el("div", { class: "meta", text:
-      `${realTime(e.at * 1000)} · ${t(`log.${e.action}`)}${detail ? `: ${detail}` : ""}` });
+      `${realTime(e.at * 1000)} · ${who} · ${t(`log.${e.action}`)}${detail ? `: ${detail}` : ""}` });
   }));
 }
+
+// The people with a password of their own: only the main password sees them.
+async function loadTeam() {
+  const { people } = await api("/api/admin/people", { password });
+  fill("team", people.length ? people.map((person) => {
+    const button = el("button", { type: "button", class: "secondary", text: t("admin.team.remove") });
+    button.addEventListener("click", async () => {
+      if (!confirm(t("confirm", { action: `${button.textContent} ${person.name}` }))) return;
+      try {
+        await api("/api/admin/people/remove", { password, id: person.id });
+        await Promise.all([loadTeam(), loadLog()]);
+      } catch (error) {
+        alert(error.message);
+      }
+    });
+    return el("article", { class: "post" }, el("strong", { text: person.name }), " ", button);
+  }) : [el("p", { class: "meta", text: t("admin.team.none") })]);
+}
+
+document.getElementById("team-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const name = document.getElementById("team-name");
+  const result = document.getElementById("team-result");
+  try {
+    const added = await api("/api/admin/people/add", { password, name: name.value });
+    showResult(result, t("admin.team.password", { name: added.name }));
+    result.append(el("br"), el("strong", { class: "share-code", text: added.password }));
+    name.value = "";
+    await Promise.all([loadTeam(), loadLog()]);
+  } catch (error) {
+    showResult(result, error.message, true);
+  }
+});
 
 const decimal = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
 
@@ -342,6 +376,7 @@ document.getElementById("login").addEventListener("submit", async (event) => {
   event.preventDefault();
   password = document.getElementById("password").value;
   try {
+    const me = await api("/api/admin/me", { password });
     await load();
     document.getElementById("login").classList.add("hidden");
     document.getElementById("admin-panel").classList.remove("hidden");
@@ -350,6 +385,9 @@ document.getElementById("login").addEventListener("submit", async (event) => {
     document.getElementById("setup-link").classList.toggle("hidden", !status.setup);
     document.getElementById("share-address").textContent = status.address || location.origin;
     await share("state");
+    const main = me.name === "";
+    document.getElementById("team-section").classList.toggle("hidden", !main);
+    if (main) loadTeam().catch((e) => showResult(document.getElementById("team-result"), e.message, true));
     // On its own: waiting for a map's streets, or failing, never undoes the login.
     openRoadMap().catch((e) => showResult(document.getElementById("road-result"), e.message, true));
   } catch (error) {

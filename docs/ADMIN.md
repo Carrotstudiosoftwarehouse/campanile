@@ -25,8 +25,15 @@ If someone floods the board, the admin page shows new posts **waiting for approv
 close in one click all posts from one device or from the last 15 or 60 minutes.
 
 Posts expire after 14 days, "I'm safe" names after 60 (`--post-days` and `--safe-days` change
-this, 0 keeps them). The admin page also shows a log of what the admin did and when, and the
+this, 0 keeps them). The admin page also shows a log of what was done, when and by whom, and the
 Campanile's clock, which you can set there (without internet a Raspberry restarts behind).
+
+### More than one volunteer
+
+With the main password, **Who runs this Campanile** gives each volunteer a password of their own.
+The Campanile makes it (like `K7M2-QX9P-T2PA`) and shows it once: write it down and hand it over.
+They can do everything except add or remove people, and the log shows their name. If someone
+leaves, remove only them: their password stops working at once.
 
 ### Signed notices (optional)
 

@@ -14,8 +14,8 @@ Italian version: [SICUREZZA.md](SICUREZZA.md).
   crosses the Wi-Fi.
 - **Nothing stays forever.** Posts go after 14 days, names after 60 (adjustable at start), deleted
   from the database, not hidden (tested).
-- **Admin actions are logged**: what and when, never who (one shared password). The last 1,000 are
-  kept.
+- **Admin actions are logged**: what, when and who, since each volunteer can have a password of
+  their own (made by the Campanile, kept only as a hash). The last 1,000 are kept.
 - **The admin can fix the clock**, which a Raspberry loses offline (no clock battery). Up to a year
   from the computer's clock, and logged. Post times, deletion of old posts, signed notices and the
   phones' time follow it (tested).

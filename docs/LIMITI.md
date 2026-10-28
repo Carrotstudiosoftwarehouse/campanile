@@ -111,9 +111,9 @@ un limite, diccelo e lo aggiungiamo.
 - **I limiti per dispositivo si possono aggirare** con molte antenne Wi-Fi, o con un indirizzo del
   telefono che cambia di continuo. Il freno d'emergenza mette in attesa quegli annunci, ma una
   piena ostinata costa comunque lavoro a chi gestisce.
-- **Una sola password di gestione.** Chi ce l'ha può pubblicare avvisi, chiudere strade e togliere
-  annunci. La pagina di gestione registra cosa è stato fatto e quando (le ultime 1.000 azioni),
-  mai chi.
+- **La password principale può tutto**, anche aggiungere e togliere chi gestisce il Campanile. Gli
+  altri entrano con una password loro, e il registro dice chi ha fatto cosa (le ultime 1.000
+  azioni). Chi usa la password principale compare solo come «Password principale».
 - **Chi ha in mano il dispositivo ha tutto.** Database e password di gestione non sono cifrati sul
   disco. Ciò che si cancella però non c'è più, sovrascritto invece che lasciato nel file
   (misurato: prima, un numero di telefono cancellato si leggeva ancora).
@@ -149,10 +149,9 @@ Più o meno in ordine di importanza:
    correggerlo dopo un lungo blackout.
 6. **Un fuzzer guidato dalla copertura** (AFL, Atheris) sul lettore delle mappe e sul costruttore
    delle strade, e un audit di sicurezza esterno.
-7. **Una password per persona**, così il registro dice chi ha fatto cosa.
-8. **Aggiornamenti firmati**, così il Campanile verifica una chiavetta da solo invece di fidarsene
+7. **Aggiornamenti firmati**, così il Campanile verifica una chiavetta da solo invece di fidarsene
    come di una chiave di casa.
-9. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
+8. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
    posizione che ti segue, che ha bisogno di HTTPS.
 
 ## Aiutaci a chiuderli

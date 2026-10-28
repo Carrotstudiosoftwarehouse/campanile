@@ -96,8 +96,9 @@ missing, tell us and we will add it.
 - **Per-device limits can be dodged** with many Wi-Fi adapters, or a phone address that keeps
   changing. The emergency brake holds those posts for approval, but a determined flood still
   costs the admin work.
-- **One admin password.** Whoever has it can publish notices, block streets and remove posts. The
-  admin page logs what was done and when (the last 1,000 actions), never who.
+- **The main password can do everything**, including adding and removing the people who run the
+  Campanile. Everyone else signs in with their own password, and the log says who did what (the
+  last 1,000 actions). Whoever uses the main password shows up only as "Main password".
 - **Whoever holds the device holds everything.** Database and admin password are not encrypted on
   disk. Deleted data is gone, though, overwritten rather than left in the file (measured: before
   this, a deleted phone number could still be read).
@@ -128,10 +129,9 @@ Roughly in order of importance:
    to set it after a long power cut.
 6. **A coverage-guided fuzzer** (AFL, Atheris) on the map reader and street builder, and an
    external security audit.
-7. **A password per person**, so the log says who did what.
-8. **Signed updates**, so a Campanile can check a USB stick itself instead of trusting it like a
+7. **Signed updates**, so a Campanile can check a USB stick itself instead of trusting it like a
    house key.
-9. **The navigator**: turn bans, missing from our map files, and a live position, which needs
+8. **The navigator**: turn bans, missing from our map files, and a live position, which needs
    HTTPS.
 
 ## Help us close them

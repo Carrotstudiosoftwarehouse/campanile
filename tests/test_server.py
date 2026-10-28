@@ -636,6 +636,60 @@ class TestAdmin(CampanileTestCase):
         self.assertIn("disattivata", r["error"])
 
 
+class TestPeople(CampanileTestCase):
+    def add(self, name):
+        return self.admin("/api/admin/people/add", name=name)
+
+    def as_person(self, password, path, **body):
+        return self.json("POST", path, {"password": password, **body})
+
+    def test_a_person_signs_in_with_their_password_and_the_log_names_them(self):
+        status, maria = self.add("Maria")
+        self.assertEqual(status, 201)
+        self.assertRegex(maria["password"], r"^[A-Z2-9]{4}-[A-Z2-9]{4}-[A-Z2-9]{4}$")
+        typed = maria["password"].lower().replace("-", " ")  # as someone might type it
+        self.assertEqual(self.as_person(typed, "/api/admin/me"), (200, {"name": "Maria"}))
+        status, _ = self.as_person(typed, "/api/admin/notices", title="Acqua", text="In piazza")
+        self.assertEqual(status, 201)
+        self.assertEqual(self.admin("/api/admin/me"), (200, {"name": ""}))
+        _, r = self.admin("/api/admin/log")
+        latest = [(e["who"], e["action"]) for e in r["log"][:2]]
+        self.assertEqual(latest, [("Maria", "notice"), ("", "person_added")])
+
+    def test_a_removed_person_is_out_from_the_next_request(self):
+        _, maria = self.add("Maria")
+        self.assertEqual(self.as_person(maria["password"], "/api/admin/list")[0], 200)
+        self.assertEqual(self.admin("/api/admin/people/remove", id=maria["id"])[0], 200)
+        self.assertEqual(self.as_person(maria["password"], "/api/admin/list")[0], 403)
+        self.assertEqual(self.admin("/api/admin/people/remove", id=maria["id"])[0], 404)
+
+    def test_only_the_main_password_manages_people(self):
+        _, maria = self.add("Maria")
+        for path, body in (
+            ("/api/admin/people", {}),
+            ("/api/admin/people/add", {"name": "Luca"}),
+            ("/api/admin/people/remove", {"id": maria["id"]}),
+        ):
+            self.assertEqual(self.as_person(maria["password"], path, **body)[0], 403, path)
+        _, r = self.admin("/api/admin/people")
+        self.assertEqual([p["name"] for p in r["people"]], ["Maria"])
+
+    def test_names_are_unique_and_people_are_limited(self):
+        self.add("Maria")
+        self.assertEqual(self.add("maria")[0], 409)
+        self.assertEqual(self.add("")[0], 400)
+        for i in range(store.MAX_ADMINS - 1):
+            self.add(f"Volontario {i}")
+        self.assertEqual(self.add("Uno di troppo")[0], 503)
+
+    def test_only_a_hash_of_the_password_is_kept(self):
+        _, maria = self.add("Maria")
+        kept = b"".join(path.read_bytes() for path in self.data.glob("*.db*"))
+        self.assertIn(b"Maria", kept)  # we are reading the right files
+        self.assertNotIn(maria["password"].encode(), kept)
+        self.assertNotIn(maria["password"].replace("-", "").encode(), kept)
+
+
 class TestPortal(CampanileTestCase):
     portal = "10.42.0.1"
 
@@ -1345,6 +1399,27 @@ class TestStoreMigration(unittest.TestCase):
             s = store.Store(path)
             try:
                 self.assertEqual([n["title"] for n in s.list_notices()], ["Vecchio"])
+            finally:
+                s.close()
+
+    def test_an_old_log_learns_who(self):
+        import sqlite3
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "old.db"
+            db = sqlite3.connect(path)
+            db.execute(
+                "CREATE TABLE admin_log (id INTEGER PRIMARY KEY AUTOINCREMENT, at INTEGER NOT NULL,"
+                " action TEXT NOT NULL, detail TEXT NOT NULL)"
+            )
+            db.execute("INSERT INTO admin_log (at, action, detail) VALUES (1, 'notice', 'Vecchio')")
+            db.commit()
+            db.close()
+            s = store.Store(path)
+            try:
+                s.log("notice", "Nuovo", who="Maria")
+                log = [(e["who"], e["detail"]) for e in s.admin_log()]
+                self.assertEqual(log, [("Maria", "Nuovo"), ("", "Vecchio")])
             finally:
                 s.close()
 
