@@ -83,13 +83,15 @@ def keygen(args) -> None:
 
 
 def sign(args) -> None:
+    path = Path(args.key).expanduser()
     try:
-        key = serialization.load_pem_private_key(
-            Path(args.key).expanduser().read_bytes(),
-            password=getpass.getpass("Passphrase: ").encode(),
-        )
-    except (OSError, ValueError, TypeError):
-        sys.exit("Wrong passphrase, or not a key file.")
+        pem = path.read_bytes()
+    except OSError as e:
+        sys.exit(f"Can't read the key file {path}: {e.strerror}.")
+    try:
+        key = serialization.load_pem_private_key(pem, getpass.getpass("Passphrase: ").encode())
+    except (ValueError, TypeError):
+        sys.exit("Wrong passphrase for this key (every character counts, spaces and capitals too).")
     if not isinstance(key, Ed25519PrivateKey):
         sys.exit("Not an Ed25519 private key.")
     raw = public_raw(key)

@@ -28,8 +28,8 @@ SIGNATURE = "campanile/release-signature.json"
 # CarrotStudio's release keys (key id: base64): the one in use and a spare kept apart, so that
 # losing one is no disaster. Only public parts here; the private ones never touch a network.
 KEYS: dict[str, str] = {
-    "757c3faf694ec061": "L7yd79BolxUQRCL6bi+H5jbn4byDDsP0KPjhlZC8Pdw=",  # in use
-    "1865236026b390df": "BGTBjpAnfnrsEm26CfYL3W/axwrU3tZTboziCUMqmTc=",  # spare, kept apart
+    "bdd66487d5516868": "IbAeMUh1QwMAp2Wd7Zzn5MYUrYxOz12rPTL1oepkeBw=",  # in use
+    "737dbf659b2ed7a3": "is0HCybd1tGJ3VpFJY7fz0kSJ6f4tHCS9bmm8rjjWTk=",  # spare, kept apart
 }
 _VERSION = re.compile(r"(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})")
 
