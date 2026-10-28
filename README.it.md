@@ -2,8 +2,8 @@
 
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-it-bianco.svg">
-    <img src="docs/immagini/logo-it.svg" height="96" alt="Campanile. Senza internet. Ancora insieme.">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/campanile-logo-it-bianco.svg">
+    <img src="docs/immagini/campanile-logo-it.svg" height="96" alt="Campanile. Senza internet. Ancora insieme.">
   </picture>
 </h1>
 
