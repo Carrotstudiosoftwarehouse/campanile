@@ -1,6 +1,12 @@
 <p align="right"><a href="README.md">English</a> · <b>Italiano</b></p>
 
-# Campanile
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-bianco.svg">
+    <img src="docs/immagini/logo.svg" height="84" align="absmiddle" alt="">
+  </picture>
+  Campanile
+</h1>
 
 ### Senza internet. Ancora insieme.
 

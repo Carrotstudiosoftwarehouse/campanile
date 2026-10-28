@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="62 30 132 192" role="img" aria-label="Campanile">
+  <path d="M98 86 L128 34 L158 86 Z" fill="#FFFFFF"/>
+  <path d="M98 94 H158 V218 H98 Z M112 150 V124 A16 16 0 0 1 144 124 V150 Z" fill="#FFFFFF" fill-rule="evenodd"/>
+  <circle cx="128" cy="134" r="9" fill="#D7261E"/>
+  <g fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round">
+    <path d="M176.1 101.6 A58 58 0 0 1 176.1 166.4"/>
+    <path d="M79.9 101.6 A58 58 0 0 0 79.9 166.4"/>
+  </g>
+</svg>

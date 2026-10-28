@@ -1,6 +1,12 @@
 <p align="right"><b>English</b> · <a href="README.it.md">Italiano</a></p>
 
-# Campanile
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/immagini/logo-bianco.svg">
+    <img src="docs/immagini/logo.svg" height="84" align="absmiddle" alt="">
+  </picture>
+  Campanile
+</h1>
 
 ### No internet. Still together.
 
