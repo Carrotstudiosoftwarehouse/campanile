@@ -79,7 +79,7 @@ missing, tell us and we will add it.
   like AFL or Atheris, and we never fuzzed the map drawing on the phone (MapLibre). Network
   requests (250,000) and signature checks (200,000) were fuzzed too. A good place to start.
 - **Tools find known patterns, not every flaw.** Bandit, Semgrep and axe-core found nothing left to
-  fix. That is not proof. CodeQL is set up but runs only once the repository is public.
+  fix. That is not proof. CodeQL runs on every change, and we read each alert it raises in the code.
 - **Other people's code** (Python, nginx, MapLibre, PMTiles, kiwix-serve) is pinned and
   hash-checked, and kiwix-serve is sandboxed on the Raspberry. We have not audited it.
 

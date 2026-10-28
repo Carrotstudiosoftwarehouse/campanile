@@ -210,6 +210,10 @@ travel this way, so the rules are strict.
 
 - **Programs travel only on a stick handed over in person**, never over Wi-Fi, where a new computer
   can't tell the real Campanile from a fake. The guide says so.
+- **An installed Campanile updates only to a newer version signed by CarrotStudio**, checked on the
+  copy it has made, never on the stick: exactly the signed files, none more or fewer, never an older
+  version. The signing keys stay offline. The first time, a stick is still trusted like a house key:
+  whoever starts a Campanile straight from a stick runs what is on it.
 - **A closed list**: program, maps, Wikipedia, signed-notice public keys, Kiwix, Python. Never the
   database (names, posts, contacts) or the password. No folder is copied as it is.
 - **A hostile stick can't slip anything in.** A Campanile folder already there is used only if it

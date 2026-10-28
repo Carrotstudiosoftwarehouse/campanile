@@ -38,6 +38,11 @@ field with many real people. What we tested: [docs/TESTING.md](docs/TESTING.md).
   nothing installed, and maps and Wikipedia over Wi-Fi between Campaniles, signed with a code
 - [x] Signed notices checked by the Campanile (Ed25519). Flood defenses: limits per device, posts
   held for approval, cleanup in batches
+- [x] One password per person on the admin page, made by the Campanile: the log says who did what
+- [x] Signed versions: every release signed offline by CarrotStudio, and GitHub publishes only a
+  package that matches. A Campanile updates from a USB stick only to a newer signed version, and a
+  power cut halfway is finished at the next start
+- [x] Pages ready for right-to-left languages such as Arabic: only the translation is missing
 - [x] Accessibility checked by machine: every page in both languages passes axe-core's WCAG 2.2 AA
   check and stays readable at 200% zoom without sideways scrolling. Large buttons, black on white,
   red only for warnings, ink blue only for section titles
@@ -161,6 +166,12 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
   senza niente installato, e mappe e Wikipedia via Wi-Fi fra Campanili, firmate con un codice
 - [x] Avvisi firmati verificati dal Campanile (Ed25519). Difese contro le inondazioni: limiti per
   dispositivo, annunci in attesa di approvazione, pulizia a gruppi
+- [x] Una password per persona nella gestione, creata dal Campanile: il registro dice chi ha fatto
+  cosa
+- [x] Versioni firmate: ogni versione firmata offline da CarrotStudio, e GitHub pubblica solo un
+  pacchetto che combacia. Un Campanile si aggiorna da chiavetta solo a una versione più nuova e
+  firmata, e un blackout a metà viene completato alla riaccensione
+- [x] Pagine pronte per le lingue da destra a sinistra come l'arabo: manca solo la traduzione
 - [x] Accessibilità controllata dalla macchina: ogni pagina nelle due lingue supera il controllo
   WCAG 2.2 AA di axe-core e resta leggibile con lo zoom al 200% senza scorrere di lato. Pulsanti
   grandi, nero su bianco, rosso solo per gli avvisi, blu inchiostro solo per i titoli delle sezioni

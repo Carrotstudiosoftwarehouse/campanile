@@ -44,7 +44,7 @@ us to improve Campanile.
 
 ```bash
 python3 -m unittest discover -s tests -v
-ruff check campanile tests scripts/sign-notice.py && ruff format --check campanile tests scripts/sign-notice.py
+ruff check campanile tests scripts/*.py && ruff format --check campanile tests scripts/*.py
 shellcheck -S warning scripts/*.sh raspberry/*.sh "Avvia Campanile (Mac).command"
 ```
 
@@ -64,7 +64,7 @@ campanile/
   server.py       HTTP server: pages, API, maps with Range requests, captive portal
   store.py        data (SQLite), validation, rate limits
   devices.py      per-device limits (the phone's MAC, never stored)
-  signing.py      signed notices (Ed25519, standard cryptography package)
+  signing.py      signed notices (Ed25519); ed25519.py checks them where `cryptography` is missing
   cap.py          official alerts in CAP, read from a file; pfif.py: the names as PFIF
   messages.py     server messages in every language
   places.py       the map search: names read from the map files, with bounded costs
@@ -72,8 +72,10 @@ campanile/
   copying.py      the copy to a USB stick; sharing.py: maps and Wikipedia between Campaniles
   preparation.py  the setup page's downloads (laptop only)
   launch.py       easy start on a laptop; firewall.py: Windows Firewall check and repair
+  release.py      is this folder a version signed by CarrotStudio?
+  update.py       updating from a USB stick, only to a newer signed version
   web/            the portal: HTML, CSS and JavaScript, no framework
-scripts/          setup, map and Wikipedia downloads, notice signing, release package, demo
+scripts/          setup, map and Wikipedia downloads, notice and release signing, package, demo
 raspberry/        installer, uninstaller, nginx and systemd configuration
 demo/             the static online demo (a service worker plays the server)
 tests/            tests: run on Linux, Windows and macOS at every change

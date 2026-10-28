@@ -54,6 +54,7 @@ Pages in English and Italian, picked from the phone's language. Maps for any are
 [Raspberry Pi setup](docs/SETUP.md#raspberry-pi).
 
 **More:** [setting up](docs/SETUP.md) (maps, Wikipedia, USB sticks, power) ·
+[talking with no network](docs/RADIO.md) (radios and apps for families) ·
 [running it](docs/ADMIN.md) (notices, moderation, signed notices, CAP alerts, PFIF) ·
 [the navigator and the encyclopedia](docs/FEATURES.md) · [security](docs/THREAT-MODEL.md) ·
 [how it was tested](docs/TESTING.md) · [roadmap](ROADMAP.md)

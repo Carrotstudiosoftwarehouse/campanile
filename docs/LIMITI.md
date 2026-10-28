@@ -91,8 +91,8 @@ un limite, diccelo e lo aggiungiamo.
   l'abbiamo mai passato sotto un fuzzer. Ci sono passate anche le richieste di rete (250.000) e la
   verifica delle firme (200.000). Un buon punto da cui cominciare.
 - **Gli strumenti trovano schemi noti, non ogni difetto.** Bandit, Semgrep e axe-core non hanno
-  trovato più niente da correggere. Non è una prova. CodeQL è pronto ma parte solo quando il
-  repository diventa pubblico.
+  trovato più niente da correggere. Non è una prova. CodeQL gira a ogni modifica, e ogni suo
+  allarme lo leggiamo nel codice.
 - **Il codice di altri** (Python, nginx, MapLibre, PMTiles, kiwix-serve) ha versioni fissate e
   impronte controllate, e sul Raspberry kiwix-serve gira isolato. Non l'abbiamo revisionato.
 

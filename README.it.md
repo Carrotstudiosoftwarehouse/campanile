@@ -55,7 +55,8 @@ Pagine in italiano e in inglese, scelte dalla lingua del telefono. Mappe di qual
 [installare su Raspberry Pi](docs/INSTALLAZIONE.md#raspberry-pi).
 
 **Per saperne di più:** [installazione](docs/INSTALLAZIONE.md) (mappe, Wikipedia, chiavette,
-alimentazione) · [gestione](docs/GESTIONE.md) (avvisi, moderazione, avvisi firmati, allarmi
+alimentazione) · [comunicare senza rete](docs/COMUNICARE.md) (radio e app per le famiglie) ·
+[gestione](docs/GESTIONE.md) (avvisi, moderazione, avvisi firmati, allarmi
 CAP, PFIF) · [navigatore ed enciclopedia](docs/FUNZIONI.md) · [sicurezza](docs/SICUREZZA.md) ·
 [come è stato provato](docs/PROVE.md) · [roadmap](ROADMAP.md#italiano)
 

@@ -231,6 +231,11 @@ Così viaggiano i programmi, quindi le regole sono strette.
 
 - **I programmi viaggiano solo su chiavetta, consegnata di persona**, mai via Wi-Fi, dove un
   computer nuovo non distingue il Campanile vero da uno falso. La guida lo dice.
+- **Un Campanile già installato si aggiorna solo a una versione più nuova firmata da
+  CarrotStudio**, controllata sulla copia che ha fatto, mai sulla chiavetta: esattamente i file
+  firmati, né uno in più né uno in meno, mai una versione più vecchia. Le chiavi di firma restano
+  offline. La prima volta una chiavetta vale ancora come una chiave di casa: chi avvia un
+  Campanile direttamente da una chiavetta esegue quello che c'è sopra.
 - **Un elenco chiuso**: programma, mappe, Wikipedia, chiavi pubbliche degli avvisi firmati, Kiwix,
   Python. Mai il database (nomi, annunci, contatti) né la password. Nessuna cartella si copia così
   com'è.
