@@ -43,7 +43,10 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 
 **Avvisi firmati (Ed25519):**
 
-- Libreria standard `cryptography`, nessuna crittografia scritta da noi.
+- Controllati da OpenSSL, tramite la libreria standard `cryptography`, dove c'è (il Raspberry).
+  Senza (i portatili), dal nostro `ed25519.py`: solo verifica, nessun segreto, segue l'RFC 8032 e
+  dà la stessa risposta di OpenSSL sui vettori dell'RFC, sui 210 casi Wycheproof di Google e su
+  12.000 firme casuali. Per firmare si usa sempre `cryptography`.
 - Le chiavi di fiducia si installano **prima**, su file, mai ricevute dalla rete, altrimenti chi
   falsifica l'avviso falsificherebbe anche la chiave.
 - La firma copre titolo, testo, urgenza, data e **scadenza** (massimo 7 giorni). Il prefisso

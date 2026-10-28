@@ -46,7 +46,7 @@ chiave mostrano *"Avviso firmato · Protezione Civile Torino"*.
    La chiave privata non lascia mai quel computer.
 2. **Ogni Campanile**, prima dell'emergenza, aggiunge la parte pubblica nella forma
    `{"keys": [ ...public.json... ]}` a `/etc/campanile/trusted-keys.json` (Raspberry) o a
-   `data/trusted-keys.json` (portatile, che richiede anche `pip install cryptography`).
+   `data/trusted-keys.json` (portatile).
 3. **Per ogni avviso**, lancia `scripts/sign-notice.py sign --key ... --title ... --text ... --urgent`
    e incolla il risultato nella pagina di gestione. Gli avvisi firmati scadono (24 ore di default,
    al massimo 7 giorni) e non si possono pubblicare due volte.

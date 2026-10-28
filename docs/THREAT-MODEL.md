@@ -41,7 +41,10 @@ We assume someone on the network wants to cause trouble.
 
 **Signed notices (Ed25519):**
 
-- Standard `cryptography` library, no crypto of our own.
+- Checked by OpenSSL, through the standard `cryptography` library, where it is installed (the
+  Raspberry). Without it (laptops), by our `ed25519.py`: checking only, no secrets, following
+  RFC 8032, and giving OpenSSL's answer on the RFC vectors, on Google's 210 Wycheproof cases and
+  on 12,000 random signatures. Signing always uses `cryptography`.
 - Trusted keys are installed **beforehand** as a file, never received from the network, or a forger
   would forge the key too.
 - The signature covers title, text, urgency, date and **expiry** (7 days max). The prefix

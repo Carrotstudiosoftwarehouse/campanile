@@ -5,6 +5,7 @@ import base64
 import contextlib
 import email.utils
 import http.client
+import importlib.util
 import io
 import json
 import os
@@ -30,6 +31,8 @@ from test_places import town
 import mapfixture
 
 PASSWORD = "test-password"
+# The tests sign with `cryptography`; Campanile checks without it too (ed25519.py).
+CAN_SIGN = importlib.util.find_spec("cryptography") is not None
 
 
 class CampanileTestCase(unittest.TestCase):
@@ -1207,7 +1210,7 @@ class TestTimeAndLog(CampanileTestCase):
         self.assertEqual(self.cfg.store.offset, 0)
 
 
-@unittest.skipUnless(signing.AVAILABLE, "needs the cryptography package")
+@unittest.skipUnless(CAN_SIGN, "signing in the tests needs the cryptography package")
 class TestSignedNotices(CampanileTestCase):
     def setUp(self):
         super().setUp()
@@ -1378,6 +1381,21 @@ class TestSignedNotices(CampanileTestCase):
 
     def test_status_says_signed_notices_are_on(self):
         self.assertTrue(self.json("GET", "/api/status")[1]["signed_notices"])
+
+
+class TestSignedNoticesWithoutTheLibrary(TestSignedNotices):
+    """Every test above again, checked by our ed25519.py as on a laptop without `cryptography`."""
+
+    def setUp(self):
+        without = mock.patch.object(signing, "Ed25519PublicKey", None)
+        without.start()
+        self.addCleanup(without.stop)
+        super().setUp()
+
+    def test_the_check_really_is_ours(self):
+        with mock.patch.object(signing.ed25519, "verify", wraps=signing.ed25519.verify) as ours:
+            self.assertEqual(self.publish(self.signed())[0], 201)
+        ours.assert_called_once()
 
 
 class TestStoreMigration(unittest.TestCase):

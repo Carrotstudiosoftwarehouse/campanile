@@ -45,7 +45,7 @@ show *"Signed notice · Protezione Civile Torino"*.
    The private key never leaves that computer.
 2. **Each Campanile**, before the emergency, adds the public part as
    `{"keys": [ ...public.json... ]}` to `/etc/campanile/trusted-keys.json` (Raspberry) or
-   `data/trusted-keys.json` (laptop, which also needs `pip install cryptography`).
+   `data/trusted-keys.json` (laptop).
 3. **For each notice**, run `scripts/sign-notice.py sign --key ... --title ... --text ... --urgent`
    and paste the output in the admin page. Signed notices expire (24 hours by default, 7 days at
    most) and can't be published twice.
