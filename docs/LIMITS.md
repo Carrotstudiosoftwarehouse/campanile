@@ -43,8 +43,10 @@ missing, tell us and we will add it.
 
 - **No real Raspberry Pi yet.** Installer, nginx, systemd and firewall ran in Debian containers on
   a Mac. Hotspot, captive portal and phone isolation by the Wi-Fi chip were never tried.
-- **Updating from a stick** ran in tests on Mac, Linux and Windows (CI), never with a real stick
-  in a person's hands. On a Raspberry only its checking part ran: the installer was a stand-in.
+- **Updating from a stick** ran end to end on a Mac, through the setup page from a FAT32 disk the
+  Mac takes for a stick, and on Windows 11 ARM in a virtual machine, with the real double click
+  (a file locked by Windows included). Never with a real stick in a person's hands. On a
+  Raspberry only its checking part ran: the installer was a stand-in.
 - **No crowd of real phones.** Up to 1,000 were simulated, in containers on one Mac over a virtual
   network. A real Wi-Fi radio handles far fewer at once.
 - **One field test, four devices.** On 26 October 2026, with no internet: a Mac, two iPhones and an

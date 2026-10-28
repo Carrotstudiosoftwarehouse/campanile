@@ -48,7 +48,9 @@ un limite, diccelo e lo aggiungiamo.
 - **Ancora nessun Raspberry Pi vero.** Installazione, nginx, systemd e firewall sono girati in
   container Debian su un Mac. Hotspot, portale automatico e telefoni tenuti separati dal chip
   Wi-Fi non sono mai stati provati.
-- **L'aggiornamento da chiavetta** è girato nei test su Mac, Linux e Windows (CI), mai con una
+- **L'aggiornamento da chiavetta** è girato da capo a fondo su un Mac, dalla pagina di
+  preparazione con un disco FAT32 che il Mac prende per una chiavetta, e su Windows 11 ARM in una
+  macchina virtuale, con il vero doppio clic (compreso un file bloccato da Windows). Mai con una
   chiavetta vera in mano a una persona. Sul Raspberry è girata solo la parte che controlla:
   l'installatore era una controfigura.
 - **Nessuna folla di telefoni veri.** Ne abbiamo simulati fino a 1.000, in container su un solo Mac
