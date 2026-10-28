@@ -105,6 +105,10 @@ shopt -u nullglob
 
 step "Configuration in $CONFIG"
 install -d -o root -g campanile -m 750 "$CONFIG"
+# The next update (campanile/update.py) runs this again with the same choices.
+{ printf -- '--ssid\n%s\n--country\n%s\n' "$SSID" "$COUNTRY"; [ "$HOTSPOT" -eq 1 ] || echo --no-hotspot; } \
+  > "$CONFIG/install-options"
+chmod 600 "$CONFIG/install-options"
 HOSTNAME_LOCAL="$(hostname).local"
 # Without a hotspot we're guests on someone else's network: no redirects.
 PORTAL=""

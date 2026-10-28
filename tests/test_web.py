@@ -82,12 +82,14 @@ def keys_in_scripts():
     keys |= {f"setup.step.{s}" for s in re.findall(r'step="(\w+)"', setup)} | {"setup.step.start"}
     keys |= {f"setup.error.{e}" for e in re.findall(r'SetupError\(\s*"(\w+)"', setup)}
     keys |= {"setup.error.cancelled", "setup.error.failed"}
+    signature = (WEB.parent / "release.py").read_text(encoding="utf-8")  # can end the update job
+    keys |= {f"setup.error.{e}" for e in re.findall(r'ReleaseError\(\s*"(\w+)"', signature)}
     copy = (WEB.parent / "copying.py").read_text(encoding="utf-8")
     keys |= {f"setup.error.{e}" for e in re.findall(r'CopyError\(\s*"(\w+)"', copy)} - {
         "setup.error.cancelled"
     }
     keys |= {f"setup.task.{t}" for t in ("map-world", "map-area", "wiki-it", "wiki-en")}
-    keys |= {"setup.task.extras", "setup.task.copy", "setup.task.receive"}
+    keys |= {"setup.task.extras", "setup.task.copy", "setup.task.receive", "setup.task.update"}
     keys |= {"map.name.world", "map.name.area"}
     return keys
 

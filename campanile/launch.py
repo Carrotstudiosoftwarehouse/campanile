@@ -8,15 +8,20 @@ from __future__ import annotations
 
 import os
 import secrets
+import shutil
+import subprocess
 import sys
 import threading
 import time
 import webbrowser
+from pathlib import Path
 
 import copying
 import firewall
 import preparation
+import release
 import server
+import update
 
 PORT = 8080
 KIWIX_PORT = 8081  # server.py's default, where kiwix-serve listens on the laptop
@@ -65,9 +70,33 @@ def watch_firewall() -> None:
         print()
 
 
+def updated(root) -> Path | None:
+    """The newer Campanile to start instead of this one: updated before, or right now."""
+    newer = update.successor(root)
+    if newer is not None:
+        return newer
+    try:
+        return update.apply_pending(root, server.VERSION)
+    except release.ReleaseError:
+        shutil.rmtree(root / update.STAGING, ignore_errors=True)
+        print("  ATTENZIONE: l'aggiornamento preparato non e' piu' quello firmato da CarrotStudio:")
+        print("  e' stato scartato. Resta la versione di prima.")
+    except (OSError, update.UpdateError) as e:
+        print(f"  L'aggiornamento non e' riuscito, resta la versione di prima. ({e})")
+    print()
+    return None
+
+
 def main() -> int:
     # Flush every line, even when the output goes to a file: "fixed" must never sit in a buffer.
     sys.stdout.reconfigure(line_buffering=True)
+    newer = updated(server.HERE.parent)
+    if newer is not None:
+        print(f'  Campanile aggiornato: parte dalla cartella "{newer.name}".')
+        try:  # the same window, the same Python: only the folder changes
+            return subprocess.call([sys.executable, str(newer / "campanile" / "launch.py")])  # noqa: S603
+        except KeyboardInterrupt:
+            return 0
     if not (server.HERE / "web" / "vendor" / "maplibre-gl.mjs").exists():
         print(
             "Manca la preparazione iniziale. Con internet, esegui una volta:\n"

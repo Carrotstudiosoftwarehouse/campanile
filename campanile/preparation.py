@@ -31,7 +31,9 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
 
 import copying
+import release
 import sharing
+import update
 
 CHUNK = 1 << 20
 NETWORK_TIMEOUT = 30  # seconds of silence before a download gives up
@@ -348,6 +350,9 @@ class Preparation:
     def start_copy(self, drive: copying.Drive) -> bool:
         return self._start("copy", self._copy_job, drive)
 
+    def start_update(self, drive: copying.Drive) -> bool:
+        return self._start("update", self._update_job, drive)
+
     def extras_ready(self) -> bool:
         """kiwix-serve for every computer, and Python's installers: what a stick needs."""
         folders = tool_folders(self.sources.tools)
@@ -542,6 +547,29 @@ class Preparation:
                 raise Cancelled() from None
             raise SetupError(e.key, e.detail) from None
         self._update(step="copied")
+
+    def _update_job(self, drive: copying.Drive) -> None:
+        """Prepares the update; it is applied at the next start (update.py)."""
+        source = update.find_program(Path(drive.path))
+        if source is None:
+            raise SetupError("update_no_program")
+        self._update(step="update_copy", done=0, total=None)
+        try:
+            _, version = update.stage(
+                source,
+                self.program / update.STAGING,
+                self.version,
+                progress=lambda done, total: self._update(done=done, total=total),
+                cancelled=self._cancel.is_set,
+            )
+        except copying.CopyError as e:
+            if e.key == "cancelled":
+                shutil.rmtree(self.program / update.STAGING, ignore_errors=True)
+                raise Cancelled() from None
+            raise SetupError(e.key, e.detail) from None
+        except release.ReleaseError as e:
+            raise SetupError(e.args[0]) from None
+        self._update(step="update_ready", detail=version)
 
     def _wiki_job(self, lang: str) -> None:
         self._tool("kiwix-serve")

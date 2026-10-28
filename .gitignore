@@ -14,3 +14,6 @@
 __pycache__/
 *.pyc
 .DS_Store
+# an update being prepared, and the note left by an updated copy (campanile/update.py)
+.campanile-update/
+.campanile-moved

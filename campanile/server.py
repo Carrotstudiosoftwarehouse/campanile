@@ -913,12 +913,12 @@ class Handler(BaseHTTPRequestHandler):
             started = setup.start_receive(address, code)
         elif task == "extras":
             started = setup.start_extras()
-        elif task == "copy":
+        elif task in ("copy", "update"):
             # Only a drive the computer itself lists: the page never names a path.
             drive = next((d for d in copying.drives() if d.path == data.get("drive")), None)
             if drive is None:
                 raise RequestError(400, "bad_drive")
-            started = setup.start_copy(drive)
+            started = setup.start_copy(drive) if task == "copy" else setup.start_update(drive)
         else:
             raise RequestError(400, "bad_task")
         if not started:

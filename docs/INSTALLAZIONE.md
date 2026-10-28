@@ -105,6 +105,15 @@ Python, la finestra indica il suo installatore sulla chiavetta.
 - Sul Raspberry, dal terminale:
   `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`
 
+**Aggiornare da una chiavetta.** Nella pagina di preparazione infila una chiavetta con un
+Campanile più nuovo e premi **Aggiorna da questa chiavetta**. Viene copiato accanto a questo
+Campanile e controllato lì: passa solo una versione più nuova firmata da CarrotStudio. Chiudi la
+finestra nera e riapri il Campanile: prima di partire ricontrolla, poi la versione nuova diventa una
+cartella sua, "Campanile 0.2.0", e ci si spostano mappe, Wikipedia e annunci. Il vecchio doppio
+clic continua a funzionare. Sul Raspberry: `sudo python3 /opt/campanile/campanile/update.py
+/media/UTENTE/CHIAVETTA` controlla la chiavetta allo stesso modo, poi lancia l'installatore della
+versione nuova con le scelte dell'ultima volta.
+
 **Mappe e Wikipedia via Wi-Fi.** Nella pagina di gestione, *Condividi con un altro Campanile*
 mostra un indirizzo e un codice. Un altro Campanile si collega a questa Wi-Fi e li scrive nella
 sua pagina di preparazione. Arrivano mappe e Wikipedia, mai programmi. L'elenco dei file è firmato

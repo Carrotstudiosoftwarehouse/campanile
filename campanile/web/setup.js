@@ -36,7 +36,8 @@ function showJob(job) {
   const amount = known
     ? t("setup.amount.of", { done: fileSize(job.done), total: fileSize(job.total) })
     : job.done ? fileSize(job.done) : "";
-  $("job-text").textContent = [t(`setup.step.${job.step}`), amount].filter(Boolean).join(" · ");
+  const step = t(`setup.step.${job.step}`, { detail: job.detail });
+  $("job-text").textContent = [step, amount].filter(Boolean).join(" · ");
   $("job-error").textContent = job.error
     ? `${t(`setup.error.${job.error}`)}${job.detail ? ` (${job.detail})` : ""}`
     : "";
@@ -111,7 +112,9 @@ async function refresh() {
 
   const running = state.job && !state.job.finished;
   for (const button of document.querySelectorAll("[data-task]")) button.disabled = running;
-  document.querySelector("[data-task=copy]").disabled = running || !state.drives.length;
+  for (const task of ["copy", "update"]) {
+    document.querySelector(`[data-task=${task}]`).disabled = running || !state.drives.length;
+  }
   showJob(state.job);
   await showArea(state.maps);
   clearTimeout(polling);
@@ -158,7 +161,7 @@ for (const button of document.querySelectorAll("[data-task]")) {
       showResult($("area-result"), "");
     }
     if (task === "wiki") body.lang = button.dataset.lang;
-    if (task === "copy") body.drive = $("drive").value;
+    if (task === "copy" || task === "update") body.drive = $("drive").value;
     if (task === "receive") {
       body.address = $("receive-address").value;
       body.code = $("receive-code").value;

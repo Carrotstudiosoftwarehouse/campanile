@@ -101,6 +101,14 @@ missing, the window shows its installer on the stick.
 - On a Raspberry, from the terminal:
   `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`
 
+**Updating from a stick.** On the setup page, plug in a stick with a newer Campanile and press
+**Update from this stick**. It is copied next to this Campanile and checked there: only a newer
+version signed by CarrotStudio passes. Close the black window and open Campanile again: before
+starting, it checks once more, then the new version becomes a folder of its own, "Campanile
+0.2.0", and maps, Wikipedia and posts move into it. The old double click keeps working. On a
+Raspberry: `sudo python3 /opt/campanile/campanile/update.py /media/USER/STICK` checks the stick the
+same way, then runs the new version's installer with the choices of last time.
+
 **Maps and Wikipedia over Wi-Fi.** On the admin page, *Share with another Campanile* shows an
 address and a code. Another Campanile joins this Wi-Fi and types both on its setup page. Maps and
 Wikipedia arrive, never programs. The file list is signed with the code, so a fake Campanile with

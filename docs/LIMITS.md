@@ -43,6 +43,8 @@ missing, tell us and we will add it.
 
 - **No real Raspberry Pi yet.** Installer, nginx, systemd and firewall ran in Debian containers on
   a Mac. Hotspot, captive portal and phone isolation by the Wi-Fi chip were never tried.
+- **Updating from a stick** ran in tests on Mac, Linux and Windows (CI), never with a real stick
+  in a person's hands. On a Raspberry only its checking part ran: the installer was a stand-in.
 - **No crowd of real phones.** Up to 1,000 were simulated, in containers on one Mac over a virtual
   network. A real Wi-Fi radio handles far fewer at once.
 - **One field test, four devices.** On 26 October 2026, with no internet: a Mac, two iPhones and an
@@ -102,7 +104,8 @@ missing, tell us and we will add it.
 - **Whoever holds the device holds everything.** Database and admin password are not encrypted on
   disk. Deleted data is gone, though, overwritten rather than left in the file (measured: before
   this, a deleted phone number could still be read).
-- **No automatic updates.** A fix reaches a Campanile only when someone installs it.
+- **No automatic updates.** A fix reaches a Campanile only when someone brings it, on a stick
+  checked against CarrotStudio's signature, or installs it.
 - **Posts and names delete themselves**: posts after 14 days, "I'm safe" names after 60. The admin
   can change both at startup, or keep them forever.
 - **The navigator** doesn't know the phone's position or turn bans, estimates times, is as recent
@@ -129,10 +132,7 @@ Roughly in order of importance:
    to set it after a long power cut.
 6. **A coverage-guided fuzzer** (AFL, Atheris) on the map reader and street builder, and an
    external security audit.
-7. **Signed updates**, so a Campanile can check a USB stick itself instead of trusting it like a
-   house key. Versions are signed with CarrotStudio's offline keys, and GitHub publishes only
-   signed ones. Still missing: an installed Campanile that checks a stick before updating itself.
-8. **The navigator**: turn bans, missing from our map files, and a live position, which needs
+7. **The navigator**: turn bans, missing from our map files, and a live position, which needs
    HTTPS.
 
 ## Help us close them

@@ -48,6 +48,9 @@ un limite, diccelo e lo aggiungiamo.
 - **Ancora nessun Raspberry Pi vero.** Installazione, nginx, systemd e firewall sono girati in
   container Debian su un Mac. Hotspot, portale automatico e telefoni tenuti separati dal chip
   Wi-Fi non sono mai stati provati.
+- **L'aggiornamento da chiavetta** è girato nei test su Mac, Linux e Windows (CI), mai con una
+  chiavetta vera in mano a una persona. Sul Raspberry è girata solo la parte che controlla:
+  l'installatore era una controfigura.
 - **Nessuna folla di telefoni veri.** Ne abbiamo simulati fino a 1.000, in container su un solo Mac
   e su una rete virtuale. Una vera radio Wi-Fi ne regge molti meno insieme.
 - **Un test sul campo, quattro apparecchi.** Il 26 ottobre 2026, senza internet: un Mac, due iPhone
@@ -118,7 +121,7 @@ un limite, diccelo e lo aggiungiamo.
   disco. Ciò che si cancella però non c'è più, sovrascritto invece che lasciato nel file
   (misurato: prima, un numero di telefono cancellato si leggeva ancora).
 - **Nessun aggiornamento automatico.** Una correzione arriva a un Campanile solo quando qualcuno la
-  installa.
+  porta, su una chiavetta controllata con la firma di CarrotStudio, o la installa.
 - **Annunci e nomi si cancellano da soli**: gli annunci dopo 14 giorni, i nomi di "sto bene" dopo
   60. Chi gestisce può cambiarli all'avvio, o tenerli per sempre.
 - **Il navigatore** non sa dove si trova il telefono né conosce i divieti di svolta, stima i tempi,
@@ -149,11 +152,7 @@ Più o meno in ordine di importanza:
    correggerlo dopo un lungo blackout.
 6. **Un fuzzer guidato dalla copertura** (AFL, Atheris) sul lettore delle mappe e sul costruttore
    delle strade, e un audit di sicurezza esterno.
-7. **Aggiornamenti firmati**, così il Campanile verifica una chiavetta da solo invece di fidarsene
-   come di una chiave di casa. Le versioni si firmano con le chiavi offline di CarrotStudio, e
-   GitHub pubblica solo quelle firmate. Manca ancora un Campanile installato che controlli la
-   chiavetta prima di aggiornarsi.
-8. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
+7. **Il navigatore**: i divieti di svolta, che non ci sono nei file delle mappe che usiamo, e una
    posizione che ti segue, che ha bisogno di HTTPS.
 
 ## Aiutaci a chiuderli
