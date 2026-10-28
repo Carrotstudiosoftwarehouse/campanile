@@ -27,7 +27,10 @@ DOMAIN = b"campanile-release-v1\n"  # so a notice's signature can never pass for
 SIGNATURE = "campanile/release-signature.json"
 # CarrotStudio's release keys (key id: base64): the one in use and a spare kept apart, so that
 # losing one is no disaster. Only public parts here; the private ones never touch a network.
-KEYS: dict[str, str] = {}
+KEYS: dict[str, str] = {
+    "757c3faf694ec061": "L7yd79BolxUQRCL6bi+H5jbn4byDDsP0KPjhlZC8Pdw=",  # in use
+    "1865236026b390df": "BGTBjpAnfnrsEm26CfYL3W/axwrU3tZTboziCUMqmTc=",  # spare, kept apart
+}
 _VERSION = re.compile(r"(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})\.(0|[1-9][0-9]{0,5})")
 
 
