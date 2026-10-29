@@ -24,6 +24,9 @@ table inet campanile {
         udp dport { 53, 67 } accept
         tcp dport { 80, 8081 } ct state new add @connections_per_phone { ether saddr ct count over 64 } reject with tcp reset
         tcp dport { 53, 80, 8081 } accept
+        # Every name leads here, so phones knock on HTTPS too: refused at once, a browser
+        # falls back to the page instead of waiting for its own timeout (dropped, it hung).
+        tcp dport 443 reject with tcp reset
         drop
     }
 
