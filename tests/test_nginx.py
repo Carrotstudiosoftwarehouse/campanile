@@ -7,6 +7,7 @@ requests come from 127.0.0.2, which Linux has and a Mac doesn't. Skipped without
 """
 
 import contextlib
+import gzip
 import http.client
 import json
 import os
@@ -33,6 +34,15 @@ ROOT = Path(__file__).resolve().parent.parent
 BASH = shutil.which("bash") if os.name != "nt" else None
 NGINX = shutil.which("nginx") or next(
     (p for p in ("/usr/sbin/nginx", "/opt/homebrew/bin/nginx") if os.access(p, os.X_OK)), None
+)
+# The file types Debian's nginx.conf brings in, so a .js is served as on the Raspberry.
+MIME_TYPES = next(
+    (
+        p
+        for p in ("/etc/nginx/mime.types", "/opt/homebrew/etc/nginx/mime.types")
+        if os.path.exists(p)
+    ),
+    None,
 )
 
 
@@ -93,6 +103,12 @@ class TestSameRulesAsCampanile(unittest.TestCase):
         self.assertIn(f"client_max_body_size {admin.CAP_BODY // 1024}k;", cap_room)
         self.assertIn(f"client_max_body_size {transport.MAX_BODY // 1024}k;", self.conf)
 
+    def test_the_map_code_is_a_type_that_travels_compressed(self):
+        # With a charset added, its type was no longer one gzip_types matches: 1.1 MB raw.
+        kind = re.search(r"default_type ([^;]+);", location(self.conf, "~ \\.mjs"))[1]
+        compressed = re.search(r"gzip_types ([^;]+);", self.conf)[1].split()
+        self.assertIn(kind, compressed)
+
     def test_pace_of_a_whole_map(self):
         maps = location(self.conf, '~ "^/maps/')
         self.assertIn(f"limit_rate_after {files.MAP_FREE // 2**20}m;", maps)
@@ -134,9 +150,10 @@ class TestThroughNginx(unittest.TestCase):
         (root / "site.conf").write_text(conf)
         kinds = ("client_body", "proxy", "fastcgi", "uwsgi", "scgi")
         temp = "".join(f"    {kind}_temp_path {root / kind};\n" for kind in kinds)
+        types = f"    include {MIME_TYPES};\n" if MIME_TYPES else ""
         (root / "nginx.conf").write_text(
             f"pid {root / 'nginx.pid'};\nevents {{}}\n"
-            f"http {{\n{temp}    include {root / 'site.conf'};\n}}\n"
+            f"http {{\n{temp}{types}    include {root / 'site.conf'};\n}}\n"
         )
         where = ["-p", str(root), "-e", str(root / "error.log"), "-c", str(root / "nginx.conf")]
         self.nginx = subprocess.Popen(  # noqa: S603 (nginx, with the configuration above)
@@ -194,6 +211,31 @@ class TestThroughNginx(unittest.TestCase):
         ask = {"password": PASSWORD}
         self.assertEqual(self.call("POST", "/api/admin/list", ask, claims, phone=True)[0], 403)
         self.assertEqual(self.call("POST", "/api/admin/list", ask)[0], 200)  # the address decides
+
+    def test_from_the_cable_its_address_opens_campanile(self):
+        # The Pi's IP on the home network, typed in a laptop: Campanile, not the hotspot's page.
+        status, page = self.call("GET", "/", headers={"Host": "192.168.1.50"})
+        self.assertEqual(status, 200)
+        self.assertIn(b"Campanile", page)
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        conn.request("GET", "/", headers={"Host": "captive.apple.com"})
+        r = conn.getresponse()
+        r.read()
+        conn.close()
+        # Any name still leads to the portal: that is how phones open it.
+        self.assertEqual((r.status, r.getheader("Location")), (302, "http://10.42.0.1/"))
+
+    @unittest.skipUnless(MIME_TYPES, "no mime.types for nginx here")
+    def test_scripts_travel_compressed(self):
+        script = (ROOT / "campanile" / "web" / "map.js").read_bytes()
+        conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=30)
+        conn.request("GET", "/map.js", headers={"Accept-Encoding": "gzip"})
+        r = conn.getresponse()
+        body = r.read()
+        conn.close()
+        self.assertEqual(r.getheader("Content-Encoding"), "gzip")
+        self.assertIn("Accept-Encoding", r.getheader("Vary") or "")
+        self.assertEqual(gzip.decompress(body), script)
 
     def test_a_whole_map_is_paced_a_tile_is_not(self):
         self.map.write_bytes(os.urandom(files.MAP_FREE + 6 * files.MAP_RATE))

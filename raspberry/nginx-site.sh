@@ -89,7 +89,8 @@ cat <<CONF
 
 server {
 $(listen 80 "$DEFAULT")
-    server_name ${PORTAL:+$PORTAL }$HOSTNAME_LOCAL localhost 127.0.0.1;
+    # Its own names, and any address: typed from the home network, the Pi's IP opens Campanile.
+    server_name ${PORTAL:+$PORTAL }$HOSTNAME_LOCAL localhost 127.0.0.1 ~^[0-9.]+\$;
     server_tokens off;
 $(quiet)
     root $CODE/campanile/web;
@@ -103,6 +104,11 @@ $(quiet)
     client_max_body_size 8k;
     limit_conn campanile_conn 16;
 
+    # Scripts and styles travel compressed: the map's code alone, 1.1 MB, becomes 0.3 MB.
+    gzip on;
+    gzip_vary on;
+    gzip_types text/css text/javascript application/javascript application/json image/svg+xml;
+
     location / {
         try_files \$uri \$uri/ =404;
 $(headers)
@@ -113,9 +119,10 @@ $(headers)
     }
 
     # Debian's mime.types doesn't know .mjs: without this the browser refuses the map code.
+    # A module is read as UTF-8 anyway; a type with no charset is one gzip_types can match.
     location ~ \.mjs\$ {
         types { }
-        default_type "text/javascript; charset=utf-8";
+        default_type text/javascript;
 $(headers)
     }
 
