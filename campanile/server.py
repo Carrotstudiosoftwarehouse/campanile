@@ -33,7 +33,7 @@ import store
 import transport
 from store import RequestError
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 
 HERE = Path(__file__).resolve().parent
 

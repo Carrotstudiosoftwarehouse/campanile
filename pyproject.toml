@@ -3,7 +3,7 @@
 # and its modules import each other by name. This file holds its description and lint settings.
 [project]
 name = "campanile"
-version = "0.1.0"
+version = "0.1.1"
 description = "Offline emergency hub: official notices, help board, \"I am safe\" list and maps, with no internet."
 readme = "README.md"
 license = "MIT"

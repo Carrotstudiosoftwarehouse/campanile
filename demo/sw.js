@@ -4,7 +4,7 @@
 // moderate. Only what a visitor can try is here; the real rules are in campanile/api.py and
 // campanile/store.py.
 
-const VERSION = "0.1.0-demo";
+const VERSION = "0.1.1-demo";
 const STORE = "campanile-demo";
 const CATEGORIES = ["water", "food", "medicine", "power", "shelter", "transport", "help", "info", "other"];
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
