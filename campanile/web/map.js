@@ -3,7 +3,7 @@ import { api, fileSize } from "/common.js";
 import { has, t, translatePage } from "/i18n.js";
 import { maplibregl, readHeader, registerPmtiles, style } from "/mapstyle.js";
 import { attachRoute, routable } from "/route.js";
-import { attachSearch, describe } from "/search.js";
+import { attachSearch, describe, title } from "/search.js";
 
 translatePage();
 
@@ -89,7 +89,7 @@ async function go(result) {
   marker?.remove();
   const card = document.createElement("div");
   const name = document.createElement("strong");
-  name.textContent = result.name;
+  name.textContent = title(result);
   const about = document.createElement("span");
   about.textContent = describe(result);
   card.append(name, about);

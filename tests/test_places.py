@@ -4,6 +4,7 @@
 import contextlib
 import gzip
 import io
+import json
 import os
 import random
 import struct
@@ -308,6 +309,56 @@ class TestKinds(PlacesTestCase):
         found = self.light_map()
         self.assertEqual(self.search("via della farmacia", found=found)[0]["type"], "street")
         self.assertFalse(found.search("via della farmacia", CENTER, "it")["missing"])
+
+
+class TestNameless(PlacesTestCase):
+    """What maps seldom name, a fountain or public toilets, is found by its kind."""
+
+    def area(self) -> places.Places:
+        tiles: dict = {}
+
+        def add(lon, lat, layer, props, line=False):
+            key, p = point(lon, lat)
+            shape = [p, (p[0] + 60, p[1])] if line else [p]
+            tiles.setdefault(key, {}).setdefault(layer, []).append((props, shape))
+
+        add(*CENTER, "places", {"name": "Borgo Prova", "kind": "locality", "kind_detail": "town"})
+        add(7.6810, 45.0700, "pois", {"kind": "drinking_water"})  # as most fountains are
+        add(7.6830, 45.0712, "pois", {"kind": "toilets"})
+        add(7.6805, 45.0701, "pois", {"kind": "shelter"})  # a bus shelter: no refuge
+        street = {"name": "King's Parade", "kind": "other", "kind_detail": "living_street"}
+        add(7.6820, 45.0705, "roads", street, line=True)
+        self.write("area.pmtiles", vector_map(tiles))
+        return self.places()
+
+    def test_the_nearest_water_has_no_name_and_is_found(self):
+        answer = self.area().search("water", CENTER, "en")
+        found = [(r["kind"], r["name"]) for r in answer["results"]]
+        self.assertEqual(found, [("drinking_water", "")])
+        self.assertFalse(answer["missing"])
+
+    def test_toilets_too(self):
+        found = self.search("toilets", lang="en", found=self.area())
+        self.assertEqual([r["kind"] for r in found], ["toilets"])
+
+    def test_a_nameless_shelter_is_no_refuge(self):
+        self.assertTrue(self.area().search("shelter", CENTER, "en")["missing"])
+
+    def test_a_living_street_is_a_street_with_or_without_the_apostrophe(self):
+        found = self.area()
+        for typed in ("King's Parade", "kings parade"):
+            with self.subTest(typed=typed):
+                names = [r["name"] for r in self.search(typed, found=found)]
+                self.assertEqual(names[:1], ["King's Parade"])
+
+    def test_an_index_saved_by_an_older_version_is_read_again(self):
+        self.area()
+        saved = self.cache / "area.json"
+        content = json.loads(saved.read_text(encoding="utf-8"))
+        content["format"] = 1  # as 0.1.0 wrote it: without the nameless fountain
+        content["rows"] = [r for r in content["rows"] if r[1] != "drinking_water"]
+        saved.write_text(json.dumps(content), encoding="utf-8")
+        self.assertFalse(self.places().search("water", CENTER, "en")["missing"])
 
 
 class TestIndexMemory(unittest.TestCase):

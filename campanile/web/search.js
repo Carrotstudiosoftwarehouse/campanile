@@ -17,9 +17,14 @@ export function label(result) {
   return "";
 }
 
+// The name, or what it is for a place without one: most drinking fountains.
+export function title(result) {
+  return result.name || label(result);
+}
+
 // "Pharmacy · San Salvario": what it is and where, for the list and the map.
 export function describe(result) {
-  return [label(result), result.near].filter(Boolean).join(" · ");
+  return [result.name && label(result), result.near].filter(Boolean).join(" · ");
 }
 
 // Options: input and results are elements; chips may be null; center() is [lon, lat] or
@@ -53,7 +58,7 @@ export function attachSearch({ input, results, chips, center, pick }) {
       const button = document.createElement("button");
       button.type = "button";
       const name = document.createElement("strong");
-      name.textContent = result.local ? `${result.name} (${result.local})` : result.name;
+      name.textContent = result.local ? `${result.name} (${result.local})` : title(result);
       const about = document.createElement("span");
       const far = result.meters === undefined ? "" : distance(result.meters);
       about.textContent = [describe(result), far].filter(Boolean).join(" · ");

@@ -28,7 +28,7 @@ from array import array
 from bisect import bisect_left, bisect_right
 from pathlib import Path
 
-FORMAT = 1  # of the files in data/places/: a new format means reading the maps again
+FORMAT = 2  # of the files in data/places/: a new format means reading the maps again
 MAP_NAME = re.compile(r"[A-Za-z0-9_-]+\.pmtiles")
 TILE_LIMIT = 8 * 2**20  # unpacked; vector tiles are rarely over 1 MB
 DIRECTORY_LIMIT = 4 * 2**20  # unpacked; real maps stay under 30 KB
@@ -71,6 +71,10 @@ PLACE, STREET, POINT = 0, 1, 2
 TYPES = ("place", "street", "poi")
 LANGUAGES = ("it", "en")
 STREET_KINDS = {"highway", "major_road", "minor_road", "path"}
+OTHER_STREETS = {"living_street"}  # the map files them under "other", but people live there
+# What people need and maps seldom name: found by kind, never by a name it hasn't got.
+NAMELESS_KINDS = {"drinking_water", "toilets"}
+APOSTROPHES = str.maketrans("", "", "'\u2019")  # "King's" is typed "kings" too
 # Many, and named after the street they stand on: they would bury the street itself.
 NOISY_POINTS = {"bus_stop", "tram_stop", "subway_entrance", "platform"}
 
@@ -377,7 +381,8 @@ def _points(geometry: list[int]):
 
 
 def _features(tile: bytes, wanted: set[str]):
-    """(layer, properties, extent, geometry) of the named features of the wanted layers."""
+    """(layer, properties, extent, geometry) of the named features of the wanted layers,
+    and of the nameless points of NAMELESS_KINDS."""
     for number, layer in _fields(tile):
         if number != 3:
             continue
@@ -412,7 +417,8 @@ def _features(tile: bytes, wanted: set[str]):
                 if tags[k] < len(keys) and tags[k + 1] < len(values)
             }
             name_tag = props.get("name")
-            if isinstance(name_tag, str) and name_tag.strip() and geometry:
+            named = isinstance(name_tag, str) and name_tag.strip()
+            if geometry and (named or (name == "pois" and props.get("kind") in NAMELESS_KINDS)):
                 yield name, props, extent, geometry
 
 
@@ -555,7 +561,7 @@ class _Reader:
         piece[:4] = box
 
     def point(self, props, lon, lat):
-        name = props["name"].strip()[:120]
+        name = props["name"].strip()[:120] if isinstance(props.get("name"), str) else ""
         kind = str(props.get("kind", ""))[:40]
         key = (normalize(name), kind, round(lon, 4), round(lat, 4))  # in two tiles at a border
         if key not in self.points and not self.full():
@@ -643,7 +649,10 @@ def read_map(path: Path) -> dict:
             for layer, props, extent, geometry in _features(tile, wanted):
                 work.spend("features")
                 if layer == "roads":
-                    if props.get("kind") in STREET_KINDS:
+                    if (
+                        props.get("kind") in STREET_KINDS
+                        or props.get("kind_detail") in OTHER_STREETS
+                    ):
                         box = _box(z, x, y, geometry, extent)
                         if box:
                             reader.street(props, box)
@@ -687,7 +696,12 @@ class MapIndex:
         self.variants: list[tuple[str, ...]] = []  # every name, normalized
         words: dict[str, list[int]] = {}
         for i, r in enumerate(rows):
-            variants = tuple(dict.fromkeys(normalize(n) for n in (r[3], *r[4].values())))
+            names = (r[3], *r[4].values())
+            variants = tuple(
+                dict.fromkeys(
+                    v for n in names for v in (normalize(n), normalize(n.translate(APOSTROPHES)))
+                )
+            )
             self.variants.append(variants)
             own = list(dict.fromkeys(w for v in variants for w in v.split()))
             own = list(dict.fromkeys(own + [SHORT_FORMS[w] for w in own if w in SHORT_FORMS]))
