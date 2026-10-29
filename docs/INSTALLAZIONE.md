@@ -138,11 +138,13 @@ Un Raspberry Pi 3B+, 4, 5 o Zero 2 W diventa un Campanile sempre pronto. Crea la
 aperta **"Campanile"**, e il portale **si apre da solo** quando un telefono si collega. Consuma
 poco e va avanti con una power bank.
 
-Serve **Raspberry Pi OS** (Bookworm o più recente) con il Wi-Fi integrato, collegato a internet
-**via cavo** (l'hotspot spegne il Wi-Fi da cui sei collegato).
+Serve **Raspberry Pi OS a 64 bit** (Bookworm o più recente: a 32 bit la mappa non si può scaricare
+dal Pi) con il Wi-Fi integrato, collegato a internet **via cavo** (l'hotspot spegne il Wi-Fi da cui
+sei collegato). Lo Zero 2 W non ha la porta di rete: usa tastiera e schermo, perché l'hotspot è
+l'ultimo passo, oppure un adattatore di rete USB.
 
 ```bash
-sudo apt install -y git
+sudo apt update && sudo apt install -y git
 git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
 scripts/download-map.sh italy-light       # facoltativo
 scripts/download-wikipedia.sh medicine    # facoltativo

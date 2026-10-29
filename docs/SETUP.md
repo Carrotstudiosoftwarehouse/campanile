@@ -132,11 +132,13 @@ A Raspberry Pi 3B+, 4, 5 or Zero 2 W is an always-ready Campanile. It creates th
 **"Campanile"**, and the portal **opens by itself** when a phone connects. It uses little power
 and runs on a power bank.
 
-You need **Raspberry Pi OS** (Bookworm or newer) with built-in Wi-Fi, online **by cable** (the
-hotspot switches off the Wi-Fi you are on).
+You need **Raspberry Pi OS 64-bit** (Bookworm or newer: on 32-bit the map can't be downloaded on
+the Pi) with built-in Wi-Fi, online **by cable** (the hotspot switches off the Wi-Fi you are on).
+A Zero 2 W has no network port: use a keyboard and screen, since the hotspot is the last step, or
+a USB network adapter.
 
 ```bash
-sudo apt install -y git
+sudo apt update && sudo apt install -y git
 git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
 scripts/download-map.sh italy-light       # optional
 scripts/download-wikipedia.sh medicine    # optional

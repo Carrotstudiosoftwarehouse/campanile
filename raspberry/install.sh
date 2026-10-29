@@ -136,6 +136,10 @@ if [ ! -s "$CONFIG/password" ]; then
   NEW_PASSWORD="$(python3 -I -c 'import secrets; print(secrets.token_urlsafe(12))')"
   ( umask 027; printf '%s\n' "$NEW_PASSWORD" > "$CONFIG/password" )
   chgrp campanile "$CONFIG/password"
+  # Shown now as well: if a later step stops the install, it isn't lost.
+  echo "Admin password, write it down: $NEW_PASSWORD"
+else
+  echo "Admin password: the same as before (sudo cat $CONFIG/password)."
 fi
 
 # Public keys of the authorities allowed to sign notices. Empty until you add one (docs/ADMIN.md).
@@ -223,11 +227,15 @@ if [ "$HOTSPOT" -eq 1 ]; then
 else
   echo "Portal:  http://$HOSTNAME_LOCAL/"
 fi
+echo
 if [ -n "$NEW_PASSWORD" ]; then
-  echo
-  echo "Admin password (page /admin.html). Write it down now:"
+  echo "Admin password, write it down now:"
   echo "    $NEW_PASSWORD"
-  echo "Stored in $CONFIG/password (readable by root and the campanile service)."
+else
+  echo "Admin password: the same as before (sudo cat $CONFIG/password)."
 fi
+echo "Admin page: http://localhost/admin.html on the Raspberry itself, or through an SSH tunnel"
+echo "from a computer on the cable (docs/ADMIN.md). Never from phones: on the open Wi-Fi the"
+echo "password would travel in clear."
 echo
 echo "Service status:  systemctl status campanile campanile-kiwix"
