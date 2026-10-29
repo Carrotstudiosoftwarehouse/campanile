@@ -73,6 +73,7 @@ export function tn(key, n, params = {}) {
   return t(`${key}_${n === 1 ? "one" : "other"}`, { n, ...params });
 }
 
+// IT | EN at the top of every page, the language in use filled in: seen at once, in any language.
 function switcher() {
   const nav = document.getElementById("lang-switch");
   if (!nav) return;
@@ -81,10 +82,14 @@ function switcher() {
   nav.replaceChildren(...AVAILABLE.map((code) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "link";
-    button.textContent = names[code] || code;
-    button.disabled = code === lang;
+    button.lang = code;
+    const name = document.createElement("span");  // read aloud "IT Italiano": the word seen, then in full
+    name.className = "visually-hidden";
+    name.textContent = ` ${names[code] || code}`;
+    button.append(code.toUpperCase(), name);
+    button.setAttribute("aria-pressed", String(code === lang));
     button.addEventListener("click", () => {
+      if (code === lang) return;
       try { localStorage.setItem(CHOICE_KEY, code); } catch { /* no storage: choice not kept */ }
       location.reload();
     });

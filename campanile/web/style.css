@@ -31,7 +31,7 @@ body {
 header.topbar {
   background: var(--paper);
   border-bottom: 1px solid var(--border);
-  padding: 12px 16px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -189,7 +189,27 @@ button.link {
 }
 button.link:disabled { color: var(--muted); text-decoration: none; cursor: default; opacity: 1; }
 
-nav.lang { display: block; margin-top: 4px; }
+/* The language, top right (left when read right to left): a pill, the one in use filled in. */
+nav.lang {
+  margin-inline-start: auto;
+  display: inline-flex;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  overflow: hidden;
+}
+nav.lang button {
+  margin: 0;
+  min-width: 48px;
+  min-height: 44px;  /* a thumb-sized target */
+  padding: 0 12px;
+  border: none;
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-weight: 700;
+}
+nav.lang button + button { border-inline-start: 2px solid var(--accent); }
+nav.lang button[aria-pressed="true"] { background: var(--accent); color: var(--accent-text); cursor: default; }
 
 button.secondary {
   background: transparent;
