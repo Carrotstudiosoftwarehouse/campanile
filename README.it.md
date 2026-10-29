@@ -101,6 +101,9 @@ simile? Scrivicelo.
 - **[Pathweave](https://github.com/Dancode-188/pathweave)**: messaggi fra dispositivi vicini quando
   internet non c'è, via Wi-Fi o, se manca, via Bluetooth. Cifrati, e con la verifica di tutte e due
   le parti.
+- **[LastLight](https://github.com/edujbarrios/lastlight)**: risposte dai documenti offline, con la
+  loro fonte, consumando pochissimo. Niente IA che inventa: trova solo quello che dicono i
+  documenti.
 
 ## Come è fatto
 

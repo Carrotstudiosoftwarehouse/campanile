@@ -101,6 +101,9 @@ something like this? Tell us.
 - **[Pathweave](https://github.com/Dancode-188/pathweave)**: messages between nearby devices when
   the internet is down, over Wi-Fi or, without it, Bluetooth. Encrypted, and both sides are
   checked.
+- **[LastLight](https://github.com/edujbarrios/lastlight)**: answers from offline documents, with
+  their source, on very little power. No AI that makes things up: it only finds what the
+  documents say.
 
 ## How it is built
 
