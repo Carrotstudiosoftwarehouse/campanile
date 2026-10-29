@@ -50,7 +50,7 @@ Pages in English and Italian, picked from the phone's language. Maps for any are
 4. Print the sign: its QR code opens the Campanile.
 5. Everyone joins the same Wi-Fi. With no internet, an Android phone's hotspot can make it.
 
-**On a Raspberry Pi**, a fixed station that makes its own Wi-Fi and opens the portal by itself:
+**On a Raspberry Pi**, a fixed station with its own Wi-Fi:
 [Raspberry Pi setup](docs/SETUP.md#raspberry-pi).
 
 **More:** [setting up](docs/SETUP.md) (maps, Wikipedia, USB sticks, power) ·

@@ -43,23 +43,33 @@ inglese o tutte e due. Gli scaricamenti riprendono se interrotti e sono controll
   <img src="immagini/setup.png" width="600" alt="Pagina di preparazione: la zona da scaricare, inquadrata dove si trova il computer">
 </p>
 
-**Dal terminale, o per il Raspberry**, con internet, una volta:
+**Dal terminale, o per il Raspberry**, nella cartella del Campanile, con internet, una volta:
 
 ```bash
 scripts/prepare.sh                        # librerie (già incluse nel pacchetto pronto)
-scripts/download-map.sh italy-light       # mappa dell'Italia, ~580 MB
+scripts/download-map.sh custom area OVEST,SUD,EST,NORD   # la tua zona, vedi sotto
+scripts/download-map.sh world             # il mondo intero, ~190 MB
 scripts/download-wikipedia.sh medicine    # voci mediche, ~260 MB
 ```
 
+### La tua zona, in dettaglio
+
+La ricerca delle vie, l'ospedale, la farmacia o l'acqua più vicini e il navigatore funzionano solo
+con una mappa del tuo comune e dei dintorni, fino a circa 30 km di lato. Sulla mappa del mondo e
+su quelle dell'Italia la ricerca trova solo i paesi.
+
+Per avere i suoi quattro numeri apri [openstreetmap.org](https://www.openstreetmap.org), cerca il
+tuo comune e ingrandisci finché lo schermo mostra lui e i dintorni. Premi **Esporta** in alto:
+compaiono quattro numeri, messi come i lati dello schermo. A sinistra c'è l'ovest, a destra l'est,
+in alto il nord e in basso il sud. Torino centro è `7.64,45.04,7.71,45.09`, circa 7 MB. Un quadrato
+di 30 km attorno a Torino pesa circa 23 MB.
+
 | Mappe (`download-map.sh`) | Dimensione | Dettaglio |
 |---|---|---|
+| `custom NOME OVEST,SUD,EST,NORD` | dipende | la tua zona, ogni via: ricerca e navigatore |
 | `world` | ~190 MB | stati, città e strade principali di tutto il mondo |
-| `italy-light` | ~580 MB | strade di tutta Italia |
-| `italy` | ~4,5 GB | ogni strada ed edificio |
-| `custom NOME OVEST,SUD,EST,NORD` | dipende | solo la tua zona, dettaglio pieno |
-
-Per la tua città usa `custom`, ovunque nel mondo (le coordinate si leggono da qualunque mappa
-online). Torino centro (`custom torino 7.64,45.04,7.71,45.09`) pesa circa 7 MB.
+| `italy-light` | ~580 MB | strade di tutta Italia, da guardare |
+| `italy` | ~4,5 GB | ogni strada ed edificio, da guardare: troppo grande per ricerca e navigatore |
 
 | Wikipedia (`download-wikipedia.sh`) | Dimensione in italiano |
 |---|---|
@@ -134,26 +144,35 @@ schermo meno luminoso.
 
 ## Raspberry Pi
 
-Un Raspberry Pi 3B+, 4, 5 o Zero 2 W diventa un Campanile sempre pronto. Crea la rete Wi-Fi
-aperta **"Campanile"**, e il portale **si apre da solo** quando un telefono si collega. Consuma
-poco e va avanti con una power bank.
+Dovrebbe funzionare su un Raspberry Pi 3B+, 4, 5 o Zero 2 W. Provato in container con Raspberry
+Pi OS e su radio Wi-Fi virtuali, non ancora su una scheda vera. Crea la rete Wi-Fi aperta
+**"Campanile"**: la maggior parte dei telefoni apre la pagina da sola, e se uno non lo fa basta il
+codice QR del cartello. Consuma poco e va avanti con una power bank.
 
 Serve **Raspberry Pi OS a 64 bit** (Bookworm o più recente: a 32 bit la mappa non si può scaricare
 dal Pi) con il Wi-Fi integrato, collegato a internet **via cavo** (l'hotspot spegne il Wi-Fi da cui
 sei collegato). Lo Zero 2 W non ha la porta di rete: usa tastiera e schermo, perché l'hotspot è
 l'ultimo passo, oppure un adattatore di rete USB.
 
+Prima trova [i quattro numeri della tua zona](#la-tua-zona-in-dettaglio) e scrivili nella riga
+della mappa, al posto di `OVEST,SUD,EST,NORD`. Poi incolla:
+
 ```bash
 sudo apt update && sudo apt install -y git
 [ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
 cd $HOME/campanile && git pull
-scripts/download-map.sh italy-light       # facoltativo
-scripts/download-wikipedia.sh medicine    # facoltativo
+scripts/download-map.sh custom area OVEST,SUD,EST,NORD   # la tua zona
+scripts/download-map.sh world             # facoltativo, ~190 MB
+scripts/download-wikipedia.sh medicine    # facoltativo, ~260 MB
 sudo raspberry/install.sh                 # opzioni: --ssid NOME  --country IT  --no-hotspot
 ```
 
-Incollate di nuovo, da qualsiasi cartella, le stesse righe riprovano dopo un problema o
-aggiornano Campanile: niente si scarica due volte, e dati e password restano.
+Se la lasci com'è, la riga della mappa si ferma con "Invalid box" e le altre vanno avanti.
+
+Incollate di nuovo, da qualsiasi cartella, le stesse righe (opzioni comprese) riprovano dopo un
+problema, aggiornano Campanile, o portano dentro una mappa o una Wikipedia che ci aggiungi. Mappe e
+Wikipedia già presenti non si riscaricano, quelle nuove vanno dove il Campanile le legge, e dati e
+password restano.
 
 L'installatore scarica da solo le librerie delle mappe la prima volta, e aspetta se il Raspberry,
 appena acceso, si sta ancora aggiornando.
@@ -162,20 +181,17 @@ appena acceso, si sta ancora aggiornando.
 
 L'installazione:
 
-- installa `python3`, `python3-cryptography`, `kiwix-tools` e `nginx` da Debian, e crea l'utente
-  di servizio `campanile`, senza privilegi
+- installa `python3`, `python3-cryptography`, `kiwix-tools`, `nginx` e `nftables` da Debian, e
+  crea l'utente di servizio `campanile`, senza privilegi
 - mette il programma in `/opt/campanile`, i dati in `/var/lib/campanile`, la configurazione in `/etc/campanile`
-- mette **nginx** sulla porta 80 per pagine, mappe e client lenti o ingordi. Il Campanile (porta
-  8080) e Wikipedia (porta 8081) ascoltano solo dentro il Raspberry, protetti da systemd, e
-  partono a ogni accensione
+- mette **nginx** sulla porta 80 per pagine, mappe e client lenti o ingordi, e sulla 8081 per
+  Wikipedia. Il Campanile (127.0.0.1:8080) e il server di Wikipedia (127.0.0.1:8082) ascoltano
+  solo dentro il Raspberry, con i limiti di systemd, e partono a ogni accensione
 - crea con NetworkManager la Wi-Fi **aperta** "Campanile" su `10.42.0.1`, e fa rispondere ogni
-  nome di dominio con il Campanile, così i telefoni aprono il portale da soli
-- isola i telefoni tra loro. Un **firewall** sull'hotspot fa raggiungere solo DHCP, DNS e il
-  Campanile, niente altro del Raspberry e nessuna rete dietro di lui
-
-**Per aggiornare**, incolla di nuovo le stesse righe. Dati e password restano. Le mappe aggiunte dopo vanno in
-`/var/lib/campanile/maps` (leggibili da tutti, permessi 644), i file di Wikipedia in
-`/var/lib/campanile/zim` (proprietario `campanile`). Poi `sudo systemctl restart campanile-kiwix`.
+  nome di dominio con il Campanile
+- chiede al chip Wi-Fi di tenere separati i telefoni (non ancora verificato sul chip di un Pi). Un
+  **firewall** sull'hotspot fa raggiungere solo DHCP, DNS, ping e il Campanile (porte 80 e 8081),
+  niente altro del Raspberry e nessuna rete dietro di lui
 
 **Cosa cambia nella rete:** la connessione NetworkManager `campanile-hotspot`,
 `/etc/NetworkManager/dnsmasq-shared.d/campanile.conf` (reindirizzamento DNS, solo con l'hotspot
@@ -183,11 +199,11 @@ acceso), il firewall `/etc/campanile/firewall.nft` con il servizio `campanile-fi
 anche il paese del Wi-Fi e sostituisce il sito predefinito di nginx (rimesso com'era alla
 disinstallazione).
 
-**Per togliere tutto:** `sudo raspberry/uninstall.sh` (conserva dati e password) oppure
-`sudo raspberry/uninstall.sh --purge` (cancella anche quelli).
+**Per togliere tutto:** `cd $HOME/campanile && sudo raspberry/uninstall.sh` (conserva dati e
+password), oppure la stessa riga con `--purge` in fondo (cancella anche quelli).
 
-Il Wi-Fi integrato regge un numero limitato di telefoni. Per una piazza intera serve un access
-point esterno.
+Il Wi-Fi integrato regge un numero limitato di telefoni: quanti, non l'abbiamo ancora misurato.
+Per una piazza intera serve un access point esterno.
 
 ## Licenze
 

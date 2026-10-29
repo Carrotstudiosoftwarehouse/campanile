@@ -51,7 +51,7 @@ Pagine in italiano e in inglese, scelte dalla lingua del telefono. Mappe di qual
 4. Stampa il cartello: il suo QR apre il Campanile.
 5. Tutti si collegano alla stessa Wi-Fi. Senza internet, la può fare l'hotspot di un telefono Android.
 
-**Su un Raspberry Pi**, una stazione fissa che fa la sua Wi-Fi e apre il portale da sola:
+**Su un Raspberry Pi**, una stazione fissa con la sua Wi-Fi:
 [installare su Raspberry Pi](docs/INSTALLAZIONE.md#raspberry-pi).
 
 **Per saperne di più:** [installazione](docs/INSTALLAZIONE.md) (mappe, Wikipedia, chiavette,
