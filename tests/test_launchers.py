@@ -253,6 +253,28 @@ class TestDownloadMap(unittest.TestCase):
         )
         return done.stdout
 
+    @unittest.skipIf(os.name == "nt" or not shutil.which("bash"), "bash")
+    def test_the_four_numbers_written_with_spaces(self):
+        script = str(REPO / "scripts" / "download-map.sh")
+        with tempfile.TemporaryDirectory() as data:
+            Path(data, "maps").mkdir()
+            Path(data, "maps", "area.pmtiles").write_bytes(b"")  # there already: no download
+            env = {**os.environ, "CAMPANILE_DATA": data}
+            for typed in (
+                "7.64, 45.04, 7.71, 45.09",
+                "7.64 ,45.04 ,7.71 ,45.09",
+                "7.64, 45.04, 7.71, 45.09 14",
+            ):
+                with self.subTest(typed=typed):
+                    done = subprocess.run(  # noqa: S603 (our own script)
+                        ["bash", script, "custom", "area", *typed.split()],  # noqa: S607
+                        env=env,
+                        capture_output=True,
+                        text=True,
+                        check=False,
+                    )
+                    self.assertIn("Already there", done.stdout, done.stderr)
+
     def test_an_area_too_big_for_the_navigator_is_said(self):
         self.assertEqual(self.check("7.495,44.935,7.877,45.205"), "")  # 30 km around Turin
         self.assertIn("the navigator won't", self.check("7.30,44.80,8.10,45.35"))  # 60 km

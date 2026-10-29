@@ -28,13 +28,17 @@ BUILDS_URL="https://build-metadata.protomaps.dev/builds.json"
 BUILD_BASE="https://build.protomaps.com"
 
 [ $# -ge 1 ] || usage
-case "$1" in
+KIND="$1"
+case "$KIND" in
   world)       NAME="world";       BBOX="-180,-85,180,85";    ZOOM="7"  ;;
   italy)       NAME="italy";       BBOX="6.6,35.4,18.6,47.1"; ZOOM="15" ;;
   italy-light) NAME="italy-light"; BBOX="6.6,35.4,18.6,47.1"; ZOOM="12" ;;
   custom)
     [ $# -ge 3 ] || usage
-    NAME="$2"; BBOX="$3"; ZOOM="${4:-15}"
+    NAME="$2"; BBOX="$3"; shift 3
+    # "7.64, 45.04, 7.71, 45.09", typed with spaces, arrives in pieces: joined again.
+    while [ $# -gt 0 ] && { [[ "$BBOX" == *, ]] || [[ "$1" == ,* ]]; }; do BBOX="$BBOX$1"; shift; done
+    ZOOM="${1:-15}"
     ;;
   *) usage ;;
 esac
@@ -50,7 +54,7 @@ if ! [[ "$BBOX" =~ ^$NUM,$NUM,$NUM,$NUM$ ]]; then
   echo "Invalid box: expected WEST,SOUTH,EAST,NORTH in degrees, e.g. 7.64,45.04,7.71,45.09" >&2
   exit 1
 fi
-python3 -I - "$BBOX" "$ZOOM" "$1" "$ROOT/campanile" <<'PY'
+python3 -I - "$BBOX" "$ZOOM" "$KIND" "$ROOT/campanile" <<'PY'
 import math, sys
 w, s, e, n = map(float, sys.argv[1].split(","))
 if not (-180 <= w < e <= 180 and -85 <= s < n <= 85):
