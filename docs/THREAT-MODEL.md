@@ -7,7 +7,8 @@ Italian version: [SICUREZZA.md](SICUREZZA.md).
 - The Wi-Fi is **open and unencrypted**. Anyone nearby can join and see all posts, "sto bene" (I'm
   safe) names and notices.
 - **No connection log.** No IP addresses or visited pages are saved.
-- Deleted posts, names and notices are **overwritten on disk**, not just hidden.
+- Deleted or closed posts, names and notices are **overwritten in the file**, not just hidden (an
+  SD card or SSD can still keep an old copy inside the chip: see [LIMITS](LIMITS.md)).
 - The family plan **never reaches the Campanile and isn't kept on the phone**. It lives in the open
   page, and you print it.
 - Management (notices, moderation) works **only on the Campanile itself**, so the password never
@@ -35,6 +36,7 @@ We assume someone on the network wants to cause trouble.
 | An internet page talking to the Campanile under its own name (DNS rebinding) | Needs the Campanile laptop's browser, online. Internet domain names get 421. Addresses, `.local` and the computer's name still work, and nobody can register those. A page could once read the board and lock out the admin with 20 wrong passwords (tested, second adversarial review). Now it gets nothing and the lockout doesn't move. |
 | Reading system files | Paths must resolve inside the portal or maps folder (`.pmtiles` only). Windows tricks are rejected: streams (`index.html:Zone.Identifier` leaked the download origin, tested), trailing dot or space, backslash, `con`, `nul` and similar. |
 | Saturating the server | 256 connections, 16 per device, 10 seconds to send a request (drip-feed, tested with a real attack). On the Raspberry the hotspot firewall caps each MAC at 64 connections, before nginx. Thousands of one-byte connections from one device made others fail 27 of 60 requests and logged 1.7 MB a minute. Now 0 and 0 (tested). |
+| Slowing everyone with costly name searches | Each name search reads every name under the database's one lock. Now 30 per 10 seconds per device, one at a time, 4 different words at most, and an index that stops at the newest 50. With 15 phones searching nonstop, reading the notices takes 1.5 ms instead of 97 (tested). |
 | Posing as another phone or the Campanile | On the Raspberry, limits, lockout and local-only admin rely on the address nginx writes (`X-Real-IP`). Request smuggling could forge it: a GET with a body ran 8 of 8 hidden requests. Two fixes, each enough alone (tested one at a time, then 0 of 16). nginx sends one request per connection. The Campanile takes a body only on POST, one `Content-Length`, no `chunked`. |
 | Power loss | Accepted posts and notices hit disk before the reply (SQLite `synchronous=FULL`). |
 | Framing by other sites | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |

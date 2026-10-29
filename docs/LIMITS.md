@@ -103,13 +103,16 @@ missing, tell us and we will add it.
 - **Nobody is verified.** Anyone can post anything, or write any name in "I'm safe".
 - **Per-device limits can be dodged** with many Wi-Fi adapters, or a phone address that keeps
   changing. The emergency brake holds those posts for approval, but a determined flood still
-  costs the admin work.
+  costs the admin work. They also start again each day: a phone's tag changes every day, so that
+  days can't be linked. One phone can keep 5 posts open and register 10 names each day.
 - **The main password can do everything**, including adding and removing the people who run the
   Campanile. Everyone else signs in with their own password, and the log says who did what (the
   last 1,000 actions). Whoever uses the main password shows up only as "Main password".
 - **Whoever holds the device holds everything.** Database and admin password are not encrypted on
-  disk. Deleted data is gone, though, overwritten rather than left in the file (measured: before
-  this, a deleted phone number could still be read).
+  disk. Deleted data, and closed posts, are overwritten rather than left in the file (measured:
+  before this, a deleted phone number could still be read). But SD cards and SSDs move writes
+  around inside the chip, so an old copy can survive there: only an encrypted disk would close
+  that.
 - **No automatic updates.** A fix reaches a Campanile only when someone brings it, on a stick
   checked against CarrotStudio's signature, or installs it.
 - **Posts and names delete themselves**: posts after 14 days, "I'm safe" names after 60. The admin

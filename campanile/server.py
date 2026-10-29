@@ -39,6 +39,7 @@ import routes
 import sharing
 import signing
 import store
+import strictjson
 from store import RequestError, clean_text, normalize_name, parse_id
 
 VERSION = "0.1.0"
@@ -162,12 +163,15 @@ class Config:
         self.wrong_code_limit = store.RateLimiter(MAX_WRONG_CODES, RATE_WINDOW)
         self.post_flow = store.RateLimiter(FLOOD_POSTS, FLOOD_WINDOW)
         self.search_limit = store.RateLimiter(SEARCHES, SEARCH_WINDOW)
+        self.safe_search_limit = store.RateLimiter(SEARCHES, SEARCH_WINDOW)
         # Searching is the only real work a phone can ask for: one at a time, so however
         # many phones search, the rest of the Campanile answers as fast as ever.
         self.searching = threading.BoundedSemaphore(SEARCHING)
         self.route_limit = store.RateLimiter(ROUTES, SEARCH_WINDOW)
         self.route_time = store.RateLimiter(ROUTE_SECONDS, SEARCH_WINDOW)
         self.routing = threading.BoundedSemaphore(SEARCHING)
+        # The names too: each search goes through every name, under the database's one lock.
+        self.safe_searching = threading.BoundedSemaphore(SEARCHING)
         self.device_tags = devices.DeviceTags(arp_table)
         self.setup = setup
         self.places = places.Places(self.maps, data / "places")
@@ -505,10 +509,14 @@ class Handler(BaseHTTPRequestHandler):
                 raise RequestError(400, "bad_category")
             return self._json(200, {"posts": db.list_posts(kind, category)})
         if path == "/api/safe":
+            if not self.cfg.safe_search_limit.allow(self._device):
+                raise RequestError(429, "too_many_searches")
             q = clean_text(param("q"), "name", 80, required=False)
             if len(normalize_name(q)) < 2:
                 raise RequestError(400, "search_too_short")
-            return self._json(200, {"results": db.search_safe(q)})
+            with _turn(self.cfg.safe_searching, "search_busy"):
+                found = db.search_safe(q)
+            return self._json(200, {"results": found})
         if path == "/api/share":  # another Campanile asking what is shared, if anything
             found = self.cfg.share.published()
             if found is None:
@@ -530,12 +538,8 @@ class Handler(BaseHTTPRequestHandler):
             q = clean_text(param("q"), "search", 80, required=False)
             if len(places.normalize(q)) < 2:
                 raise RequestError(400, "search_too_short")
-            if not self.cfg.searching.acquire(timeout=SEARCH_WAIT):
-                raise RequestError(503, "search_busy")
-            try:
+            with _turn(self.cfg.searching, "search_busy"):
                 found = self.cfg.places.search(q, _near(param("near")), self._lang)
-            finally:
-                self.cfg.searching.release()
             return self._json(200, found)
         if path == "/api/route":
             if self.cfg.route_time.blocked(self._device):
@@ -545,17 +549,15 @@ class Handler(BaseHTTPRequestHandler):
             start, end, mode = _near(param("from")), _near(param("to")), param("by")
             if start is None or end is None or mode not in ("foot", "car"):
                 raise RequestError(400, "bad_route")
-            if not self.cfg.routing.acquire(timeout=SEARCH_WAIT):
-                raise RequestError(503, "route_busy")
-            began = time.monotonic()
-            try:
-                found = self.cfg.routes.route(start, end, mode)
-            except routes.RouteError as e:
-                busy = e.key in ("route_wait", "route_long")
-                raise RequestError(503 if busy else 404, e.key) from None
-            finally:
-                self.cfg.routing.release()
-                self.cfg.route_time.record(self._device, time.monotonic() - began)
+            with _turn(self.cfg.routing, "route_busy"):
+                began = time.monotonic()
+                try:
+                    found = self.cfg.routes.route(start, end, mode)
+                except routes.RouteError as e:
+                    busy = e.key in ("route_wait", "route_long")
+                    raise RequestError(503 if busy else 404, e.key) from None
+                finally:
+                    self.cfg.route_time.record(self._device, time.monotonic() - began)
             return self._json(200, found)
         if path == "/api/roads/closed":
             return self._json(200, {"closed": self.cfg.routes.closed()})
@@ -576,7 +578,7 @@ class Handler(BaseHTTPRequestHandler):
         self._body_left = False
         self.server.unwatch(self)
         try:
-            data = store.strict_json(raw.decode())
+            data = strictjson.loads(raw.decode())
         except (UnicodeDecodeError, ValueError, RecursionError):  # JSONDecodeError is a ValueError
             raise RequestError(400, "bad_json") from None
         if not isinstance(data, dict):
@@ -931,6 +933,18 @@ class Handler(BaseHTTPRequestHandler):
         if not started:
             raise RequestError(409, "setup_busy")
         return self._json(202, {"ok": True})
+
+
+@contextlib.contextmanager
+def _turn(semaphore: threading.BoundedSemaphore, busy: str):
+    """One at a time: whoever waits past SEARCH_WAIT hears "try again in a moment", so a crowd
+    of costly requests never piles up on the rest of the Campanile."""
+    if not semaphore.acquire(timeout=SEARCH_WAIT):
+        raise RequestError(503, busy)
+    try:
+        yield
+    finally:
+        semaphore.release()
 
 
 def _near(value: str) -> tuple[float, float] | None:

@@ -1,4 +1,6 @@
 # DEVELOPED BY CARROTSTUDIO software house
+# Not a pip package: Campanile runs from its own folder (double click, or raspberry/install.sh),
+# and its modules import each other by name. This file holds its description and lint settings.
 [project]
 name = "campanile"
 version = "0.1.0"

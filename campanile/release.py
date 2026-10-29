@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import base64
 import binascii
-import json
 import re
 import sys
 from pathlib import Path
@@ -20,7 +19,7 @@ from pathlib import Path
 import copying
 import messages
 import signing
-import store
+import strictjson
 
 FORMAT = "campanile-release-v1"
 DOMAIN = b"campanile-release-v1\n"  # so a notice's signature can never pass for a release's
@@ -70,7 +69,7 @@ def check(root: Path, newer_than: str | None = None, keys: dict[str, str] | None
     except (OSError, UnicodeDecodeError):
         raise ReleaseError("release_unreadable") from None
     try:
-        signed = json.loads(text, object_pairs_hook=store.reject_duplicate_keys)
+        signed = strictjson.loads(text)
     except (ValueError, RecursionError):
         raise ReleaseError("release_unreadable") from None
     if not isinstance(signed, dict) or set(signed) != {"format", "release", "key", "signature"}:

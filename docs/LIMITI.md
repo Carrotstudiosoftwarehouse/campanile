@@ -117,13 +117,17 @@ un limite, diccelo e lo aggiungiamo.
   bene".
 - **I limiti per dispositivo si possono aggirare** con molte antenne Wi-Fi, o con un indirizzo del
   telefono che cambia di continuo. Il freno d'emergenza mette in attesa quegli annunci, ma una
-  piena ostinata costa comunque lavoro a chi gestisce.
+  piena ostinata costa comunque lavoro a chi gestisce. In più ripartono ogni giorno: l'etichetta
+  del telefono cambia ogni giorno, perché i giorni non si possano collegare. Un telefono può
+  tenere aperti 5 annunci e registrare 10 nomi al giorno.
 - **La password principale può tutto**, anche aggiungere e togliere chi gestisce il Campanile. Gli
   altri entrano con una password loro, e il registro dice chi ha fatto cosa (le ultime 1.000
   azioni). Chi usa la password principale compare solo come «Password principale».
 - **Chi ha in mano il dispositivo ha tutto.** Database e password di gestione non sono cifrati sul
-  disco. Ciò che si cancella però non c'è più, sovrascritto invece che lasciato nel file
-  (misurato: prima, un numero di telefono cancellato si leggeva ancora).
+  disco. Ciò che si cancella, e gli annunci chiusi, vengono sovrascritti invece che lasciati nel
+  file (misurato: prima, un numero di telefono cancellato si leggeva ancora). Però le schede SD e
+  gli SSD spostano le scritture dentro il chip, e lì una copia vecchia può sopravvivere: solo un
+  disco cifrato chiuderebbe il problema.
 - **Nessun aggiornamento automatico.** Una correzione arriva a un Campanile solo quando qualcuno la
   porta, su una chiavetta controllata con la firma di CarrotStudio, o la installa.
 - **Annunci e nomi si cancellano da soli**: gli annunci dopo 14 giorni, i nomi di "sto bene" dopo

@@ -276,6 +276,25 @@ class TestSafe(CampanileTestCase):
         _, t = self.json("GET", "/api/safe?q=nicolo")
         self.assertEqual(t["results"], [])
 
+    def test_a_name_search_reads_four_different_words_at_most(self):
+        # Each word is a pass over every name: past four, a name is found anyway.
+        self.assertEqual(self.json("POST", "/api/safe", {"name": "Giulia Rossi"})[0], 201)
+        _, t = self.json("GET", "/api/safe?q=" + quote("rossi rossi giulia giu ros zzz"))
+        self.assertEqual([p["name"] for p in t["results"]], ["Giulia Rossi"])
+
+    def test_name_searches_have_a_limit_per_phone(self):
+        for _ in range(campanile.SEARCHES):
+            self.assertEqual(self.json("GET", "/api/safe?q=rossi")[0], 200)
+        self.assertEqual(self.json("GET", "/api/safe?q=rossi")[0], 429)
+
+    def test_one_name_search_at_a_time(self):
+        self.assertTrue(self.cfg.safe_searching.acquire(timeout=1))  # one is already running
+        try:
+            self.assertEqual(self.json("GET", "/api/safe?q=rossi")[0], 503)
+        finally:
+            self.cfg.safe_searching.release()
+        self.assertEqual(self.json("GET", "/api/safe?q=rossi")[0], 200)
+
     def test_optional_fields_and_validation(self):
         self.assertEqual(self.json("POST", "/api/safe", {"name": "Anna"})[0], 201)
         self.assertEqual(self.json("POST", "/api/safe", {"name": "A"})[0], 400)
@@ -1182,6 +1201,41 @@ class TestTimeAndLog(CampanileTestCase):
         self.post(contact="Lia")  # writing is when old posts are deleted
         self.assertFalse(on_disk("3331234567"))
 
+    def test_a_closed_post_leaves_the_disk_however_it_is_closed(self):
+        # Closing used to only hide a post: its contact stayed in the file for 14 days.
+        def on_disk(text):
+            return any(text.encode() in f.read_bytes() for f in self.data.glob("campanile.db*"))
+
+        db = self.cfg.store
+        author = self.post(contact="3330000001")[1]
+        removed = self.post(contact="3330000002")[1]
+        self.post(contact="3330000003")
+        db.add_post("offer", "water", "x", "a", "3330000004", device="aabbccddeeff")
+        markers = ["3330000001", "3330000002", "3330000003", "3330000004"]
+        self.assertTrue(all(on_disk(m) for m in markers))  # the control
+        close = {"id": author["id"], "code": author["code"]}
+        self.assertEqual(self.json("POST", "/api/posts/close", close)[0], 200)
+        self.assertFalse(on_disk("3330000001"))  # by its author
+        self.assertEqual(self.admin("/api/admin/delete", table="post", id=removed["id"])[0], 200)
+        self.assertFalse(on_disk("3330000002"))  # by the admin
+        self.assertEqual(db.close_device_posts("aabbccddeeff"), 1)
+        self.assertFalse(on_disk("3330000004"))  # a device's flood, cleaned up
+        self.assertEqual(self.admin("/api/admin/close-recent", minutes=60)[1], {"closed": 1})
+        self.assertFalse(on_disk("3330000003"))  # the last minutes, cleaned up
+        self.assertEqual(self.json("POST", "/api/posts/close", close)[0], 404)  # gone, not wrong
+
+    def test_closed_posts_left_by_an_older_version_leave_the_disk_at_start(self):
+        path = self.data / "old.db"
+        old = store.Store(path)
+        old.add_post("offer", "water", "x", "a", "3330000009")
+        old._db.execute("UPDATE posts SET closed = 1")  # what 0.1.0 did when a post was closed
+        old._db.commit()
+        old.close()
+        files = lambda: b"".join(f.read_bytes() for f in self.data.glob("old.db*"))  # noqa: E731
+        self.assertTrue(b"3330000009" in files())  # the control
+        store.Store(path).close()
+        self.assertFalse(b"3330000009" in files())
+
     def test_zero_days_keeps_them(self):
         self.cfg.store.keep["posts"] = 0
         self.post()
@@ -1398,6 +1452,22 @@ class TestSignedNotices(CampanileTestCase):
         self.cfg.require_signed = True
         self.assertEqual(self.admin("/api/admin/notices", title="x", text="y")[0], 403)
         self.assertEqual(self.publish(self.signed())[0], 201)
+
+    def test_a_trusted_key_anyone_could_sign_for_is_refused(self):
+        # The curve's neutral point: R = it and S = 0 verify for any message, OpenSSL's too.
+        weak = (1).to_bytes(32, "little")
+        keys = self.data / "weak-keys.json"
+        entry = {"name": "Fake", "public_key": base64.b64encode(weak).decode()}
+        keys.write_text(json.dumps({"keys": [entry]}))
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.cfg.trusted_keys = signing.TrustedKeys.load(keys)
+        self.assertEqual(len(self.cfg.trusted_keys), 0)
+        now = int(time.time())
+        notice = {"title": "Evacuate", "text": "Now", "urgent": True, "issued": now,
+                  "expires": now + 3600, "issuer": signing.key_id(weak)}  # fmt: skip
+        forged = {"format": signing.FORMAT, "notice": notice,
+                  "signature": base64.b64encode(weak + bytes(32)).decode()}  # fmt: skip
+        self.assertNotEqual(self.publish(forged)[0], 201)
 
     def test_broken_keys_file_turns_signing_off_but_not_campanile(self):
         bad = self.data / "bad-keys.json"

@@ -19,6 +19,7 @@ import time
 from pathlib import Path
 
 import ed25519
+import strictjson
 
 try:
     from cryptography.exceptions import InvalidSignature
@@ -147,18 +148,9 @@ def _parse(signed):
     if not isinstance(signed, str):
         return signed
     try:
-        return json.loads(signed, object_pairs_hook=_no_duplicates)
+        return strictjson.loads(signed)
     except (ValueError, RecursionError):
         raise SignatureError("sig_unreadable") from None
-
-
-def _no_duplicates(pairs: list) -> dict:
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError(f"duplicate key: {key}")
-        result[key] = value
-    return result
 
 
 def signature_b64(signed) -> str:

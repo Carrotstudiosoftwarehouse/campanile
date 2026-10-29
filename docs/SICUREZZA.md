@@ -7,7 +7,9 @@ English version: [THREAT-MODEL.md](THREAT-MODEL.md).
 - La Wi-Fi è **aperta e non cifrata**. Chiunque nei dintorni può collegarsi e vedere tutti gli
   annunci, i nomi in "sto bene" e gli avvisi.
 - **Nessun registro dei collegamenti.** Non si salvano indirizzi IP né pagine visitate.
-- Annunci, nomi e avvisi cancellati vengono **sovrascritti sul disco**, non solo nascosti.
+- Annunci chiusi o cancellati, nomi e avvisi tolti vengono **sovrascritti nel file**, non solo
+  nascosti (una scheda SD o un SSD può tenere una copia vecchia dentro il chip: vedi
+  [LIMITI](LIMITI.md)).
 - Il piano familiare **non arriva mai al Campanile e non resta nel telefono**. Vive nella pagina
   aperta, e si stampa.
 - La gestione (avvisi, moderazione) funziona **solo dal Campanile stesso**, così la password non
@@ -37,6 +39,7 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 | Una pagina di internet che parla col Campanile sotto il proprio nome (DNS rebinding) | Serve il browser del portatile che fa da Campanile, mentre è in rete. I nomi di dominio di internet ricevono 421. Indirizzi, nomi `.local` e il nome del computer funzionano, e nessuno può registrarli. Prima una pagina poteva leggere la bacheca e bloccare chi gestisce con 20 password sbagliate (provato, seconda revisione da attaccante). Ora non ottiene niente e il blocco non si muove. |
 | Leggere file del sistema | I percorsi devono risolversi nella cartella del portale o delle mappe (solo `.pmtiles`). Trucchi di Windows rifiutati: flussi nascosti (`index.html:Zone.Identifier` rivelava da dove era stato scaricato il pacchetto, provato), punto o spazio finale, barra rovesciata, `con`, `nul` e simili. |
 | Saturare il server | 256 connessioni, 16 per dispositivo, 10 secondi per mandare la richiesta (connessioni "a goccia", provato con un attacco reale). Sul Raspberry il firewall dell'hotspot, prima di nginx, lascia 64 connessioni per MAC. Migliaia di connessioni da un byte da un solo dispositivo facevano fallire agli altri 27 richieste su 60 e scrivevano 1,7 MB di registro al minuto. Ora 0 e 0 (provato). |
+| Rallentare tutti con ricerche di nomi costose | Ogni ricerca dei nomi legge tutti i nomi sotto l'unico lucchetto del database. Ora 30 ogni 10 secondi per dispositivo, una alla volta, al massimo 4 parole diverse, e un indice che si ferma ai 50 più recenti. Con 15 telefoni che cercano senza sosta, leggere gli avvisi richiede 1,5 ms invece di 97 (provato). |
 | Fingersi un altro telefono o il Campanile | Sul Raspberry limiti, blocco e gestione solo locale poggiano sull'indirizzo che scrive nginx (`X-Real-IP`). Il "request smuggling" poteva falsificarlo: una GET con un corpo eseguiva 8 richieste nascoste su 8. Due correzioni, ciascuna sufficiente da sola (provato una per una, poi 0 su 16). nginx manda una richiesta per connessione. Il Campanile accetta un corpo solo su POST, con un solo `Content-Length`, senza `chunked`. |
 | Calo di corrente | Annunci e avvisi accettati sono su disco prima della risposta (SQLite `synchronous=FULL`). |
 | Pagine dentro altri siti | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |

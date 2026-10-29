@@ -67,8 +67,16 @@ def _decode(data: bytes):
 BASE = _decode((4 * pow(5, P - 2, P) % P).to_bytes(32, "little"))
 
 
+IDENTITY = (0, 1, 1, 0)  # the curve's neutral point
+
+
 def is_public_key(data: bytes) -> bool:
-    return isinstance(data, bytes) and len(data) == 32 and _decode(data) is not None
+    """32 bytes naming a point of the curve, and not one of its 8 points of small order: with
+    those, anyone can make a signature that verifies, OpenSSL's too. libsodium refuses them."""
+    if not isinstance(data, bytes) or len(data) != 32:
+        return False
+    point = _decode(data)
+    return point is not None and _encode(_multiply(8, point)) != _encode(IDENTITY)
 
 
 def verify(public_key: bytes, signature: bytes, message: bytes) -> bool:

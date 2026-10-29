@@ -21,6 +21,8 @@ import time
 from pathlib import Path
 from urllib.parse import urlsplit
 
+import strictjson
+
 FORMAT = "campanile-share-1"
 ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"  # Crockford's: no I, L, O, U to misread
 CODE_LENGTH = 16  # 80 bits: guessing it, even offline, is out of reach
@@ -93,21 +95,10 @@ def lan_address(text) -> str | None:
     return f"http://[{ip}]:{port}" if ip.version == 6 else f"http://{ip}:{port}"
 
 
-def _no_duplicates(pairs):
-    keys = [k for k, _ in pairs]
-    if len(keys) != len(set(keys)):
-        raise ValueError("duplicate key")
-    return dict(pairs)
-
-
-def _no_constant(name):
-    raise ValueError(f"{name} is not JSON")
-
-
 def check(manifest: str) -> tuple[str, list[dict]]:
     """The session and the files of a list received from another Campanile. Its signature is
     checked before this is called; this checks that what it says is something we accept."""
-    data = json.loads(manifest, object_pairs_hook=_no_duplicates, parse_constant=_no_constant)
+    data = strictjson.loads(manifest)
     if not isinstance(data, dict) or set(data) != {"format", "session", "files"}:
         raise ValueError("not a share list")
     if data["format"] != FORMAT:

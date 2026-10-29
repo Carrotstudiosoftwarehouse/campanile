@@ -16,6 +16,16 @@ import ed25519
 
 VECTORS = Path(__file__).resolve().parent / "vectors"
 HAS_OPENSSL = importlib.util.find_spec("cryptography") is not None
+SMALL_ORDER = (  # the first is the curve's neutral point
+    "0100000000000000000000000000000000000000000000000000000000000000",
+    "ecffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7f",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "0000000000000000000000000000000000000000000000000000000000000080",
+    "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc05",
+    "26e8958fc2b227b045c3f489f2ef98f0d5dfac05d3c63339b13802886d53fc85",
+    "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac037a",
+    "c7176a703d4dd84fba3c0b760d10670f2a2053fa2c39ccc64ec7fd7792ac03fa",
+)
 
 
 def rfc_vectors():
@@ -66,6 +76,15 @@ class TestVectors(unittest.TestCase):
             self.assertEqual(got, expected, f"{case['tcId']}: {case['flags']}")
             counted[case["result"]] += 1
         self.assertEqual(counted, {"valid": 117, "invalid": 64})
+
+    def test_the_eight_points_of_small_order_are_not_keys(self):
+        # libsodium's list. With one of these as a key, a signature anyone can build verifies.
+        for key in SMALL_ORDER:
+            point = ed25519._decode(bytes.fromhex(key))
+            self.assertIsNotNone(point, key)  # a real point of the curve...
+            eight = ed25519._encode(ed25519._multiply(8, point))
+            self.assertEqual(eight, bytes.fromhex(SMALL_ORDER[0]), key)  # ...of small order
+            self.assertFalse(ed25519.is_public_key(bytes.fromhex(key)), key)
 
     def test_a_public_key_must_name_a_point(self):
         key = bytes.fromhex(rfc_vectors()[0]["public_key"])

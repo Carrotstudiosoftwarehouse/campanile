@@ -65,6 +65,7 @@ campanile/
   store.py        data (SQLite), validation, rate limits
   devices.py      per-device limits (the phone's MAC, never stored)
   signing.py      signed notices (Ed25519); ed25519.py checks them where `cryptography` is missing
+  strictjson.py   the one JSON reader for whatever comes from outside: no key twice, no NaN
   cap.py          official alerts in CAP, read from a file; pfif.py: the names as PFIF
   messages.py     messages in every language: the server's and the laptop window's
   places.py       the map search: names read from the map files, with bounded costs

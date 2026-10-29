@@ -22,6 +22,7 @@ MAX_PENDING_POSTS = 500
 MAX_OPEN_POSTS_PER_DEVICE = 5
 MAX_SAFE = 5000
 MAX_SAFE_PER_DEVICE = 10  # a family registering its members
+MAX_NAME_WORDS = 4  # of a name search: a name is found with fewer, and each one costs a pass
 MAX_NOTICES = 50
 MAX_CLOSED_ROADS = 300
 # Nothing stays forever: in an emergency a post two weeks old has almost always passed, while
@@ -87,6 +88,8 @@ CREATE TABLE IF NOT EXISTS notices (
     created INTEGER NOT NULL
 );
 CREATE INDEX IF NOT EXISTS open_posts ON posts (closed, created);
+-- The newest names first: a search stops at its first 50 instead of sorting them all.
+CREATE INDEX IF NOT EXISTS safe_created ON safe (created);
 CREATE TABLE IF NOT EXISTS admin_log (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at INTEGER NOT NULL,
@@ -179,24 +182,6 @@ def clean_text(
     if len(value) > max_length:
         raise RequestError(400, "field_too_long", field=label, max=max_length)
     return value
-
-
-def reject_duplicate_keys(pairs: list) -> dict:
-    """json.loads hook: {"text": "a", "text": "b"} is refused, not silently resolved.
-
-    Different readers pick different duplicates; with signed notices that would let one
-    program verify a text and another display a different one.
-    """
-    result = {}
-    for key, value in pairs:
-        if key in result:
-            raise ValueError(f"duplicate key: {key}")
-        result[key] = value
-    return result
-
-
-def strict_json(raw: str):
-    return json.loads(raw, object_pairs_hook=reject_duplicate_keys)
 
 
 def normalize_name(name: str) -> str:
@@ -296,6 +281,8 @@ class Store:
             self._db.executescript(SCHEMA)
             self._migrate()
             self._db.commit()
+            # Up to 0.1.0 a closed post was only hidden, its contact still in the file.
+            self._remove_posts("DELETE FROM posts WHERE closed = 1", ())
             row = self._db.execute("SELECT value FROM settings WHERE name = 'clock'").fetchone()
             self.offset = float(row["value"]) if row else 0.0
 
@@ -530,24 +517,25 @@ class Store:
             return cur.rowcount > 0
 
     def close_device_posts(self, device: str) -> int:
-        """Closes every open or pending post of one device: the cleanup after a flood."""
+        """Removes every post of one device, waiting or not: the cleanup after a flood."""
         if not device:
             return 0
         with self._lock:
-            cur = self._db.execute(
-                "UPDATE posts SET closed = 1 WHERE device = ? AND closed = 0", (device,)
-            )
-            self._db.commit()
-            return cur.rowcount
+            return self._remove_posts("DELETE FROM posts WHERE device = ?", (device,))
 
     def close_recent_posts(self, minutes: int) -> int:
         with self._lock:
-            cur = self._db.execute(
-                "UPDATE posts SET closed = 1 WHERE closed = 0 AND created >= ?",
-                (self.now() - minutes * 60,),
-            )
-            self._db.commit()
-            return cur.rowcount
+            cutoff = self.now() - minutes * 60
+            return self._remove_posts("DELETE FROM posts WHERE created >= ?", (cutoff,))
+
+    def _remove_posts(self, sql: str, params: tuple) -> int:
+        """A closed post is deleted and wiped from the disk, contact included. Nothing needs
+        it: a code for it is simply not found, and ids are never reused. Under the lock."""
+        gone = self._db.execute(sql, params).rowcount
+        self._db.commit()
+        if gone:
+            self._wipe()
+        return gone
 
     def remove_device_safe(self, device: str) -> int:
         if not device:
@@ -579,8 +567,7 @@ class Store:
                 "SELECT code_hash FROM posts WHERE id = ? AND closed = 0", post_id, code
             )
             if result == OK:
-                self._db.execute("UPDATE posts SET closed = 1 WHERE id = ?", (post_id,))
-                self._db.commit()
+                self._remove_posts("DELETE FROM posts WHERE id = ?", (post_id,))
             return result
 
     def add_safe(self, name, message, place, device: str = "") -> tuple[int, str]:
@@ -614,7 +601,7 @@ class Store:
         """Searching "rossi giulia" also finds "Giulia Rossi"."""
         sql = "SELECT id, name, message, place, created FROM safe WHERE 1 = 1"
         params: list = []
-        for word in normalize_name(query).split():
+        for word in list(dict.fromkeys(normalize_name(query).split()))[:MAX_NAME_WORDS]:
             sql += " AND instr(search_name, ?) > 0"
             params.append(word)
         sql += " ORDER BY created DESC, id DESC LIMIT ?"
@@ -760,15 +747,15 @@ class Store:
 
     def delete(self, table: str, item_id: int) -> bool:
         sql = {
-            "post": "UPDATE posts SET closed = 1 WHERE id = ? AND closed = 0",
+            "post": "DELETE FROM posts WHERE id = ?",
             "safe": "DELETE FROM safe WHERE id = ?",
             "notice": "DELETE FROM notices WHERE id = ?",
         }.get(table if isinstance(table, str) else "")
         if sql is None:
             raise RequestError(400, "bad_table")
         with self._lock:
-            cur = self._db.execute(sql, (item_id,))
+            gone = self._db.execute(sql, (item_id,)).rowcount
             self._db.commit()
-            if table != "post":  # a removed post is only closed, and goes with the others
+            if gone:
                 self._wipe()
-            return cur.rowcount > 0
+            return gone > 0
