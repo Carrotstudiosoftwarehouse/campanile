@@ -102,6 +102,15 @@ class TestRaspberryInstall(unittest.TestCase):
                 folder.mkdir(parents=True)
             (clone / "maps" / "town.pmtiles").write_bytes(b"map")
             (clone / "zim" / "medicine.zim").write_bytes(b"zim")
+            # Left by 0.1.0, which copied: the same file twice, and a newer one by that name.
+            for folder, name, content in (
+                ("maps", "world.pmtiles", b"w"),
+                ("zim", "old.zim", b"o"),
+            ):
+                (clone / folder / name).write_bytes(content)
+                (data / folder / name).write_bytes(content)
+            (clone / "maps" / "area.pmtiles").write_bytes(b"new numbers")
+            (data / "maps" / "area.pmtiles").write_bytes(b"old numbers")
             Path(tmp, "secret").write_text("not for phones")
             (clone / "maps" / "evil.pmtiles").symlink_to(Path(tmp, "secret"))
             (stubs / "chown").write_text("#!/bin/sh\nexit 0\n")  # the real one needs root
@@ -113,10 +122,24 @@ class TestRaspberryInstall(unittest.TestCase):
                 env=env,
                 check=True,
             )
-            self.assertEqual([p.name for p in (data / "maps").iterdir()], ["town.pmtiles"])
-            self.assertEqual([p.name for p in (data / "zim").iterdir()], ["medicine.zim"])
+            installed = sorted(p.name for p in (data / "maps").iterdir())
+            self.assertEqual(installed, ["area.pmtiles", "town.pmtiles", "world.pmtiles"])
+            self.assertEqual(
+                sorted(p.name for p in (data / "zim").iterdir()), ["medicine.zim", "old.zim"]
+            )
             self.assertFalse((clone / "maps" / "town.pmtiles").exists())  # moved: one copy
+            self.assertFalse((clone / "maps" / "world.pmtiles").exists())  # the double, gone
+            self.assertFalse((clone / "zim" / "old.zim").exists())
+            newer = clone / "maps" / "area.pmtiles"  # not the same file: never deleted
+            self.assertTrue(newer.exists())
+            self.assertEqual(newer.read_bytes(), b"new numbers")
             self.assertTrue((clone / "maps" / "evil.pmtiles").is_symlink())  # left where it was
+
+    def test_a_hotspot_that_fails_still_gets_the_summary(self):
+        # Address, password and admin page first; the error last, where it is seen.
+        failed = INSTALL.index("the Wi-Fi hotspot didn't start")
+        self.assertLess(INSTALL.index('step "Done"'), failed)
+        self.assertLess(INSTALL.index("Admin page:"), failed)
 
     def test_what_it_runs_works_from_a_stick_without_exec_bits(self):
         # An update from a FAT32 stick loses the exec bits: what runs directly gets them back.

@@ -21,6 +21,7 @@ USAGE
 SSID="Campanile"
 COUNTRY=""  # the Wi-Fi country already set, unless --country says otherwise
 HOTSPOT=1
+HOTSPOT_FAILED=0
 NGINX_WAS_OFF=0
 ADDRESS="10.42.0.1"
 CONNECTION="campanile-hotspot"
@@ -134,7 +135,12 @@ for f in "$SOURCE"/data/maps/*.pmtiles "$SOURCE"/data/zim/*.zim; do
   [ -f "$f" ] && [ ! -L "$f" ] || continue
   to="$DATA/maps"
   [[ "$f" == *.zim ]] && to="$DATA/zim"
-  [ -e "$to/$(basename "$f")" ] || mv "$f" "$to/" 2>/dev/null || cp "$f" "$to/"
+  have="$to/$(basename "$f")"
+  if [ ! -e "$have" ]; then
+    mv "$f" "$to/" 2>/dev/null || cp "$f" "$to/"
+  elif cmp -s "$f" "$have"; then
+    rm -f "$f"  # the same file twice, as 0.1.0 left it by copying: the clone's goes
+  fi
 done
 for f in "$DATA"/maps/*.pmtiles "$DATA"/zim/*.zim; do
   [ -L "$f" ] && continue
@@ -250,11 +256,11 @@ DNS
     802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
     ipv4.method shared ipv4.addresses "$ADDRESS/24" ipv6.method disabled \
     802-11-wireless.ap-isolation yes
-  nmcli connection up "$CONNECTION" || fail "the Wi-Fi hotspot didn't start (the reason is just above). Campanile is installed and running: check that Wi-Fi isn't blocked (rfkill list), then run this again. Admin password: sudo cat $CONFIG/password"
+  nmcli connection up "$CONNECTION" || HOTSPOT_FAILED=1  # said last, after the summary
 fi
 
 step "Done"
-if [ "$HOTSPOT" -eq 1 ]; then
+if [ "$HOTSPOT" -eq 1 ] && [ "$HOTSPOT_FAILED" -eq 0 ]; then
   echo "Portal:  http://$ADDRESS/   (or http://$HOSTNAME_LOCAL/)"
   echo "Open Wi-Fi network: $SSID"
 else
@@ -268,7 +274,11 @@ else
   echo "Admin password: the same as before (sudo cat $CONFIG/password)."
 fi
 echo "Admin page: http://localhost/admin.html on the Raspberry itself, or through an SSH tunnel"
-echo "from a computer on the cable (docs/ADMIN.md). Never from phones: on the open Wi-Fi the"
-echo "password would travel in clear."
+echo "from a computer on the cable (docs/ADMIN.md, in Italian docs/GESTIONE.md). Never from"
+echo "phones: on the open Wi-Fi the password would travel in clear."
 echo
 echo "Service status:  systemctl status campanile campanile-kiwix"
+if [ "$HOTSPOT_FAILED" -eq 1 ]; then
+  echo
+  fail "the Wi-Fi hotspot didn't start (the reason is above, after \"Wi-Fi hotspot\"). Campanile is installed and running: check that Wi-Fi isn't blocked (rfkill list), then run this again."
+fi
