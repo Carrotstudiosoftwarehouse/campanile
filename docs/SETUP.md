@@ -138,11 +138,13 @@ hotspot switches off the Wi-Fi you are on).
 ```bash
 sudo apt install -y git
 git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
-scripts/prepare.sh
 scripts/download-map.sh italy-light       # optional
 scripts/download-wikipedia.sh medicine    # optional
 sudo raspberry/install.sh                 # options: --ssid NAME  --country IT  --no-hotspot
 ```
+
+The installer fetches the map libraries itself the first time, and waits if the Raspberry, just
+switched on, is still updating itself.
 
 `--country` is the two-letter country code for the Wi-Fi rules (for example `DE`, `FR`).
 

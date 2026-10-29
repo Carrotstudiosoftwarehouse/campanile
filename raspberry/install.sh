@@ -47,7 +47,6 @@ done
 [[ "$SSID" =~ ^[A-Za-z0-9\ _.-]{1,32}$ ]] || fail "invalid network name (1-32 chars: letters, digits, space, . _ -)"
 [[ "$COUNTRY" =~ ^[A-Z]{2}$ ]] || fail "invalid country code (two capital letters, e.g. IT)"
 [ -f "$SOURCE/campanile/server.py" ] || fail "run this from the Campanile project folder"
-[ -f "$SOURCE/campanile/web/vendor/maplibre-gl.mjs" ] || fail "map libraries missing: run scripts/prepare.sh first"
 
 if [ "$HOTSPOT" -eq 1 ]; then
   systemctl is-active --quiet NetworkManager \
@@ -62,10 +61,21 @@ if [ "$HOTSPOT" -eq 1 ]; then
   fi
 fi
 
+# The map libraries, the first time only: one command less in the guide. As whoever cloned
+# the folder, so its files stay theirs, not root's.
+if [ ! -f "$SOURCE/campanile/web/vendor/maplibre-gl.mjs" ]; then
+  step "Map libraries (first time only)"
+  as=()
+  [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != root ] && as=(sudo -u "$SUDO_USER")
+  "${as[@]}" "$SOURCE/scripts/prepare.sh" || fail "map libraries not downloaded (the reason is just above)"
+fi
+
 step "Packages"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -q
-apt-get install -y -q python3 python3-cryptography kiwix-tools nginx nftables
+# A Pi just switched on often updates itself for a few minutes: wait for apt, don't fail.
+WAIT=(-o DPkg::Lock::Timeout=600)
+apt-get "${WAIT[@]}" update -q
+apt-get "${WAIT[@]}" install -y -q python3 python3-cryptography kiwix-tools nginx nftables
 
 step "Service user 'campanile'"
 if ! id campanile >/dev/null 2>&1; then

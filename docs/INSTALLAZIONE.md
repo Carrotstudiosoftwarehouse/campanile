@@ -144,11 +144,13 @@ Serve **Raspberry Pi OS** (Bookworm o più recente) con il Wi-Fi integrato, coll
 ```bash
 sudo apt install -y git
 git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
-scripts/prepare.sh
 scripts/download-map.sh italy-light       # facoltativo
 scripts/download-wikipedia.sh medicine    # facoltativo
 sudo raspberry/install.sh                 # opzioni: --ssid NOME  --country IT  --no-hotspot
 ```
+
+L'installatore scarica da solo le librerie delle mappe la prima volta, e aspetta se il Raspberry,
+appena acceso, si sta ancora aggiornando.
 
 `--country` è il codice di due lettere del paese, per le regole del Wi-Fi (per esempio `DE`, `FR`).
 
