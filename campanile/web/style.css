@@ -1,7 +1,8 @@
 /* DEVELOPED BY CARROTSTUDIO software house */
 :root {
   /* Black and white for everything; red only for official notices and warnings; ink blue
-     only for section titles (blue is "information" on public safety signs, ISO 7010). */
+     for section titles and the two main actions (blue is "information" on public safety
+     signs, ISO 7010). */
   --bg: #ffffff;
   --paper: #ffffff;
   --text: #111111;
@@ -11,6 +12,9 @@
   --accent-text: #ffffff;
   --red: #c4161c;
   --section: #1f3a5f;  /* 11:1 on white */
+  --section-tint: #f2f5f9;  /* behind the main actions: the ink blue still 10:1 */
+  --section-soft: #3d4f66;  /* their small text, 7:1 */
+  --line: #888888;  /* the lighter cards' edge: 3.5:1, still a visible control */
 }
 
 * { box-sizing: border-box; }
@@ -73,7 +77,8 @@ a { color: var(--accent); }
   font-size: 0.95rem;
 }
 
-.note.stale { border-color: var(--red); color: var(--red); font-weight: 600; }
+.note.stale, .note.danger { border-color: var(--red); color: var(--red); font-weight: 600; }
+.note.danger { border-width: 2px; }
 
 .notice {
   background: var(--paper);
@@ -89,21 +94,33 @@ a { color: var(--accent); }
 .notice.urgent .tag, .notice.urgent .meta { color: #ffffff; }
 
 /* The big buttons on the home page */
-.actions { display: grid; gap: 12px; margin: 16px 0 8px; }
+/* Home: two main actions side by side, the tools under them, lighter: what matters first. */
+.actions { display: grid; gap: 10px; margin: 16px 0 8px; }
+.actions .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 4px; }
+@media (max-width: 340px) { .actions .pair { grid-template-columns: 1fr; } }
 a.action {
   display: block;
-  padding: 16px 18px;
-  border: 2px solid var(--text);
+  padding: 12px 14px;
+  border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--paper);
   color: var(--text);
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   line-height: 1.25;
   text-decoration: none;
 }
 a.action:active { background: var(--bg); }
-a.action small { display: block; margin-top: 4px; font-size: 0.95rem; font-weight: 400; color: var(--muted); }
+a.action small { display: block; margin-top: 4px; font-size: 0.9rem; font-weight: 400; color: var(--muted); }
+a.action.main {
+  padding: 16px;
+  border: 3px solid var(--section);
+  background: var(--section-tint);
+  color: var(--section);
+  font-size: 1.35rem;
+}
+a.action.main small { color: var(--section-soft); }
+a.action.main:active { background: var(--paper); }
 a.action small.urgent { color: var(--red); font-weight: 700; }
 /* Not available (no map, no Wikipedia): a dashed border, never faded text. */
 a.action.off { border-style: dashed; }
@@ -231,6 +248,18 @@ footer {
   font-size: 0.85rem;
   text-align: center;
   padding: 24px 16px 40px;
+}
+footer .find-person { margin: 0 0 12px; font-size: 1rem; }
+
+/* The home's other official notices, behind one button: red, like the notices. */
+button.all-notices {
+  display: block;
+  width: 100%;
+  margin: 0 0 8px;
+  border: 2px solid var(--red);
+  background: var(--paper);
+  color: var(--red);
+  font-weight: 700;
 }
 
 /* Full-screen map */

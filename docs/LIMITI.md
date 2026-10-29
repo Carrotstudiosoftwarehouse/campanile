@@ -9,7 +9,7 @@ un limite, diccelo e lo aggiungiamo.
 
 **Cosa continua a funzionare, se è stato preparato prima**
 
-- Sulla Wi-Fi del Campanile: avvisi ufficiali, bacheca, "sto bene" e piano famigliare. Nessuna di
+- Sulla Wi-Fi del Campanile: avvisi ufficiali, bacheca, "sto bene" e piano familiare. Nessuna di
   queste cose ha bisogno di internet.
 - Mappe, ricerca e navigatore, per le mappe già scaricate.
 - Le voci mediche di Wikipedia, se scaricate con il programma che le serve (sul portatile, il

@@ -20,32 +20,33 @@
     <section id="whats-happening" aria-labelledby="notices-title">
       <h2 id="notices-title" data-i18n="home.notices">Avvisi ufficiali</h2>
       <div id="notices" aria-live="polite"></div>
+      <button type="button" class="all-notices hidden" id="all-notices" aria-controls="notices" aria-expanded="false"></button>
     </section>
 
     <nav class="actions" aria-label="Cosa vuoi fare" data-i18n-aria="home.actions">
-      <a class="action" href="/board.html?i=need">
-        <span data-i18n="home.need">Chiedo aiuto</span>
-        <small data-i18n="home.need.sub">Scrivilo nella bacheca del quartiere: lo leggono i vicini</small>
-      </a>
-      <a class="action" href="/board.html?i=offer">
-        <span data-i18n="home.offer">Offro aiuto</span>
-        <small data-i18n="home.offer.sub">Guarda in bacheca chi ha bisogno vicino a te</small>
+      <div class="pair">
+        <a class="action main" href="/board.html?i=need">
+          <span data-i18n="home.need">Ho bisogno</span>
+          <small data-i18n="home.need.sub">acqua, medicine, un passaggio&hellip;</small>
+        </a>
+        <a class="action main" href="/board.html?i=offer">
+          <span data-i18n="home.offer">Offro</span>
+          <small data-i18n="home.offer.sub">acqua, cibo, una mano&hellip;</small>
+        </a>
+      </div>
+      <a class="action off" href="#" id="wiki-card">
+        <span data-i18n="home.wiki">Medicina offline</span>
+        <small id="wiki-text" data-i18n="home.wiki.checking">Controllo in corso&hellip;</small>
       </a>
       <a class="action" href="/map.html" id="map-card">
         <span data-i18n="home.map">Mappa</span>
         <small id="map-text" data-i18n="home.map.sub">Una via, l'ospedale pi&ugrave; vicino, e la strada per arrivarci</small>
       </a>
-      <a class="action off" href="#" id="wiki-card">
-        <span data-i18n="home.wiki">Medicina offline</span>
-        <small id="wiki-text" data-i18n="home.wiki.checking">Controllo in corso&hellip;</small>
-      </a>
-      <a class="action" href="/safe.html">
-        <span data-i18n="home.safe">Sto bene</span>
-        <small><span data-i18n="home.safe.sub">Fai sapere che stai bene, o cerca una persona</span> <span id="people-count"></span></small>
+      <a class="action" href="/plan.html">
+        <span data-i18n="home.plan">Piano familiare</span>
+        <small data-i18n="home.plan.sub">Da fare prima, in famiglia: dove ritrovarsi, chi chiamare. Si stampa.</small>
       </a>
     </nav>
-
-    <p class="more"><a href="/plan.html" data-i18n="home.plan.link">Piano famigliare: compilalo e stampalo</a></p>
 
     <div class="note">
       <strong data-i18n="home.note.title">Da sapere:</strong>
@@ -54,6 +55,7 @@
     <p class="meta" id="updated"></p>
   </main>
   <footer>
+    <p class="find-person"><a href="/safe.html" data-i18n="home.find">Cerca una persona</a></p>
     Campanile <span id="version"></span> &middot; <span data-i18n="footer.free">software libero</span> &middot; <span data-i18n="footer.maps">mappe &copy; OpenStreetMap</span>
     <nav class="lang" id="lang-switch"></nav>
   </footer>

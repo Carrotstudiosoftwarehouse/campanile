@@ -32,12 +32,12 @@ con il proprio telefono, senza app, senza account e senza credito, e trova:
 | | |
 |---|---|
 | **Avvisi ufficiali** | Chi gestisce il Campanile (Comune, protezione civile, volontari) pubblica dove si distribuisce l'acqua, dove apre un rifugio, cosa evitare. Si possono caricare anche gli allarmi ufficiali in CAP, il formato di IT-alert. |
-| **Chiedo aiuto / Offro aiuto** | Acqua, cibo, medicinali, energia, alloggio, passaggi: i vicini chiedono e offrono. |
-| **Sto bene** | Lasci il tuo nome per chi ti cerca, oppure cerchi una persona. |
+| **Ho bisogno / Offro** | Acqua, cibo, medicinali, energia, alloggio, passaggi: i vicini chiedono e offrono. In cima a "Ho bisogno": in pericolo si chiama il 112, la bacheca non è un numero d'emergenza. |
+| **Medicina offline** | Le voci mediche di Wikipedia, tramite Kiwix. |
 | **Mappa offline** | La tua zona via per via. Cerchi, o tocchi **Ospedale, Farmacia, Acqua, Polizia** per i più vicini. |
 | **Navigatore** | La strada per arrivarci, a piedi o in auto, evitando le strade segnate come interrotte. |
-| **Medicina offline** | Le voci mediche di Wikipedia, tramite Kiwix. |
-| **Piano famigliare** | Punti di ritrovo, contatti e medicinali: si compila prima e si stampa. |
+| **Piano familiare** | Punti di ritrovo, contatti e medicinali: si compila prima e si stampa. |
+| **Cerca una persona** | In fondo alla pagina principale: chi sta bene lascia il suo nome, chi cerca qualcuno lo trova. |
 
 Pagine in italiano e in inglese, scelte dalla lingua del telefono. Mappe di qualunque zona del mondo.
 

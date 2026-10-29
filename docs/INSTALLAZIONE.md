@@ -78,7 +78,7 @@ La ricerca nella mappa legge ogni mappa una volta sola, in sottofondo, e mette i
 `data/places/`. Trova vie, luoghi e punti utili (ospedali, farmacie, acqua potabile...) nella tua
 zona, stati e città nella mappa del mondo.
 
-**Poi** compila il piano famigliare e fai una prova con un paio di telefoni. Stampa il cartello in
+**Poi** compila il piano familiare e fai una prova con un paio di telefoni. Stampa il cartello in
 anticipo solo per il Raspberry, il cui indirizzo non cambia mai. Quello del portatile cambia con la
 rete, quindi stampa il suo cartello (o ricopia a mano l'indirizzo) quando la rete del giorno è
 pronta.

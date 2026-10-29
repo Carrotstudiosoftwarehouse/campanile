@@ -3,7 +3,7 @@ import {
   api, el, when, showResult, CATEGORIES, categoryLabel, kindLabel, rememberMine,
   loadMine, saveMine, closeMine, fold,
 } from "/common.js";
-import { t, tn, translatePage } from "/i18n.js";
+import { showEmergency, t, tn, translatePage } from "/i18n.js";
 
 translatePage();
 
@@ -184,6 +184,11 @@ function applyIntent(intent) {
   filterKind.value = OPPOSITE[intent];
   // One page, one task: the title already says whose posts these are, "See all" how many.
   document.getElementById("filters").classList.add("hidden");
+  if (intent === "need") {
+    // Before anything else: this board is not a rescue line.
+    document.getElementById("danger").classList.remove("hidden");
+    api("/api/status").then((status) => showEmergency(status.emergency)).catch(() => {}); // else 112
+  }
 }
 
 fillCategories();

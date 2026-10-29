@@ -43,6 +43,7 @@ import places
 content = places.read_map(out / "maps" / f"{name}.pmtiles")
 index = {
     "synonyms": {word: sorted(kinds) for word, kinds in places.SYNONYMS.items()},
+    "short_forms": places.SHORT_FORMS,
     "maps": [{"map": name, "max_zoom": content["max_zoom"], "rows": content["rows"]}],
 }
 (out / "maps" / "places.json").write_text(json.dumps(index, ensure_ascii=False), encoding="utf-8")

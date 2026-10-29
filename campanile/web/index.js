@@ -1,6 +1,6 @@
 // DEVELOPED BY CARROTSTUDIO software house
 import { api, el, realTime, when } from "/common.js";
-import { showEmergency, t, tn, translatePage } from "/i18n.js";
+import { showEmergency, t, translatePage } from "/i18n.js";
 
 translatePage();
 
@@ -13,28 +13,49 @@ function noticeLabel(n) {
   return n.source ? t("notice.cap", { kind, source: n.source }) : kind;
 }
 
-async function showNotices() {
-  const { notices } = await api("/api/notices");
+function noticeCard(n) {
+  return el("article", { class: n.urgent ? "notice urgent" : "notice" },
+    el("div", { class: "tag", text: noticeLabel(n) }),
+    el("h3", { text: n.title }),
+    el("p", { text: n.text }),
+    el("div", { class: "meta", text: n.expires
+      ? `${when(n.created)} · ${t("notice.until", { when: realTime(n.expires * 1000) })}`
+      : when(n.created) }));
+}
+
+// One notice in view, the first the Campanile sends (urgent ones first, then the newest), and
+// the rest behind a button: "I need" and "I can give" stay within reach of a thumb.
+const allButton = document.getElementById("all-notices");
+let notices = [];
+let showAll = false;
+
+function drawNotices() {
   const list = document.getElementById("notices");
   if (notices.length === 0) {
     list.replaceChildren(el("p", { class: "meta", text: t("notices.none") }));
   } else {
-    list.replaceChildren(...notices.map((n) =>
-      el("article", { class: n.urgent ? "notice urgent" : "notice" },
-        el("div", { class: "tag", text: noticeLabel(n) }),
-        el("h3", { text: n.title }),
-        el("p", { text: n.text }),
-        el("div", { class: "meta", text: n.expires
-          ? `${when(n.created)} · ${t("notice.until", { when: realTime(n.expires * 1000) })}`
-          : when(n.created) }))));
+    list.replaceChildren(...(showAll ? notices : notices.slice(0, 1)).map(noticeCard));
   }
+  allButton.classList.toggle("hidden", notices.length < 2);
+  allButton.setAttribute("aria-expanded", String(showAll));
+  allButton.textContent = showAll ? t("notices.fewer") : t("notices.all", { n: notices.length });
+}
+
+allButton.addEventListener("click", () => {
+  showAll = !showAll;
+  drawNotices();
+  if (!showAll) allButton.scrollIntoView({ block: "nearest" }); // the list shrank above it
+});
+
+async function showNotices() {
+  ({ notices } = await api("/api/notices"));
+  drawNotices();
 }
 
 async function showStatus() {
   const status = await api("/api/status");
   showEmergency(status.emergency);
   document.getElementById("version").textContent = "v" + status.version;
-  document.getElementById("people-count").textContent = tn("people", status.registered_people);
 
   const hasMaps = status.maps.length > 0;
   document.getElementById("map-card").classList.toggle("off", !hasMaps);

@@ -346,9 +346,14 @@ async function loadPlaces() {
   if (!placesData) {
     const response = await fetch("/maps/places.json");
     placesData = response.ok ? await response.json() : { synonyms: {}, maps: [] };
+    // "Hwy" finds "Highway", as on the Campanile (places.SHORT_FORMS).
+    const short = new Map(Object.entries(placesData.short_forms || {}));
     for (const m of placesData.maps) {
       m.variants = m.rows.map((r) => [...new Set([r[3], ...Object.values(r[4])].map(plain))]);
-      m.words = m.variants.map((v) => v.join(" ").split(" "));
+      m.words = m.variants.map((v) => {
+        const words = v.join(" ").split(" ");
+        return [...words, ...words.filter((w) => short.has(w)).map((w) => short.get(w))];
+      });
     }
   }
   return placesData;

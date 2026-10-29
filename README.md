@@ -31,12 +31,12 @@ their own phone, with no app, no account and no mobile credit, and finds:
 | | |
 |---|---|
 | **Official notices** | Whoever runs the Campanile (town hall, civil protection, volunteers) posts where water is handed out, where a shelter opens, what to avoid. Official alerts in CAP, IT-alert's format, can be loaded too. |
-| **"I need / I can help" board** | Water, food, medicine, power, shelter, rides: neighbors ask and offer. |
-| **"I'm safe"** | Leave your name for whoever is looking for you, or search for someone. |
+| **"I need / I can give" board** | Water, food, medicine, power, shelter, rides: neighbors ask and offer. At the top of "I need": in danger, call the emergency number; the board is not one. |
+| **Offline medicine** | Wikipedia's medical articles, through Kiwix. |
 | **Offline map** | Your area street by street. Search, or tap **Hospital, Pharmacy, Water, Police** for the nearest. |
 | **Navigator** | The way there, on foot or by car, around the streets marked as blocked. |
-| **Offline medicine** | Wikipedia's medical articles, through Kiwix. |
 | **Family plan** | Meeting points, contacts and medicines: filled in beforehand and printed. |
+| **Look for someone** | At the bottom of the home page: whoever is safe leaves their name, whoever is looking for someone finds it. |
 
 Pages in English and Italian, picked from the phone's language. Maps for any area of the world.
 

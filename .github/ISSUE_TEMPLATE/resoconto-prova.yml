@@ -41,7 +41,7 @@ body:
         - label: "Sto bene · I'm safe"
         - label: "Mappa offline · Offline map"
         - label: "Wikipedia offline"
-        - label: "Piano famigliare · Family plan"
+        - label: "Piano familiare · Family plan"
   - type: textarea
     id: problemi
     attributes:

@@ -155,7 +155,7 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
 ## Adesso: 0.1, un nodo (disponibile, provato in laboratorio)
 
 - [x] Avvisi ufficiali, bacheca "offro / cerco", registro "sto bene"
-- [x] Mappa e Wikipedia offline, piano famigliare, cartello con codice QR
+- [x] Mappa e Wikipedia offline, piano familiare, cartello con codice QR
 - [x] Ricerca nella mappa senza internet: vie, paesi, l'ospedale, la farmacia, l'acqua o la
   polizia più vicini
 - [x] Navigatore a piedi o in auto dentro la tua zona, che evita le strade segnate come interrotte
@@ -197,7 +197,7 @@ Viene prima di qualunque rete, più o meno in quest'ordine.
   consumi
 - [ ] **Android**, e le altre parti che non abbiamo potuto provare ([docs/PROVE.md](docs/PROVE.md))
 - [ ] **Verifiche sul campo delle difese**: telefoni isolati dal chip Wi-Fi del Raspberry, Android
-  con "DNS privato" attivo, il piano famigliare nella finestra del portale dell'iPhone (il suo
+  con "DNS privato" attivo, il piano familiare nella finestra del portale dell'iPhone (il suo
   spazio di memoria potrebbe non restare)
 - [ ] **Mappe fatte da altri nei test automatici**, non solo quelle del nostro generatore di
   prova. Oggi le mappe vere si provano a mano

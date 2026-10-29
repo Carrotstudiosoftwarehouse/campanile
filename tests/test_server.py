@@ -589,6 +589,13 @@ class TestAdmin(CampanileTestCase):
         _, r = self.admin("/api/admin/list")
         self.assertEqual((r["posts"], r["safe"]), ([], []))
 
+    def test_the_first_notice_is_the_urgent_one_else_the_newest(self):
+        # The home page shows only the first, the rest behind a button: it must be this one.
+        for title, urgent in (("Prima", False), ("Urgente", True), ("Ultima", False)):
+            self.admin("/api/admin/notices", title=title, text="Testo", urgent=urgent)
+        titles = [n["title"] for n in self.json("GET", "/api/notices")[1]["notices"]]
+        self.assertEqual(titles, ["Urgente", "Ultima", "Prima"])
+
     def test_notices(self):
         self.assertEqual(self.json("GET", "/api/notices")[1], {"notices": []})
         no_password = {"title": "x", "text": "y"}

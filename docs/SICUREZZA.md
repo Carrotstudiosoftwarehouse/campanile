@@ -8,7 +8,7 @@ English version: [THREAT-MODEL.md](THREAT-MODEL.md).
   annunci, i nomi in "sto bene" e gli avvisi.
 - **Nessun registro dei collegamenti.** Non si salvano indirizzi IP né pagine visitate.
 - Annunci, nomi e avvisi cancellati vengono **sovrascritti sul disco**, non solo nascosti.
-- Il piano famigliare **non arriva mai al Campanile e non resta nel telefono**. Vive nella pagina
+- Il piano familiare **non arriva mai al Campanile e non resta nel telefono**. Vive nella pagina
   aperta, e si stampa.
 - La gestione (avvisi, moderazione) funziona **solo dal Campanile stesso**, così la password non
   passa mai sulla Wi-Fi.
@@ -94,7 +94,7 @@ gestione, e resta scritto. I codici che tolgono un nome e le etichette dei telef
 - **Un falso Campanile** (stesso nome di Wi-Fi, portale finto) non si distingue. Per il browser è
   *lo stesso sito* (`http://10.42.0.1`), quindi può leggere ciò che il vero ha lasciato nel telefono
   e lasciare in cache pagine e script che poi girano anche sulla rete vera, perfino dopo un
-  ricaricamento (provato con Chrome). Per questo il piano famigliare non resta nel telefono. Restano
+  ricaricamento (provato con Chrome). Per questo il piano familiare non resta nel telefono. Restano
   solo numeri e codici dei propri annunci, che al massimo permettono di chiuderli. La soluzione vera
   è HTTPS con un certificato per ogni Campanile, che il telefono verifica da solo offline, più un
   rilevatore di reti gemelle (roadmap). Senza HTTPS i browser non offrono rimedi, perché i comandi
@@ -336,7 +336,7 @@ I punti delicati sono i **collegamenti** tra i pezzi, e ognuno ha una prova.
 - **Le porte interne** 8080 e 8082 ascoltano solo su `127.0.0.1` (provato che dalla rete non si
   raggiungono).
 - **Wikipedia su un'origine separata** (porta 8081). Un difetto in Kiwix non può leggere ciò che le
-  pagine del Campanile tengono nel browser (il piano famigliare aperto) né usare le API del
+  pagine del Campanile tengono nel browser (il piano familiare aperto) né usare le API del
   Campanile a nome del telefono.
 - **Firewall sull'hotspot.** Dai telefoni passano solo DHCP, DNS, 80 e 8081. Nessun altro servizio
   (SSH compreso), nessun inoltro. Provato da un secondo dispositivo, con la controprova a firewall
