@@ -215,6 +215,28 @@ class TestRaspberryInstall(unittest.TestCase):
         self.assertIn("ExecStart=/usr/bin/python3 -s /opt/campanile/campanile/server.py", unit)
 
 
+class TestDownloadMap(unittest.TestCase):
+    """scripts/download-map.sh, before it downloads anything: the box it is given."""
+
+    def check(self, box: str, kind: str = "custom") -> str:
+        script = (REPO / "scripts" / "download-map.sh").read_text(encoding="utf-8")
+        code = re.search(r"python3 -I - \"\$BBOX\"[^\n]*<<'PY'\n(.*?)\nPY\n", script, re.S)[1]
+        done = subprocess.run(  # noqa: S603 (the box check of our own script)
+            [sys.executable, "-I", "-", box, "15", kind, str(REPO / "campanile")],
+            input=code,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return done.stdout
+
+    def test_an_area_too_big_for_the_navigator_is_said(self):
+        self.assertEqual(self.check("7.495,44.935,7.877,45.205"), "")  # 30 km around Turin
+        self.assertIn("the navigator won't", self.check("7.30,44.80,8.10,45.35"))  # 60 km
+        self.assertIn("towns only", self.check("6.6,44.0,9.2,46.4"))  # a whole region
+        self.assertEqual(self.check("6.6,35.4,18.6,47.1", kind="italy"), "")  # a map of ours
+
+
 HOTSPOT_OFF = REPO / "raspberry" / "hotspot-off.sh"
 INSTALLED = Path("/etc/systemd/system/campanile-firewall.service")  # a real Campanile here
 

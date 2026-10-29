@@ -50,11 +50,24 @@ if ! [[ "$BBOX" =~ ^$NUM,$NUM,$NUM,$NUM$ ]]; then
   echo "Invalid box: expected WEST,SOUTH,EAST,NORTH in degrees, e.g. 7.64,45.04,7.71,45.09" >&2
   exit 1
 fi
-python3 -I - "$BBOX" <<'PY'
-import sys
+python3 -I - "$BBOX" "$ZOOM" "$1" "$ROOT/campanile" <<'PY'
+import math, sys
 w, s, e, n = map(float, sys.argv[1].split(","))
 if not (-180 <= w < e <= 180 and -85 <= s < n <= 85):
     sys.exit("Invalid box: WEST must be < EAST and SOUTH < NORTH.")
+zoom, kind = int(sys.argv[2]), sys.argv[3]
+sys.path.insert(0, sys.argv[4])
+import places, routes  # their limits, not a copy of them
+side = 2**zoom
+def row(lat):
+    return int((1 - math.asinh(math.tan(math.radians(lat))) / math.pi) / 2 * side)
+tiles = (int((e + 180) / 360 * side) - int((w + 180) / 360 * side) + 1) * (row(s) - row(n) + 1)
+if kind == "custom" and tiles > places.DETAIL_TILES:
+    print(f"Note: a very big area (about {tiles:,} tiles): search will find towns only, and"
+          " there will be no routes. About 30 km across gives both.")
+elif kind == "custom" and tiles > routes.MAX_TILES:
+    print(f"Note: a big area (about {tiles:,} tiles, routes need at most {routes.MAX_TILES:,}):"
+          " search will work, the navigator won't. About 30 km across gives both.")
 PY
 
 TARGET="$MAPS/$NAME.pmtiles"
@@ -62,7 +75,9 @@ TARGET="$MAPS/$NAME.pmtiles"
 # On a Raspberry the installer has moved the map to /var/lib/campanile.
 for HAVE in "$TARGET" "/var/lib/campanile/maps/$NAME.pmtiles"; do
   if [ -f "$HAVE" ]; then
-    echo "Already there: $HAVE (delete it to download a newer one)"
+    AGAIN="delete it"
+    [[ "$HAVE" == /var/lib/* ]] && AGAIN="sudo rm $HAVE"
+    echo "Already there: $HAVE. To download it again (other numbers, newer streets): $AGAIN"
     exit 0
   fi
 done
