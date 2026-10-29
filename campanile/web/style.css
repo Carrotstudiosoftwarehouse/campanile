@@ -178,6 +178,9 @@ button {
   margin-top: 12px;
 }
 
+/* "Tap again to close it": the same button, now saying what the second tap does. */
+button.secondary.sure { border-color: var(--red); color: var(--red); }
+
 button.link {
   background: none;
   border: none;

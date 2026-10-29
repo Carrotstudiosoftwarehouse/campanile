@@ -13,6 +13,7 @@ export const kindLabel = (kind) => t(`kind.${kind}`);
 // What this phone published, so it can close it with one tap. Stays on the phone.
 const MINE_KEY = "campanile-mine-v1";
 const MAX_MINE = 30;
+const SURE_FOR = 6000; // ms a "tap again to close" waits for the second tap
 const CODE_FORMAT = /^[A-Z2-9]{4}-[A-Z2-9]{4}$/;
 
 function validEntry(e) {
@@ -145,8 +146,39 @@ export async function closeMine(kind, path, entry) {
   saveMine(kind, loadMine(kind).filter((e) => e.id !== entry.id));
 }
 
-// Draws this phone's own posts or names, each with a one-tap button to close it.
-export function showMine({ kind, path, button, onChange }) {
+// What can't be undone takes a second tap: no dialog, which a phone's portal window may not
+// show. Untouched for a few seconds, the button is back as it was.
+export function secondTap(button, sure, act) {
+  const label = button.textContent;
+  let timer = null;
+  const back = () => {
+    clearTimeout(timer);
+    button.classList.remove("sure");
+    button.textContent = label;
+  };
+  button.addEventListener("click", () => {
+    if (!button.classList.contains("sure")) {
+      button.classList.add("sure");
+      button.textContent = sure;
+      timer = setTimeout(back, SURE_FOR);
+      return;
+    }
+    back();
+    act();
+  });
+}
+
+// Closed from this phone: said where the tap was, and its receipt, if still shown, goes.
+export function closedMine(entry, text) {
+  const receipt = document.getElementById("receipt");
+  if (receipt && document.getElementById("receipt-id")?.textContent === String(entry.id)) {
+    receipt.classList.add("hidden");
+  }
+  showResult(document.getElementById("mine-done"), text);
+}
+
+// Draws this phone's own names, each with a button to take it away.
+export function showMine({ kind, path, button, sure, done, onChange }) {
   const section = document.getElementById("mine-section");
   const list = document.getElementById("mine");
   const entries = loadMine(kind);
@@ -154,7 +186,7 @@ export function showMine({ kind, path, button, onChange }) {
   fold(list, entries.slice().reverse().map((entry) => {
     const action = el("button", { type: "button", class: "secondary", text: t(button) });
     const result = el("p", { class: "result" });
-    action.addEventListener("click", async () => {
+    secondTap(action, t(sure), async () => {
       action.disabled = true;
       try {
         await closeMine(kind, path, entry);
@@ -163,7 +195,8 @@ export function showMine({ kind, path, button, onChange }) {
         action.disabled = false;
         return;
       }
-      showMine({ kind, path, button, onChange });
+      showMine({ kind, path, button, sure, done, onChange });
+      closedMine(entry, t(done, { n: entry.id }));
       if (onChange) onChange();
     });
     return el("article", { class: "post" },

@@ -4,7 +4,10 @@ import { t, tn, translatePage } from "/i18n.js";
 
 translatePage();
 
-const MINE = { kind: "safe", path: "/api/safe/remove", button: "safe.remove.one" };
+const MINE = {
+  kind: "safe", path: "/api/safe/remove", button: "safe.remove.one",
+  sure: "safe.remove.sure", done: "safe.removed.mine",
+};
 const FIRST = 5;  // results shown before "See all"
 showMine(MINE);
 

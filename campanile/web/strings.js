@@ -122,6 +122,8 @@ export const STRINGS = {
     "board.closed": "Annuncio chiuso.",
     "board.close.need": "Chiudi la richiesta",
     "board.close.offer": "Chiudi l'offerta",
+    "board.close.sure": "Tocca di nuovo per chiuderlo",
+    "board.closed.mine": "Annuncio n. {n} chiuso: non è più nella bacheca.",
     "close": "Chiudi",
 
     "safe.page": "Sto bene",
@@ -158,6 +160,8 @@ export const STRINGS = {
     "safe.other.code": "Codice",
     "safe.other.submit": "Rimuovi",
     "safe.removed": "Nome tolto.",
+    "safe.remove.sure": "Tocca di nuovo per toglierlo",
+    "safe.removed.mine": "Nome n. {n} tolto: chi cerca non lo trova più.",
     "remove": "Togli",
 
     "map.page": "Mappa",
@@ -666,6 +670,8 @@ export const STRINGS = {
     "board.closed": "Post closed.",
     "board.close.need": "Close my request",
     "board.close.offer": "Close my offer",
+    "board.close.sure": "Tap again to close it",
+    "board.closed.mine": "Post no. {n} closed: it is off the board.",
     "close": "Close",
 
     "safe.page": "I'm safe",
@@ -702,6 +708,8 @@ export const STRINGS = {
     "safe.other.code": "Code",
     "safe.other.submit": "Remove",
     "safe.removed": "Name removed.",
+    "safe.remove.sure": "Tap again to remove it",
+    "safe.removed.mine": "Name no. {n} removed: searches no longer find it.",
     "remove": "Remove",
 
     "map.page": "Map",

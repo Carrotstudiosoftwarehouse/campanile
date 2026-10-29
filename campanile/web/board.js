@@ -1,7 +1,7 @@
 // DEVELOPED BY CARROTSTUDIO software house
 import {
   api, el, when, showResult, CATEGORIES, categoryLabel, kindLabel, rememberMine,
-  loadMine, saveMine, closeMine, fold,
+  loadMine, saveMine, closeMine, closedMine, secondTap, fold,
 } from "/common.js";
 import { showEmergency, t, tn, translatePage } from "/i18n.js";
 
@@ -45,10 +45,10 @@ function postCard(p, mine) {
     p.contact ? el("div", { class: "meta", text: t("board.contact", { contact: p.contact }) }) : null,
     el("div", { class: "meta", text: `N. ${p.id} · ${when(p.created)}` }),
   );
-  if (mine) {  // posted from this phone: closing it is one tap, right here
+  if (mine) {  // posted from this phone: closed right here, with a second tap
     const close = el("button", { type: "button", class: "secondary", text: t(p.kind ? `board.close.${p.kind}` : "board.other.submit") });
     const result = el("p", { class: "result" });
-    close.addEventListener("click", async () => {
+    secondTap(close, t("board.close.sure"), async () => {
       close.disabled = true;
       try {
         await closeMine(MINE.kind, MINE.path, mine);
@@ -57,6 +57,7 @@ function postCard(p, mine) {
         close.disabled = false;
         return;
       }
+      closedMine(mine, t("board.closed.mine", { n: mine.id }));
       load();
     });
     card.append(close, result);
