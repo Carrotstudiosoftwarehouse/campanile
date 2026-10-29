@@ -26,7 +26,7 @@ import mapfixture as mf
 import messages
 import routes
 import store
-from test_server import PASSWORD, CampanileTestCase
+from test_server import PASSWORD, CampanileTestCase, server_source
 
 Z = 14
 WEST, EAST = 7.674, 7.686  # the streets along the two banks; the river is between them
@@ -674,9 +674,10 @@ class TestFromThePhone(CampanileTestCase):
         self.assertEqual(self.json("GET", "/api/roads/closed")[1]["closed"], [])
 
     def test_every_field_the_server_names_has_a_label(self):
-        source = (Path(__file__).resolve().parent.parent / "campanile" / "server.py").read_text()
+        source = server_source()  # every module of the server
         used = set(re.findall(r'(?:clean_text|_unchanged)\([^,]+, "(\w+)"', source))
-        self.assertIn("note", used)
+        self.assertIn("note", used)  # admin.py
+        self.assertIn("description", used)  # api.py
         self.assertEqual(used - set(messages.FIELDS), set())
 
     def test_touching_where_there_is_no_street(self):

@@ -133,7 +133,7 @@ $(headers)
         # Debian turns tcp_nopush on: each map tile then waited ~40 ms for the phone's
         # delayed ACK (measured, p95 48 ms -> 0.5 ms with it off).
         tcp_nopush off;
-        # A tile at a time is never paced; a whole map is (server.py MAP_FREE, MAP_RATE).
+        # A tile at a time is never paced; a whole map is (files.py MAP_FREE, MAP_RATE).
         limit_rate_after 8m;
         limit_rate 128k;
 $(headers)
@@ -152,7 +152,7 @@ $(to_campanile)
         proxy_read_timeout 60s;
     }
 
-    # A CAP alert passes 100 kB (server.py CAP_BODY). Only the admin page sends one, and it
+    # A CAP alert passes 100 kB (admin.py CAP_BODY). Only the admin page sends one, and it
     # works only on the Raspberry itself or through its SSH tunnel: the room, only for them.
     location = /api/admin/cap {
         allow 127.0.0.1;

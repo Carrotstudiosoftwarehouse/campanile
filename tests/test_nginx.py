@@ -23,7 +23,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "campanile"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import admin
+import files
 import server as campanile
+import transport
 from test_server import PASSWORD, cap_alert
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -85,15 +88,15 @@ class TestSameRulesAsCampanile(unittest.TestCase):
         self.conf = site()
 
     def test_room_for_a_cap_alert(self):
-        self.assertEqual(campanile.CAP_BODY % 1024, 0)
+        self.assertEqual(admin.CAP_BODY % 1024, 0)
         cap_room = location(self.conf, "= /api/admin/cap")
-        self.assertIn(f"client_max_body_size {campanile.CAP_BODY // 1024}k;", cap_room)
-        self.assertIn(f"client_max_body_size {campanile.MAX_BODY // 1024}k;", self.conf)
+        self.assertIn(f"client_max_body_size {admin.CAP_BODY // 1024}k;", cap_room)
+        self.assertIn(f"client_max_body_size {transport.MAX_BODY // 1024}k;", self.conf)
 
     def test_pace_of_a_whole_map(self):
         maps = location(self.conf, '~ "^/maps/')
-        self.assertIn(f"limit_rate_after {campanile.MAP_FREE // 2**20}m;", maps)
-        self.assertIn(f"limit_rate {campanile.MAP_RATE // 1024}k;", maps)
+        self.assertIn(f"limit_rate_after {files.MAP_FREE // 2**20}m;", maps)
+        self.assertIn(f"limit_rate {files.MAP_RATE // 1024}k;", maps)
 
 
 @unittest.skipUnless(BASH and NGINX, "needs nginx and bash")
@@ -135,9 +138,9 @@ class TestThroughNginx(unittest.TestCase):
             f"pid {root / 'nginx.pid'};\nevents {{}}\n"
             f"http {{\n{temp}    include {root / 'site.conf'};\n}}\n"
         )
-        files = ["-p", str(root), "-e", str(root / "error.log"), "-c", str(root / "nginx.conf")]
+        where = ["-p", str(root), "-e", str(root / "error.log"), "-c", str(root / "nginx.conf")]
         self.nginx = subprocess.Popen(  # noqa: S603 (nginx, with the configuration above)
-            [NGINX, *files, "-g", "daemon off;"], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
+            [NGINX, *where, "-g", "daemon off;"], stdout=subprocess.DEVNULL, stderr=subprocess.PIPE
         )
         self.addCleanup(self.stop_nginx)
         deadline = time.monotonic() + 10
@@ -193,7 +196,7 @@ class TestThroughNginx(unittest.TestCase):
         self.assertEqual(self.call("POST", "/api/admin/list", ask)[0], 200)  # the address decides
 
     def test_a_whole_map_is_paced_a_tile_is_not(self):
-        self.map.write_bytes(os.urandom(campanile.MAP_FREE + 6 * campanile.MAP_RATE))
+        self.map.write_bytes(os.urandom(files.MAP_FREE + 6 * files.MAP_RATE))
         began = time.monotonic()
         status, tile = self.call("GET", "/maps/big.pmtiles", headers={"Range": "bytes=0-399999"})
         self.assertEqual((status, len(tile)), (206, 400_000))

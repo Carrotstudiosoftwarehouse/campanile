@@ -16,6 +16,7 @@ import time
 import webbrowser
 from pathlib import Path
 
+import api
 import copying
 import firewall
 import messages
@@ -137,7 +138,7 @@ def main() -> int:
         print()
 
     password = admin_password()
-    ip = server.lan_address()
+    ip = api.lan_address()
     print()
     say("on")
     print()

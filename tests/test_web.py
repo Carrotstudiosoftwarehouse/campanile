@@ -14,8 +14,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "campanile"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import places
 import store
+from test_server import server_source
 
 WEB = Path(__file__).resolve().parent.parent / "campanile" / "web"
 PAGES = sorted(WEB.glob("*.html"))
@@ -167,7 +169,7 @@ class TestStrings(unittest.TestCase):
         self.assertEqual(tuple(re.findall(r'"(\w+)"', listed)), store.CATEGORIES)
 
     def test_every_action_in_the_log_has_its_words(self):
-        source = (WEB.parent / "server.py").read_text(encoding="utf-8")
+        source = server_source()  # every module of the server
         actions = set(re.findall(r'self\._log\("(\w+)"', source))
         self.assertGreater(len(actions), 14)  # the search sees the calls
         for lang, strings in catalog().items():

@@ -61,7 +61,11 @@ see [SECURITY.md](SECURITY.md).
 
 ```
 campanile/
-  server.py       HTTP server: pages, API, maps with Range requests, captive portal
+  server.py       the web server put together: settings, which part answers, command line
+  transport.py    connections, deadlines and HTTP framing; nothing about what a request is for
+  files.py        pages and maps from disk: never outside their folder, Range, a whole map paced
+  api.py          what phones and other Campaniles ask: status, board, names, search, routes
+  admin.py        the admin and setup pages, from the Campanile itself only
   store.py        data (SQLite), validation, rate limits
   devices.py      per-device limits (the phone's MAC, never stored)
   signing.py      signed notices (Ed25519); ed25519.py checks them where `cryptography` is missing

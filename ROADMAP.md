@@ -73,8 +73,8 @@ This comes before any network, roughly in this order.
 - [ ] **An external security audit**, by people outside the project, starting from our web server
 - [ ] **Sharing over a channel authenticated by the code**, so whoever stands between two
   Campaniles can't hold the downloads
-- [ ] **A shorter `server.py`**: the request handling split from what each request does, a step
-  at a time, each step with the tests still green
+- [x] **A shorter `server.py`**: the request handling split from what each request does, in
+  five modules, by moving code only, with the same tests green before and after
 
 **2. Usable by everyone, starting now**
 
@@ -213,8 +213,8 @@ Viene prima di qualunque rete, più o meno in quest'ordine.
   server web
 - [ ] **Condivisione su un canale autenticato con il codice**, così chi si mette fra due
   Campanili non può tenerne occupati i download
-- [ ] **Un `server.py` più corto**: la gestione delle richieste separata da quello che ognuna fa,
-  un passo alla volta, ogni passo con i test ancora verdi
+- [x] **Un `server.py` più corto**: la gestione delle richieste separata da quello che ognuna fa,
+  in cinque moduli, solo spostando codice, con gli stessi test verdi prima e dopo
 
 **2. Usabile da tutti, da subito**
 

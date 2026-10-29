@@ -25,10 +25,13 @@ from urllib.parse import quote
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "campanile"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import api
 import devices
+import files
 import server as campanile
 import signing
 import store
+import transport
 from test_places import town
 
 import mapfixture
@@ -36,6 +39,17 @@ import mapfixture
 PASSWORD = "test-password"
 # The tests sign with `cryptography`; Campanile checks without it too (ed25519.py).
 CAN_SIGN = importlib.util.find_spec("cryptography") is not None
+
+
+def server_source() -> str:
+    """The web server's own code: every module its request handler is made of."""
+    folder = Path(campanile.__file__).resolve().parent
+    found = set()
+    for part in campanile.Handler.__mro__:
+        file = getattr(sys.modules[part.__module__], "__file__", None)
+        if file and Path(file).resolve().parent == folder:
+            found.add(Path(file).resolve())
+    return "".join(f.read_text(encoding="utf-8") for f in sorted(found))
 
 
 class CampanileTestCase(unittest.TestCase):
@@ -407,7 +421,7 @@ class TestRequests(CampanileTestCase):
             self.assertEqual(r.status, 400, body)
 
     def test_body_too_large(self):
-        r, _ = self.request("POST", "/api/posts", b"x" * (campanile.MAX_BODY + 1), {})
+        r, _ = self.request("POST", "/api/posts", b"x" * (transport.MAX_BODY + 1), {})
         self.assertEqual(r.status, 413)
 
     def test_connection_safe_after_error(self):
@@ -572,9 +586,9 @@ class TestFiles(CampanileTestCase):
     def test_a_whole_map_is_paced_a_tile_is_not(self):
         # The same rule as nginx's on the Raspberry, scaled down: 4 kB free, then 4 kB a second.
         with (
-            mock.patch.object(campanile, "MAP_FREE", 4096),
-            mock.patch.object(campanile, "MAP_RATE", 4096),
-            mock.patch.object(campanile, "CHUNK_SIZE", 1024),
+            mock.patch.object(files, "MAP_FREE", 4096),
+            mock.patch.object(files, "MAP_RATE", 4096),
+            mock.patch.object(files, "CHUNK_SIZE", 1024),
         ):
             began = time.monotonic()
             r, tile = self.request("GET", "/maps/test.pmtiles", headers={"Range": "bytes=0-4095"})
@@ -668,8 +682,8 @@ class TestAdmin(CampanileTestCase):
         self.assertEqual(self.admin("/api/admin/list")[0], 429)
 
     def test_only_from_the_campanile_itself(self):
-        old = campanile.LOCAL_ADDRESSES
-        campanile.LOCAL_ADDRESSES = set()  # the test client now looks like it's on the network
+        old = transport.LOCAL_ADDRESSES
+        transport.LOCAL_ADDRESSES = set()  # the test client now looks like it's on the network
         try:
             status, r = self.admin("/api/admin/list")
             self.assertEqual(status, 403)
@@ -677,7 +691,7 @@ class TestAdmin(CampanileTestCase):
             self.cfg.admin_from_network = True
             self.assertEqual(self.admin("/api/admin/list")[0], 200)
         finally:
-            campanile.LOCAL_ADDRESSES = old
+            transport.LOCAL_ADDRESSES = old
 
     def test_no_password_means_admin_off(self):
         self.cfg.admin_password = None
@@ -863,7 +877,7 @@ class TestConnections(CampanileTestCase):
         """Every slot held by answers someone reads very slowly: a phone still gets in."""
         self.server.shutdown()
         self.server.server_close()
-        slots = campanile.FAIR_SHARE * 2  # one device holding all of them: over its share
+        slots = transport.FAIR_SHARE * 2  # one device holding all of them: over its share
         self.server = campanile.create_server("127.0.0.1", 0, self.cfg, max_connections=slots)
         self.port = self.server.server_address[1]
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
@@ -881,7 +895,7 @@ class TestConnections(CampanileTestCase):
             self.assertEqual(len(self.server._answering), slots)  # all still being sent
             started = time.monotonic()
             self.assertEqual(self.json("GET", "/api/status")[0], 200)
-            self.assertLess(time.monotonic() - started, campanile.SLOT_WAIT)
+            self.assertLess(time.monotonic() - started, transport.SLOT_WAIT)
         finally:
             for s in slow:
                 s.close()
@@ -917,11 +931,11 @@ class TestConnections(CampanileTestCase):
             c.request("GET", "/api/status")
             self.assertEqual(c.getresponse().read()[:1], b"{")
             idle.append(c)
-        time.sleep(campanile.EVICT_AFTER + 0.3)
+        time.sleep(transport.EVICT_AFTER + 0.3)
         try:
             started = time.monotonic()
             self.assertEqual(self.json("GET", "/api/status")[0], 200)
-            self.assertLess(time.monotonic() - started, campanile.SLOT_WAIT)
+            self.assertLess(time.monotonic() - started, transport.SLOT_WAIT)
             # The oldest idle connection was closed for it; a browser simply reconnects.
             closed = 0
             for c in idle:
@@ -1071,7 +1085,7 @@ class TestBehindProxy(CampanileTestCase):
     def test_connection_cap_per_ip_is_left_to_nginx(self):
         server = campanile.create_server("127.0.0.1", 0, self.cfg)
         try:
-            self.assertEqual(server._max_per_ip, campanile.MAX_CONNECTIONS)
+            self.assertEqual(server._max_per_ip, transport.MAX_CONNECTIONS)
         finally:
             server.server_close()
 
@@ -1138,7 +1152,7 @@ class TestPlaces(CampanileTestCase):
         answers = []
         with (
             mock.patch.object(self.cfg.places, "search", side_effect=slow),
-            mock.patch.object(campanile, "SEARCH_WAIT", 0.3),
+            mock.patch.object(api, "SEARCH_WAIT", 0.3),
         ):
             first = threading.Thread(target=lambda: answers.append(self.find("farmacia")[0]))
             first.start()
@@ -1170,15 +1184,15 @@ class TestPlaces(CampanileTestCase):
 
 class TestNoProxy(CampanileTestCase):
     def test_x_real_ip_is_ignored_without_a_proxy(self):
-        old = campanile.LOCAL_ADDRESSES
-        campanile.LOCAL_ADDRESSES = {"10.9.9.9"}  # the test client (127.0.0.1) is now "remote"
+        old = transport.LOCAL_ADDRESSES
+        transport.LOCAL_ADDRESSES = {"10.9.9.9"}  # the test client (127.0.0.1) is now "remote"
         try:
             status, _ = self.json(
                 "POST", "/api/admin/list", {"password": PASSWORD}, {"X-Real-IP": "10.9.9.9"}
             )
             self.assertEqual(status, 403)
         finally:
-            campanile.LOCAL_ADDRESSES = old
+            transport.LOCAL_ADDRESSES = old
 
 
 class TestTimeAndLog(CampanileTestCase):
@@ -1249,10 +1263,10 @@ class TestTimeAndLog(CampanileTestCase):
         old._db.execute("UPDATE posts SET closed = 1")  # what 0.1.0 did when a post was closed
         old._db.commit()
         old.close()
-        files = lambda: b"".join(f.read_bytes() for f in self.data.glob("old.db*"))  # noqa: E731
-        self.assertTrue(b"3330000009" in files())  # the control
+        on_disk = lambda: b"".join(f.read_bytes() for f in self.data.glob("old.db*"))  # noqa: E731
+        self.assertTrue(b"3330000009" in on_disk())  # the control
         store.Store(path).close()
-        self.assertFalse(b"3330000009" in files())
+        self.assertFalse(b"3330000009" in on_disk())
 
     def test_zero_days_keeps_them(self):
         self.cfg.store.keep["posts"] = 0
@@ -1914,7 +1928,7 @@ class TestComputerLanguage(unittest.TestCase):
 
 class TestUnits(unittest.TestCase):
     def test_parse_range(self):
-        f = campanile.parse_range
+        f = files.parse_range
         self.assertEqual(f("bytes=0-0", 10), (0, 0))
         self.assertEqual(f("bytes=9-", 10), (9, 9))
         self.assertEqual(f("bytes=-1", 10), (9, 9))
@@ -2077,8 +2091,8 @@ class TestCapAlerts(CampanileTestCase):
     def test_only_the_admin_on_the_campanile_itself(self):
         wrong = self.json("POST", "/api/admin/cap", {"password": "x", "cap": cap_alert()})
         self.assertEqual(wrong[0], 403)
-        old = campanile.LOCAL_ADDRESSES
-        campanile.LOCAL_ADDRESSES = {"10.9.9.9"}  # the test client is now a phone on the Wi-Fi
+        old = transport.LOCAL_ADDRESSES
+        transport.LOCAL_ADDRESSES = {"10.9.9.9"}  # the test client is now a phone on the Wi-Fi
         try:
             small = self.json("POST", "/api/admin/cap", {"password": PASSWORD, "cap": cap_alert()})
             self.assertEqual(small[0], 403)
@@ -2086,7 +2100,7 @@ class TestCapAlerts(CampanileTestCase):
             big = self.json("POST", "/api/admin/cap", {"password": PASSWORD, "cap": "x" * 20_000})
             self.assertEqual(big[0], 413)
         finally:
-            campanile.LOCAL_ADDRESSES = old
+            transport.LOCAL_ADDRESSES = old
         self.assertEqual(self.notices(), [])
 
     def test_an_alert_shaped_like_it_alerts_own_is_read(self):
