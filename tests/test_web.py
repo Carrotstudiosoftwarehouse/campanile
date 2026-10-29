@@ -127,6 +127,10 @@ class TestStrings(unittest.TestCase):
         for key, word in quick.items():
             self.assertIn(places.normalize(word), places.SYNONYMS, key)
 
+    def test_the_medicine_card_says_it_is_not_a_doctor(self):
+        for lang, word in (("it", "medico"), ("en", "doctor")):
+            self.assertIn(word, self.strings[lang]["home.wiki.on"], lang)
+
     def test_every_key_used_by_the_pages_exists(self):
         used = {key for page in PAGES for _, key, _ in marked(page)} | keys_in_scripts()
         self.assertEqual(used - set(self.strings["it"]), set())
