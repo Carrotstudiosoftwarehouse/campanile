@@ -278,6 +278,38 @@ class TestCost(PlacesTestCase):
             self.assertEqual(self.search("via roma", found=found)[0]["name"], "Via Roma")
 
 
+class TestKinds(PlacesTestCase):
+    """A kind of place ("farmacia", the nearest-pharmacy button) answers with that kind only."""
+
+    def light_map(self) -> places.Places:
+        # Like Italy at low zoom: no pharmacy, but a village called Farmacia 20 km away.
+        tiles: dict = {}
+        key, p = point(7.94, 45.07)
+        village = {"name": "Farmacia", "kind": "locality", "kind_detail": "village"}
+        tiles.setdefault(key, {}).setdefault("places", []).append((village, [p]))
+        key, p = point(*CENTER)
+        street = {"name": "Via della Farmacia", "kind": "minor_road"}
+        tiles.setdefault(key, {}).setdefault("roads", []).append((street, [p, (p[0] + 50, p[1])]))
+        self.write("light.pmtiles", vector_map(tiles))
+        return self.places()
+
+    def test_a_kind_the_map_lacks_is_said_never_a_namesake(self):
+        answer = self.light_map().search("farmacia", CENTER, "it")
+        self.assertEqual(answer["results"], [])
+        self.assertTrue(answer["missing"])
+
+    def test_with_real_pharmacies_only_pharmacies(self):
+        self.write("town.pmtiles", mf.pmtiles(town()))
+        answer = self.light_map().search("farmacia", CENTER, "it")
+        self.assertEqual({r["kind"] for r in answer["results"]}, {"pharmacy"})
+        self.assertFalse(answer["missing"])
+
+    def test_a_name_with_the_word_is_still_found_when_typed(self):
+        found = self.light_map()
+        self.assertEqual(self.search("via della farmacia", found=found)[0]["type"], "street")
+        self.assertFalse(found.search("via della farmacia", CENTER, "it")["missing"])
+
+
 class TestIndexMemory(unittest.TestCase):
     """The index kept in memory is bounded like the reading, whatever the map says."""
 

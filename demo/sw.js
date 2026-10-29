@@ -377,7 +377,10 @@ async function findPlaces(url, lang) {
   for (const m of [...data.maps].sort((a, b) => b.max_zoom - a.max_zoom)) {
     m.rows.forEach((r, i) => {
       const distance = near ? km(near[0], near[1], r[5], r[6]) : 0;
-      if (kinds && r[0] === 2 && kinds.includes(r[1])) found.push([[-1, 0, distance], m, r]);
+      if (kinds) { // a kind of place: only that kind, never a namesake (as places.py)
+        if (r[0] === 2 && kinds.includes(r[1])) found.push([[-1, 0, distance], m, r]);
+        return;
+      }
       if (words.every((w) => m.words[i].some((x) => x.startsWith(w)))) {
         const variants = m.variants[i];
         const quality = variants.includes(text) ? 0 : variants.some((v) => v.startsWith(text)) ? 1 : 2;
@@ -399,7 +402,7 @@ async function findPlaces(url, lang) {
     if (!results.some((other) => sameThing(result, other))) results.push(result);
     if (results.length === 10) break;
   }
-  return { results, ready: true };
+  return { results, ready: true, missing: Boolean(kinds) && results.length === 0 };
 }
 
 function normalize(name) {

@@ -87,7 +87,7 @@ export function attachSearch({ input, results, chips, center, pick }) {
     else if (!answer.ready) {
       say(t("search.wait"));
       timer = setTimeout(() => run(query), RETRY);
-    } else say(t("search.none"));
+    } else say(answer.missing ? t("search.missing") : t("search.none"));
   }
 
   input.addEventListener("input", () => {

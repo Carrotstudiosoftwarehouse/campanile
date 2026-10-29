@@ -961,10 +961,12 @@ class Places:
         kinds = SYNONYMS.get(text)
         found: list[tuple[tuple, MapIndex, int]] = []
         for index in indexes:
-            if kinds:  # "pharmacy": the nearest pharmacies first, then names with the word
+            if kinds:  # a kind of place: only that kind, nearest first. A village called
+                # "Farmacia" is no pharmacy, and in an emergency must never look like one.
                 found += [
                     ((-1, 0, index.distance(i, near)), index, i) for i in index.of_kinds(kinds)
                 ]
+                continue
             matches = {*index.best(index.matching(text.split())), *index.starting(text)}
             found += [(index.rank(i, text, near), index, i) for i in matches]
         found.sort(key=lambda item: item[0])
@@ -975,4 +977,5 @@ class Places:
                 results.append(result)
                 if len(results) == RESULTS:
                     break
-        return {"results": results, "ready": self.ready}
+        # "missing": the maps have no place of that kind, and the page says so.
+        return {"results": results, "ready": self.ready, "missing": bool(kinds) and not results}
