@@ -5,6 +5,7 @@ import errno
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -147,6 +148,14 @@ class TestCopy(CopyCase):
         self.assertIn(b"\r\n", readme)  # Notepad on an old Windows shows it right
         self.assertIn(b"tools/python", readme)
         self.assertFalse(list(root.rglob("*.partial")))
+
+    def test_a_copy_without_tools_says_what_it_lacks(self):
+        # As one made on a Raspberry: no tools/, so no Python installers and no kiwix-serve.
+        shutil.rmtree(self.tools)
+        readme = (self.copy() / copying.README).read_text(encoding="utf-8")
+        self.assertNotIn("tools/python", readme)
+        self.assertIn("python.org", readme)
+        self.assertIn("Offline Wikipedia", readme)  # the file is on the stick, its server isn't
 
     def test_copying_again_rewrites_only_what_changed(self):
         root = self.copy()

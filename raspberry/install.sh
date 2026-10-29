@@ -102,8 +102,12 @@ fi
 step "Code in $CODE"
 NEW="$(mktemp -d /opt/.campanile-new.XXXXXX)"
 trap 'rm -rf "$NEW"' EXIT
-cp -R "$SOURCE/campanile" "$SOURCE/raspberry" "$SOURCE/scripts" "$NEW/"
-cp "$SOURCE/LICENSE" "$SOURCE/README.md" "$SOURCE/README.it.md" "$NEW/" 2>/dev/null || true
+# The whole program, as copying.py takes it to a stick: a copy made here starts a laptop too.
+PROGRAM=(campanile raspberry scripts docs README.md README.it.md LICENSE SECURITY.md CONTRIBUTING.md
+         ROADMAP.md pyproject.toml "Avvia Campanile (Windows).bat" "Avvia Campanile (Mac).command")
+for name in "${PROGRAM[@]}"; do
+  if [ -e "$SOURCE/$name" ]; then cp -R "$SOURCE/$name" "$NEW/"; fi
+done
 find "$NEW" -name '__pycache__' -prune -exec rm -rf {} +
 chown -R root:root "$NEW"
 chmod -R u=rwX,go=rX "$NEW"

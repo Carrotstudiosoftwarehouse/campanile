@@ -4,6 +4,7 @@ never from the folder they start in: that folder may be a stick someone else pre
 
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -12,6 +13,9 @@ import unittest
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO / "campanile"))
+import copying  # noqa: E402
+
 WINDOWS = REPO / "Avvia Campanile (Windows).bat"
 GUARD = b'set "NoDefaultCurrentDirectoryInExePath=1"\r\n'
 INSTALL = (REPO / "raspberry" / "install.sh").read_text(encoding="utf-8")
@@ -198,6 +202,13 @@ class TestRaspberryInstall(unittest.TestCase):
                 stopped = "systemctl disable --now nginx.service" in done.calls
                 self.assertEqual(stopped, before != "serving")  # off again if it was off
                 self.assertEqual("systemctl restart nginx.service" in done.calls, not stopped)
+
+    def test_the_raspberry_keeps_all_a_stick_copy_takes(self):
+        # copying.py makes a stick from /opt/campanile: what it takes must be there.
+        step = re.search(r'step "Code in \$CODE"\n(.*?)\nstep ', INSTALL, re.S)[1]
+        listed = re.search(r"PROGRAM=\((.*?)\)\n", step, re.S)
+        copied = shlex.split(listed[1]) if listed else re.findall(r'"\$SOURCE/([^"]+)"', step)
+        self.assertEqual(sorted(set(copied)), sorted(copying.PROGRAM))
 
     def test_the_service_ignores_packages_in_its_home(self):
         unit = (REPO / "raspberry" / "campanile.service").read_text(encoding="utf-8")

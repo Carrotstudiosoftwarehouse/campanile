@@ -376,29 +376,52 @@ def _explain(error: OSError, name: str) -> CopyError:
     return CopyError("failed", f"{name}: {error.strerror or error}")
 
 
-def readme(version: str) -> str:
+def readme(version: str, installers: bool = True, wiki_server: bool = True) -> str:
+    """The note on the stick. A copy made on a Raspberry has no tools/: it says so."""
+    python_it = (
+        "1. Se il computer non ha Python: apri la cartella tools/python e installalo\n"
+        "   (Windows: python-...-amd64.exe, o -arm64.exe sui computer ARM; spunta\n"
+        '   "Add python.exe to PATH". Mac: il file .pkg).'
+        if installers
+        else "1. Serve Python 3, gratuito su python.org: questa copia non ha gli installatori."
+    )
+    python_en = (
+        "1. If the computer has no Python: open the folder tools/python and install it\n"
+        "   (Windows: python-...-amd64.exe, or -arm64.exe on ARM computers; tick\n"
+        '   "Add python.exe to PATH". Mac: the .pkg file).'
+        if installers
+        else "1. The computer needs Python 3, free from python.org: this copy has no installers."
+    )
+    wiki_it = (
+        ""
+        if wiki_server
+        else "\nWikipedia offline: questa copia non ha il programma che la serve sui portatili.\n"
+        "Con internet, la pagina di preparazione lo scarica (Medicina offline).\n"
+    )
+    wiki_en = (
+        ""
+        if wiki_server
+        else "\nOffline Wikipedia: this copy lacks the program that serves it on laptops.\n"
+        "With internet, the setup page fetches it (Offline medicine).\n"
+    )
     return f"""CAMPANILE {version} - copia pronta / ready-made copy
 
 ITALIANO
-1. Se il computer non ha Python: apri la cartella tools/python e installalo
-   (Windows: python-...-amd64.exe, o -arm64.exe sui computer ARM; spunta
-   "Add python.exe to PATH". Mac: il file .pkg).
+{python_it}
 2. Doppio clic su "Avvia Campanile (Windows)" o "Avvia Campanile (Mac)".
    Su Linux: python3 campanile/launch.py
 3. Gli altri si collegano alla stessa Wi-Fi e aprono l'indirizzo che compare.
-
+{wiki_it}
 Questa copia viene dal Campanile di chi te l'ha data: accettala solo di persona.
 Non installare mai programmi presi da una rete Wi-Fi: chiunque puo' chiamare
 una rete "Campanile".
 
 ENGLISH
-1. If the computer has no Python: open the folder tools/python and install it
-   (Windows: python-...-amd64.exe, or -arm64.exe on ARM computers; tick
-   "Add python.exe to PATH". Mac: the .pkg file).
+{python_en}
 2. Double-click "Avvia Campanile (Windows)" or "Avvia Campanile (Mac)".
    On Linux: python3 campanile/launch.py
 3. The others join the same Wi-Fi and open the address shown.
-
+{wiki_en}
 This copy comes from the Campanile of whoever gave it to you: accept it only in
 person. Never install programs taken from a Wi-Fi network: anyone can name a
 network "Campanile".
@@ -457,7 +480,12 @@ def copy(
                     done(size)
                     continue
             listed[relative] = {"bytes": size, "sha256": _write(source, target, done, cancelled)}
-        _write(readme(version).replace("\n", "\r\n").encode(), root / README)
+        names = [relative for _, relative in files]
+        installers = any(n.startswith("tools/python/") for n in names)
+        wiki = any(n.startswith("data/zim/") for n in names)
+        server = any(n.startswith("tools/") and not n.startswith("tools/python/") for n in names)
+        note = readme(version, installers, wiki_server=server or not wiki)
+        _write(note.replace("\n", "\r\n").encode(), root / README)
         manifest = json.dumps(
             {
                 "campanile": version,
