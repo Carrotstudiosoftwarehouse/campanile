@@ -182,6 +182,13 @@ $("cancel").addEventListener("click", async () => {
   await refresh();
 });
 
+// A Raspberry has no setup page: say so before anyone looks for a password.
+api("/api/status").then((status) => {
+  if (status.setup) return;
+  $("login").classList.add("hidden");
+  $("only-laptop").classList.remove("hidden");
+}).catch(() => {});
+
 $("login").addEventListener("submit", async (event) => {
   event.preventDefault();
   password = $("password").value;
