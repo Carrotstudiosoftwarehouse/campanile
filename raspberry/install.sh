@@ -14,7 +14,7 @@ Usage, from the project folder:
   --country CC    two-letter country code for the Wi-Fi rules (default: IT)
   --no-hotspot    stay on the existing network, no hotspot and no redirect
 
-Run scripts/prepare.sh first. Maps and Wikipedia in data/ are copied too.
+The map libraries are fetched the first time. Maps and Wikipedia in data/ are copied too.
 USAGE
 }
 
