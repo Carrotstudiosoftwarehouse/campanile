@@ -90,11 +90,22 @@ Come un estintore: lo prepari con calma e speri di non usarlo mai.
 ## Progetti amici
 
 Piccoli progetti con la stessa idea: aiutare le persone quando internet non c'è. Ognuno è dei suoi
-autori; li colleghiamo perché insieme arrivano più lontano. Hai costruito qualcosa di simile?
-Scrivicelo, e lo aggiungiamo qui.
+autori, e ognuno ha detto sì a stare qui: insieme arrivano più lontano. Hai costruito qualcosa di
+simile? Scrivicelo.
 
 - **[OFFGRID](https://github.com/lyle-leif/OFFGRID)**: una mappa offline e un assistente IA che
   gira su un portatile, per Batangas, nelle Filippine.
+- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: una mappa di dove sono le squadre
+  dell'emergenza sul campo e di come stanno, costruita da quello che comunicano via radio. Gira nel
+  browser, senza internet.
+- **[Pathweave](https://github.com/Dancode-188/pathweave)**: messaggi fra dispositivi vicini quando
+  internet non c'è, via Wi-Fi o, se manca, via Bluetooth. Cifrati, e con la verifica di tutte e due
+  le parti.
+
+### Progetti simili
+
+Non conosciamo ancora i loro autori: li colleghiamo perché hanno la stessa idea.
+
 - **[Prometheus Station](https://github.com/Guillain-RDCDE/Prometheus-Station)**: una scatola a
   batteria che serve tutta Wikipedia senza internet e senza rete.
 - **[ConnectBox](https://github.com/ConnectBox/connectbox-pi)**: un Raspberry Pi che condivide
@@ -108,9 +119,6 @@ Scrivicelo, e lo aggiungiamo qui.
   visti dal satellite, in tempo reale.
 - **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: una mappa offline dei punti di
   aiuto durante le emergenze in Cile.
-- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: una mappa di dove sono le squadre
-  dell'emergenza sul campo e di come stanno, costruita da quello che comunicano via radio. Gira nel
-  browser, senza internet.
 
 ## Come è fatto
 

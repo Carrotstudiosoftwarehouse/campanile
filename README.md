@@ -90,11 +90,22 @@ Like a fire extinguisher: you set it up calmly and hope you never need it.
 ## Friends
 
 Small projects with the same idea: helping people when the internet is gone. Each belongs to its
-own authors; we link them because together they reach further. Built something like this? Tell
-us, and it goes here.
+own authors, and each said yes to being linked here: together they reach further. Built
+something like this? Tell us.
 
 - **[OFFGRID](https://github.com/lyle-leif/OFFGRID)**: an offline map and an AI assistant that runs
   on a laptop, for Batangas, in the Philippines.
+- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: a map of where emergency field teams
+  are and how they are doing, built from what they report by radio. Runs in the browser, no
+  internet needed.
+- **[Pathweave](https://github.com/Dancode-188/pathweave)**: messages between nearby devices when
+  the internet is down, over Wi-Fi or, without it, Bluetooth. Encrypted, and both sides are
+  checked.
+
+### Similar projects
+
+We don't know their authors yet: we link them because they share the same idea.
+
 - **[Prometheus Station](https://github.com/Guillain-RDCDE/Prometheus-Station)**: a battery box that
   serves all of Wikipedia with no internet and no network.
 - **[ConnectBox](https://github.com/ConnectBox/connectbox-pi)**: a Raspberry Pi that shares media
@@ -107,9 +118,6 @@ us, and it goes here.
   monitoring for Algeria.
 - **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: an offline-first map of aid
   points during emergencies in Chile.
-- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: a map of where emergency field teams
-  are and how they are doing, built from what they report by radio. Runs in the browser, no
-  internet needed.
 
 ## How it is built
 
