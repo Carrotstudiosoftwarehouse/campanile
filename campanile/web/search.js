@@ -2,12 +2,11 @@
 // Finding a street, a town or the nearest pharmacy in the maps, without internet. Shared by
 // the map page and the setup page: one box, a few big buttons, a list to tap.
 import { api } from "/common.js";
-import { has, lang, t } from "/i18n.js";
+import { distance, has, t } from "/i18n.js";
 
 const WAIT = 250; // ms after the last key before searching
 const RETRY = 2000; // while the Campanile is still reading the maps
 const CHIPS = ["hospital", "pharmacy", "water", "police"];
-const distance = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
 
 // What a result is, in words: "Pharmacy", "Street", "Village"...
 export function label(result) {
@@ -21,13 +20,6 @@ export function label(result) {
 // "Pharmacy · San Salvario": what it is and where, for the list and the map.
 export function describe(result) {
   return [label(result), result.near].filter(Boolean).join(" · ");
-}
-
-function far(meters) {
-  if (meters === undefined) return "";
-  return meters < 1000
-    ? t("search.meters", { n: Math.round(meters / 10) * 10 })
-    : t("search.km", { n: distance.format(meters / 1000) });
 }
 
 // Options: input and results are elements; chips may be null; center() is [lon, lat] or
@@ -63,7 +55,8 @@ export function attachSearch({ input, results, chips, center, pick }) {
       const name = document.createElement("strong");
       name.textContent = result.local ? `${result.name} (${result.local})` : result.name;
       const about = document.createElement("span");
-      about.textContent = [describe(result), far(result.meters)].filter(Boolean).join(" · ");
+      const far = result.meters === undefined ? "" : distance(result.meters);
+      about.textContent = [describe(result), far].filter(Boolean).join(" · ");
       button.append(name, about);
       button.addEventListener("click", () => choose(result));
       return button;

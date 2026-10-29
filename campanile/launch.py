@@ -1,7 +1,7 @@
 # DEVELOPED BY CARROTSTUDIO software house
 """The double click: starts Campanile on a laptop and opens the setup page, or the sign.
 
-The window is read by non-technical people, so its messages stay in Italian.
+The window is read by non-technical people: it speaks the computer's language.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ from pathlib import Path
 
 import copying
 import firewall
+import messages
 import preparation
 import release
 import server
@@ -29,6 +30,12 @@ WHOLE_NETWORK = "0.0.0.0"  # noqa: S104 (here we do want to be found)
 DATA = server.HERE.parent / "data"
 PASSWORD_FILE = DATA / "admin-password.txt"
 TRUSTED_KEYS = DATA / "trusted-keys.json"  # optional: enables signed notices
+LANG = messages.computer_language()
+NINE_ONE_ONE = ("US", "CA")  # where people call 911; elsewhere 112, and the admin page changes it
+
+
+def say(key: str, *values) -> None:
+    print("  " + messages.window(key, LANG, *values))
 
 
 def admin_password() -> str:
@@ -58,27 +65,14 @@ def watch_firewall() -> None:
         if not blocked:
             continue
         print()
-        print("  ATTENZIONE: Windows sta bloccando i telefoni, che non possono collegarsi.")
-        print("  (Succede se alla domanda di Windows sulle reti si e' premuto Annulla.)")
-        print("  Premi INVIO per sistemarlo: Windows ti chiedera' il permesso.")
+        say("firewall_blocked")
         input()
-        if firewall.allow(blocked):
-            print("  Sistemato: ora i telefoni possono collegarsi.")
-        else:
-            print("  Non e' stato sistemato. Riprova chiudendo e riaprendo il Campanile,")
-            print("  e a Windows rispondi Si'.")
+        say("firewall_fixed" if firewall.allow(blocked) else "firewall_not_fixed")
         print()
 
 
 # Why nothing starts: this Campanile would start empty while its data sits elsewhere.
-STOPPED = {
-    "update_folder_missing": "Questo Campanile e' stato aggiornato: mappe, Wikipedia e annunci\n"
-    "  sono nella cartella \"{0}\", che qui accanto non c'e' piu'. Rimettila accanto e riapri.",
-    "update_unfinished": "Questo e' un aggiornamento non finito: apri il Campanile dalla cartella\n"
-    '  "{0}", che lo finisce da sola.',
-    "update_data_twice": 'Ci sono dati sia in "{0}" sia in "{1}": per non perdere niente il\n'
-    "  Campanile non parte. Tieni la cartella giusta e sposta altrove l'altra.",
-}
+STOPPED = ("update_folder_missing", "update_unfinished", "update_data_twice")
 
 
 def updated(root: Path) -> Path | None:
@@ -89,21 +83,27 @@ def updated(root: Path) -> Path | None:
         return update.resume(root, server.VERSION)
     except release.ReleaseError:
         shutil.rmtree(root / update.STAGING, ignore_errors=True)
-        print("  ATTENZIONE: l'aggiornamento preparato non e' piu' quello firmato da CarrotStudio:")
-        print("  e' stato scartato. Parte la versione di prima.")
+        say("update_discarded")
     except update.UpdateError as e:
         if e.args[0] != "update_folder_exists":
             raise
-        print(
-            f"  L'aggiornamento e' pronto, ma qui accanto c'e' gia' una cartella \"{e.args[1]}\":"
-        )
-        print("  spostala altrove e riapri il Campanile. Intanto parte la versione di prima.")
+        say("update_folder_exists", e.args[1])
     except OSError:
         if (root / update.MOVED).exists():
             raise  # past the point of no return: only forward, at the next start
-        print("  L'aggiornamento non e' riuscito: parte la versione di prima.")
+        say("update_failed")
     print()
     return None
+
+
+def server_args() -> list[str]:
+    args = ["--host", WHOLE_NETWORK, "--port", str(PORT), "--setup"]
+    args += ["--password-file", str(PASSWORD_FILE)]
+    if messages.computer_region() in NINE_ONE_ONE:
+        args += ["--emergency-number", "911"]
+    if TRUSTED_KEYS.exists():
+        args += ["--trusted-keys", str(TRUSTED_KEYS)]
+    return args
 
 
 def main() -> int:
@@ -112,47 +112,50 @@ def main() -> int:
     try:
         newer = updated(server.HERE.parent)
     except update.UpdateError as e:
-        print("\n  " + STOPPED[e.args[0]].format(*e.args[1:]) + "\n")
+        print()
+        say(e.args[0], *e.args[1:])
+        print()
         return 1
     except OSError:
-        print("\n  L'aggiornamento non e' finito (un file in uso?). Chiudi le altre finestre e")
-        print("  riapri il Campanile: riparte da dove si era fermato. Niente e' perso.\n")
+        print()
+        say("update_locked")
+        print()
         return 1
     if newer is not None:
-        print(f'  Campanile aggiornato: parte dalla cartella "{newer.name}".')
+        say("updated", newer.name)
         try:  # the same window, the same Python: only the folder changes
             return subprocess.call([sys.executable, str(newer / "campanile" / "launch.py")])  # noqa: S603
         except KeyboardInterrupt:
             return 0
     if not (server.HERE / "web" / "vendor" / "maplibre-gl.mjs").exists():
-        print(
-            "Manca la preparazione iniziale. Con internet, esegui una volta:\n"
-            "    scripts/prepare.sh"
-        )
+        say("not_prepared")
         return 1
 
     damaged = copying.check(server.HERE.parent)
     if damaged:
-        print("  ATTENZIONE: questa copia del Campanile e' incompleta o danneggiata")
-        print(f"  ({len(damaged)} file, per esempio {damaged[0]}).")
-        print("  Rifalla dalla chiavetta originale, o chiedi una chiavetta nuova.")
+        say("damaged", len(damaged), damaged[0])
         print()
 
     password = admin_password()
     ip = server.lan_address()
     print()
-    print("  CAMPANILE ACCESO. Lascia aperta questa finestra: chiudendola si spegne.")
+    say("on")
     print()
     if ip:
-        print(f"  Dagli altri telefoni, collegati alla stessa Wi-Fi:  http://{ip}:{PORT}/")
+        say("phones", f"http://{ip}:{PORT}/")
     else:
-        print("  Questo computer non e' collegato a nessuna rete Wi-Fi o via cavo:")
-        print("  gli altri dispositivi non possono ancora raggiungerlo.")
-    print(f"  Da questo computer:   http://localhost:{PORT}/")
-    print(f"  Gestione e avvisi:    http://localhost:{PORT}/admin.html")
-    print(f"  Password di gestione: {password}")
-    print(f"  Preparazione:         http://localhost:{PORT}/setup.html")
-    print(f"  Guida da stampare:    http://localhost:{PORT}/guide.html")
+        say("no_network")
+    here = f"http://localhost:{PORT}/"
+    lines = [
+        ("here", here),
+        ("admin", here + "admin.html"),
+        ("password", password),
+        ("setup", here + "setup.html"),
+        ("guide", here + "guide.html"),
+    ]
+    width = max(len(messages.window(key, LANG)) for key, _ in lines)
+    for key, value in lines:
+        print(f"  {messages.window(key, LANG):<{width}} {value}")
     print()
 
     threading.Thread(target=watch_firewall, daemon=True).start()
@@ -161,13 +164,10 @@ def main() -> int:
     first_page = "sign.html" if any((DATA / "maps").glob("*.pmtiles")) else "setup.html"
     threading.Timer(1.0, webbrowser.open, [f"http://localhost:{PORT}/{first_page}"]).start()
     try:
-        args = ["--host", WHOLE_NETWORK, "--port", str(PORT), "--setup"]
-        args += ["--password-file", str(PASSWORD_FILE)]
-        if TRUSTED_KEYS.exists():
-            args += ["--trusted-keys", str(TRUSTED_KEYS)]
-        server.main(args)
+        server.main(server_args())
     except OSError as e:
-        print(f"\n  Impossibile usare la porta {PORT}: forse il Campanile e' gia' acceso. ({e})")
+        print()
+        say("port_busy", PORT, e)
         return 1
     return 0
 

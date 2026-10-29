@@ -29,6 +29,12 @@ Gli annunci si cancellano da soli dopo 14 giorni, i nomi di "sto bene" dopo 60 (
 quando e da chi, e l'orologio del Campanile, che lì si può correggere (senza internet il
 Raspberry riparte indietro).
 
+### Il numero di emergenza
+
+Le pagine dicono di chiamare il 112, il numero europeo. Fuori dall'Europa, scrivi quello della
+tua zona in **Numero di emergenza**, nella gestione. Un portatile impostato su Stati Uniti o
+Canada parte già con il 911.
+
 ### Più di un volontario
 
 Con la password principale, **Chi gestisce il Campanile** dà a ogni volontario una password sua.

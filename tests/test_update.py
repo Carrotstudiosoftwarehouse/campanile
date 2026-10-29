@@ -81,6 +81,20 @@ class UpdateTestCase(unittest.TestCase):
         )
 
 
+class TestTopNames(unittest.TestCase):
+    # What 0.1.0 copies from a stick: names at the top of the folder, and everything under them.
+    SHIPPED_0_1_0 = frozenset({
+        "campanile", "raspberry", "scripts", "docs", "README.md", "README.it.md", "LICENSE",
+        "SECURITY.md", "CONTRIBUTING.md", "ROADMAP.md", "pyproject.toml",
+        "Avvia Campanile (Windows).bat", "Avvia Campanile (Mac).command",
+    })  # fmt: skip
+
+    def test_a_new_version_adds_or_renames_nothing_at_the_top(self):
+        # A Campanile in the field copies an update with its own list: a new name would never
+        # arrive, and the signature check would refuse the whole update.
+        self.assertLessEqual(set(copying.PROGRAM), self.SHIPPED_0_1_0)
+
+
 class TestStage(UpdateTestCase):
     def test_the_program_is_found_on_the_stick(self):
         self.assertEqual(update.find_program(self.stick), self.stick / "Campanile")
@@ -232,6 +246,12 @@ class TestApply(UpdateTestCase):
 
 
 class TestLaptopStart(UpdateTestCase):
+    def setUp(self):
+        super().setUp()
+        italian = mock.patch.object(launch, "LANG", "it")  # the words checked below
+        italian.start()
+        self.addCleanup(italian.stop)
+
     def start(self):
         """launch.main() in the old folder, up to the hand-over or the refusal."""
         out = io.BytesIO()
@@ -254,6 +274,19 @@ class TestLaptopStart(UpdateTestCase):
         self.assertEqual(code, 0)
         call.assert_called_once_with([sys.executable, str(new_launcher)])
         server.assert_not_called()
+
+    def test_a_computer_set_to_the_united_states_or_canada_starts_with_911(self):
+        for region, wanted in (("US", True), ("CA", True), ("IT", False), ("", False)):
+            with mock.patch.object(launch.messages, "computer_region", return_value=region):
+                args = " ".join(launch.server_args())
+            self.assertEqual("--emergency-number 911" in args, wanted, region)
+
+    def test_an_english_computer_reads_english(self):
+        self.stage()
+        with mock.patch.object(launch, "LANG", "en"):
+            code, *_, said = self.start()
+        self.assertEqual(code, 0)
+        self.assertIn('Campanile updated: starting from the folder "Campanile 0.2.0"', said)
 
     def test_a_locked_file_stops_everything_and_the_next_start_finishes(self):
         self.stage()

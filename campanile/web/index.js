@@ -1,6 +1,6 @@
 // DEVELOPED BY CARROTSTUDIO software house
 import { api, el, realTime, when } from "/common.js";
-import { t, tn, translatePage } from "/i18n.js";
+import { showEmergency, t, tn, translatePage } from "/i18n.js";
 
 translatePage();
 
@@ -32,6 +32,7 @@ async function showNotices() {
 
 async function showStatus() {
   const status = await api("/api/status");
+  showEmergency(status.emergency);
   document.getElementById("version").textContent = "v" + status.version;
   document.getElementById("people-count").textContent = tn("people", status.registered_people);
 

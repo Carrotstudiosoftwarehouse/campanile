@@ -32,6 +32,9 @@ FORGET_EVERY = 60  # seconds between looks for what has expired
 MAX_LOG = 1000  # entries of what the admin did; older ones go
 MAX_ADMINS = 50  # people with a password of their own
 MAX_OFFSET = 400 * 86400  # seconds the Campanile's clock may be set away from the computer's
+EMERGENCY = "112"  # the number to call in danger, until the admin sets this area's
+# Digits only: 112, 911, 999, 000. [0-9], not \d, which also takes other scripts' digits.
+EMERGENCY_FORMAT = re.compile(r"[0-9]{2,6}")
 MAX_ID = 2**63 - 1  # the largest number SQLite can store
 
 CATEGORIES = (
@@ -329,6 +332,22 @@ class Store:
             )
             self._db.commit()
         return self.now()
+
+    def emergency(self) -> str | None:
+        """The number to call in danger, if the admin set one."""
+        with self._lock:
+            row = self._db.execute("SELECT value FROM settings WHERE name = 'emergency'").fetchone()
+        return row["value"] if row else None
+
+    def set_emergency(self, number) -> str:
+        if not isinstance(number, str) or not EMERGENCY_FORMAT.fullmatch(number):
+            raise RequestError(400, "bad_emergency")
+        with self._lock:
+            self._db.execute(
+                "INSERT OR REPLACE INTO settings (name, value) VALUES ('emergency', ?)", (number,)
+            )
+            self._db.commit()
+        return number
 
     def instance(self) -> str:
         """A random name for this Campanile, made once: records it exports never collide with

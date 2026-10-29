@@ -11,7 +11,8 @@ tick *"Add python.exe to PATH"*. On a Mac, the developer tools it offers also wo
 missing, the launcher says what to do.
 
 1. Download the **ready-to-use package** from [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) and unzip it.
-2. Double-click **Avvia Campanile (Mac)** or **Avvia Campanile (Windows)**.
+2. Double-click **Avvia Campanile (Mac)** or **Avvia Campanile (Windows)** (*avvia* is Italian
+   for *start*). Its window speaks the computer's language, Italian or English.
 3. The **setup page** opens the first time. With internet, download the map and the medical
    articles, one click each.
 4. Print the **sign** (its QR code has the address) and the one-page

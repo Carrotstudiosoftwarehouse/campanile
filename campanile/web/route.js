@@ -3,7 +3,7 @@
 // browser tells its position only to https sites, so on a phone the start is a touch on the
 // map; on the Campanile's own computer the browser can tell where it is.
 import { api, el } from "/common.js";
-import { lang, t } from "/i18n.js";
+import { distance, lang, t } from "/i18n.js";
 import { maplibregl } from "/mapstyle.js";
 
 const INK = "#111111";
@@ -11,15 +11,8 @@ const RED = "#c4161c";
 const CLOSED_EVERY = 60_000; // ms between looks at the blocked streets
 const BUILDING_EVERY = 5_000; // ms between looks while the Campanile builds a map's streets
 const MOVED = 40; // metres: a start or an end this far from the nearest street is said
-const number = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
 const day = new Intl.DateTimeFormat(lang, { dateStyle: "long" });
 const EMPTY = { type: "FeatureCollection", features: [] };
-
-export function distance(metres) {
-  return metres < 1000
-    ? t("search.meters", { n: Math.max(10, Math.round(metres / 10) * 10) })
-    : t("search.km", { n: number.format(metres / 1000) });
-}
 
 function duration(seconds) {
   const minutes = Math.max(1, Math.round(seconds / 60));
@@ -169,7 +162,7 @@ export function attachRoute({ getMap, ui }) {
     const moved = Math.max(0, ...(r.moved || []));
     ui.made.textContent = [
       Number.isNaN(made.getTime()) ? "" : t("route.made", { date: day.format(made) }),
-      moved >= MOVED ? t("route.moved", { n: moved }) : "",
+      moved >= MOVED ? t("route.moved", { n: distance(moved) }) : "",
     ].filter(Boolean).join(" ");
     ui.steps.replaceChildren(...r.steps.map((s) => el("li", {
       text: s.metres > 0 ? `${say(s)} · ${distance(s.metres)}` : say(s),

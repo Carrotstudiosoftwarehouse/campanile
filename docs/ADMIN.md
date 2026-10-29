@@ -28,6 +28,12 @@ Posts expire after 14 days, "I'm safe" names after 60 (`--post-days` and `--safe
 this, 0 keeps them). The admin page also shows a log of what was done, when and by whom, and the
 Campanile's clock, which you can set there (without internet a Raspberry restarts behind).
 
+### The emergency number
+
+The pages tell people to call 112, Europe's number. Elsewhere, write your area's number under
+**Emergency number** on the admin page. A laptop set to the United States or Canada starts with
+911 by itself.
+
 ### More than one volunteer
 
 With the main password, **Who runs this Campanile** gives each volunteer a password of their own.

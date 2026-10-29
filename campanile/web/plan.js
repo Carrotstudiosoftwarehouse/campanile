@@ -2,10 +2,11 @@
 // The plan is meant to be printed: it is never sent to the Campanile and lives only in this tab.
 // Every Campanile has the same address, so a fake network with the same name would be the same
 // site to the browser and could read anything kept there (tested).
-import { el, showResult } from "/common.js";
-import { t, translatePage } from "/i18n.js";
+import { api, el, showResult } from "/common.js";
+import { showEmergency, t, translatePage } from "/i18n.js";
 
 translatePage();
+api("/api/status").then((status) => showEmergency(status.emergency)).catch(() => {}); // else 112
 
 const STORAGE_KEY = "campanile-plan-v1";
 const form = document.getElementById("plan");

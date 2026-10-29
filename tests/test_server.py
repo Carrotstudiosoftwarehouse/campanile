@@ -1,6 +1,7 @@
 # DEVELOPED BY CARROTSTUDIO software house
 """Campanile server tests. Run: python3 -m unittest discover -s tests -v"""
 
+import argparse
 import base64
 import contextlib
 import email.utils
@@ -9,6 +10,8 @@ import importlib.util
 import io
 import json
 import os
+import plistlib
+import shutil
 import socket
 import sqlite3
 import sys
@@ -1210,6 +1213,28 @@ class TestTimeAndLog(CampanileTestCase):
         self.assertEqual(stolen[0], 403)
         self.assertEqual(self.cfg.store.offset, 0)
 
+    def test_the_emergency_number_is_set_from_the_admin_page_and_kept(self):
+        self.assertEqual(self.json("GET", "/api/status")[1]["emergency"], "112")
+        self.cfg.emergency = "911"  # a laptop set to the United States starts with it
+        self.assertEqual(self.json("GET", "/api/status")[1]["emergency"], "911")
+        saved = self.admin("/api/admin/emergency", number="999")
+        self.assertEqual(saved, (200, {"emergency": "999"}))
+        self.assertEqual(self.json("GET", "/api/status")[1]["emergency"], "999")
+        again = store.Store(self.data / "campanile.db")  # a restart keeps it
+        self.assertEqual(again.emergency(), "999")
+        again.close()
+        self.assertEqual(self.admin("/api/admin/log")[1]["log"][0]["action"], "emergency_set")
+
+    def test_the_emergency_number_is_digits_only_and_only_from_the_admin(self):
+        for bad in ("11 2", "1", "1234567", "112<script>", "\u0661\u0661\u0662", 911, None, ""):
+            with self.subTest(bad=bad):
+                self.assertEqual(self.admin("/api/admin/emergency", number=bad)[0], 400)
+        stolen = self.json("POST", "/api/admin/emergency", {"password": "x", "number": "000"})
+        self.assertEqual(stolen[0], 403)
+        self.assertEqual(self.json("GET", "/api/status")[1]["emergency"], "112")
+        with self.assertRaises(argparse.ArgumentTypeError):
+            campanile.emergency_number("9 1 1")
+
 
 @unittest.skipUnless(CAN_SIGN, "signing in the tests needs the cryptography package")
 class TestSignedNotices(CampanileTestCase):
@@ -1620,6 +1645,69 @@ class TestLanguages(CampanileTestCase):
             self.assertEqual(set(texts), set(messages.LANGUAGES), key)
         for key, texts in messages.FIELDS.items():
             self.assertEqual(set(texts), set(messages.LANGUAGES), key)
+
+    def test_the_laptop_window_speaks_every_language_in_plain_ascii(self):
+        import messages
+
+        for key, texts in messages.WINDOW.items():
+            self.assertEqual(set(texts), set(messages.LANGUAGES), key)
+            for text in texts.values():
+                text.encode("ascii")  # a Windows console may show nothing else
+
+
+class TestComputerLanguage(unittest.TestCase):
+    """The language and country of the computer itself, for its own window."""
+
+    def ask(self, platform="linux", env=None, mac=None):
+        import messages
+
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, ignore_errors=True)
+        if mac is not None:  # the Mac's settings file, as macOS writes it
+            prefs = home / "Library" / "Preferences" / ".GlobalPreferences.plist"
+            prefs.parent.mkdir(parents=True)
+            prefs.write_bytes(plistlib.dumps(mac, fmt=plistlib.FMT_BINARY))
+        with (
+            mock.patch.object(messages.sys, "platform", platform),
+            mock.patch.object(messages.Path, "home", return_value=home),
+            mock.patch.dict(os.environ, env or {}, clear=True),
+        ):
+            return messages.computer_language(), messages.computer_region()
+
+    def test_a_linux_or_raspberry_terminal(self):
+        self.assertEqual(self.ask(env={"LANG": "it_IT.UTF-8"}), ("it", "IT"))
+        self.assertEqual(self.ask(env={"LANG": "en_US.UTF-8"}), ("en", "US"))
+        self.assertEqual(self.ask(env={"LC_ALL": "en_CA.UTF-8", "LANG": "it_IT"}), ("en", "CA"))
+
+    def test_a_mac_follows_its_settings_even_when_the_terminal_says_nothing(self):
+        mac = {"AppleLanguages": ["en-US"], "AppleLocale": "en_US"}
+        self.assertEqual(self.ask("darwin", {"LANG": "C.UTF-8"}, mac), ("en", "US"))
+
+    def test_the_first_language_we_speak_wins_and_the_region_setting_gives_the_country(self):
+        mac = {"AppleLanguages": ["es-ES", "it-IT"], "AppleLocale": "it_CA"}
+        self.assertEqual(self.ask("darwin", mac=mac), ("it", "CA"))
+
+    def test_nothing_known_means_english_and_no_country(self):
+        self.assertEqual(self.ask(env={"LANG": "C.UTF-8"}), ("en", ""))
+        self.assertEqual(self.ask(env={"LANG": "de_DE.UTF-8"}), ("en", "DE"))
+        self.assertEqual(self.ask("darwin", mac={"AppleLanguages": "not a list"}), ("en", ""))
+        if sys.platform != "win32":  # Windows' settings missing: it must not break
+            self.assertEqual(self.ask("win32"), ("en", ""))
+
+    def test_this_computer_answers(self):
+        import messages
+
+        self.assertIn(messages.computer_language(), messages.LANGUAGES)
+        self.assertRegex(messages.computer_region(), r"^([A-Z]{2})?$")
+
+    @unittest.skipUnless(sys.platform == "win32", "Windows only")
+    def test_windows_says_its_language_in_its_settings(self):
+        import messages
+
+        # No environment at all: what is left can only come from Windows itself.
+        with mock.patch.dict(os.environ, {}, clear=True):
+            tags = messages._computer_tags()
+        self.assertRegex(tags[0] if tags else "", r"^[a-z]{2,3}_[A-Z]{2}")
 
 
 class TestUnits(unittest.TestCase):

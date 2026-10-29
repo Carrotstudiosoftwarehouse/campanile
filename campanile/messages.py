@@ -7,6 +7,13 @@ language of the phone (Accept-Language). Add a language by adding a column.
 
 from __future__ import annotations
 
+import locale
+import os
+import plistlib
+import re
+import sys
+from pathlib import Path
+
 LANGUAGES = ("it", "en")
 DEFAULT = "it"
 # For a phone in a language we don't have yet, English is understood by more people.
@@ -231,6 +238,10 @@ MESSAGES = {
         "it": "Ora non valida: deve essere entro un anno da quella del computer.",
         "en": "Invalid time: it must be within a year of the computer's.",
     },
+    "bad_emergency": {
+        "it": "Il numero di emergenza è fatto solo di cifre, da 2 a 6.",
+        "en": "The emergency number is digits only, 2 to 6 of them.",
+    },
     "route_long": {
         "it": "Percorso troppo lungo da calcolare qui: prova con punti più vicini.",
         "en": "This route is too long to work out here: try nearer points.",
@@ -374,6 +385,166 @@ MESSAGES = {
         "en": "The signed notice can't be read.",
     },
 }
+
+
+# The black window of a laptop, in the computer's language. Plain ASCII ("e'", not "è"): a
+# Windows console may show nothing else. {0}, {1}: what the code fills in.
+WINDOW = {
+    "on": {
+        "it": "CAMPANILE ACCESO. Lascia aperta questa finestra: chiudendola si spegne.",
+        "en": "CAMPANILE IS ON. Keep this window open: closing it switches Campanile off.",
+    },
+    "phones": {
+        "it": "Dagli altri telefoni, collegati alla stessa Wi-Fi:  {0}",
+        "en": "From other phones, on the same Wi-Fi:  {0}",
+    },
+    "no_network": {
+        "it": "Questo computer non e' collegato a nessuna rete Wi-Fi o via cavo:\n"
+        "  gli altri dispositivi non possono ancora raggiungerlo.",
+        "en": "This computer is not on any Wi-Fi or wired network:\n"
+        "  other devices can't reach it yet.",
+    },
+    # The list under "on": label and address, lined up.
+    "here": {"it": "Da questo computer:", "en": "On this computer:"},
+    "admin": {"it": "Gestione e avvisi:", "en": "Admin and notices:"},
+    "password": {"it": "Password di gestione:", "en": "Admin password:"},
+    "setup": {"it": "Preparazione:", "en": "Setup:"},
+    "guide": {"it": "Guida da stampare:", "en": "Guide to print:"},
+    "firewall_blocked": {
+        "it": "ATTENZIONE: Windows sta bloccando i telefoni, che non possono collegarsi.\n"
+        "  (Succede se alla domanda di Windows sulle reti si e' premuto Annulla.)\n"
+        "  Premi INVIO per sistemarlo: Windows ti chiedera' il permesso.",
+        "en": "WARNING: Windows is blocking the phones, they can't connect.\n"
+        "  (It happens if Cancel was pressed when Windows asked about networks.)\n"
+        "  Press ENTER to fix it: Windows will ask your permission.",
+    },
+    "firewall_fixed": {
+        "it": "Sistemato: ora i telefoni possono collegarsi.",
+        "en": "Fixed: phones can connect now.",
+    },
+    "firewall_not_fixed": {
+        "it": "Non e' stato sistemato. Riprova chiudendo e riaprendo il Campanile,\n"
+        "  e a Windows rispondi Si'.",
+        "en": "Not fixed. Try again: close and reopen Campanile,\n  and answer Yes to Windows.",
+    },
+    "not_prepared": {
+        "it": "Manca la preparazione iniziale. Con internet, esegui una volta:\n"
+        "    scripts/prepare.sh",
+        "en": "The first preparation is missing. With internet, run once:\n    scripts/prepare.sh",
+    },
+    "damaged": {
+        "it": "ATTENZIONE: questa copia del Campanile e' incompleta o danneggiata\n"
+        "  ({0} file, per esempio {1}).\n"
+        "  Rifalla dalla chiavetta originale, o chiedi una chiavetta nuova.",
+        "en": "WARNING: this copy of Campanile is incomplete or damaged\n"
+        "  ({0} of its files, for example {1}).\n"
+        "  Copy it again from the original stick, or ask for a new stick.",
+    },
+    "port_busy": {
+        "it": "Impossibile usare la porta {0}: forse il Campanile e' gia' acceso. ({1})",
+        "en": "Can't use port {0}: maybe Campanile is already on. ({1})",
+    },
+    "updated": {
+        "it": 'Campanile aggiornato: parte dalla cartella "{0}".',
+        "en": 'Campanile updated: starting from the folder "{0}".',
+    },
+    "update_discarded": {
+        "it": "ATTENZIONE: l'aggiornamento preparato non e' piu' quello firmato da CarrotStudio:\n"
+        "  e' stato scartato. Parte la versione di prima.",
+        "en": "WARNING: the prepared update is no longer the one CarrotStudio signed:\n"
+        "  it was thrown away. The previous version starts.",
+    },
+    "update_folder_exists": {
+        "it": "L'aggiornamento e' pronto, ma qui accanto c'e' gia' una cartella \"{0}\":\n"
+        "  spostala altrove e riapri il Campanile. Intanto parte la versione di prima.",
+        "en": 'The update is ready, but there is already a folder "{0}" next to this one:\n'
+        "  move it elsewhere and reopen Campanile. For now the previous version starts.",
+    },
+    "update_failed": {
+        "it": "L'aggiornamento non e' riuscito: parte la versione di prima.",
+        "en": "The update didn't work: the previous version starts.",
+    },
+    "update_locked": {
+        "it": "L'aggiornamento non e' finito (un file in uso?). Chiudi le altre finestre e\n"
+        "  riapri il Campanile: riparte da dove si era fermato. Niente e' perso.",
+        "en": "The update didn't finish (a file in use?). Close the other windows and\n"
+        "  reopen Campanile: it goes on from where it stopped. Nothing is lost.",
+    },
+    # Why nothing starts: this Campanile would start empty while its data sits elsewhere.
+    "update_folder_missing": {
+        "it": "Questo Campanile e' stato aggiornato: mappe, Wikipedia e annunci\n"
+        "  sono nella cartella \"{0}\", che qui accanto non c'e' piu'. Rimettila accanto e riapri.",
+        "en": "This Campanile was updated: maps, Wikipedia and posts are in the\n"
+        '  folder "{0}", which is no longer next to this one. Put it back and reopen.',
+    },
+    "update_unfinished": {
+        "it": "Questo e' un aggiornamento non finito: apri il Campanile dalla cartella\n"
+        '  "{0}", che lo finisce da sola.',
+        "en": "This is an unfinished update: open Campanile from the folder\n"
+        '  "{0}", which finishes it by itself.',
+    },
+    "update_data_twice": {
+        "it": 'Ci sono dati sia in "{0}" sia in "{1}": per non perdere niente il\n'
+        "  Campanile non parte. Tieni la cartella giusta e sposta altrove l'altra.",
+        "en": 'There is data both in "{0}" and in "{1}": so that nothing is lost,\n'
+        "  Campanile doesn't start. Keep the right folder and move the other elsewhere.",
+    },
+    "update_installing": {
+        "it": "Campanile {0}, firmato da CarrotStudio: lo installo.",
+        "en": "Campanile {0}, signed by CarrotStudio: installing it.",
+    },
+}
+
+
+def window(key: str, lang: str, *values) -> str:
+    """A line for the black window."""
+    return WINDOW[key][lang if lang in LANGUAGES else FALLBACK].format(*values)
+
+
+def computer_language() -> str:
+    """The language of this computer's own window: its first one we speak, else English."""
+    for tag in _computer_tags():
+        if tag[:2].lower() in LANGUAGES:
+            return tag[:2].lower()
+    return FALLBACK
+
+
+def computer_region() -> str:
+    """This computer's country, like "US", as its settings say; "" when they don't."""
+    for tag in _computer_tags(region=True):
+        found = re.match(r"[a-z]{2,3}[-_](?:[a-z]{4}[-_])?([a-z]{2})(?![a-z])", tag, re.I)
+        if found:
+            return found[1].upper()
+    return ""
+
+
+def _computer_tags(region: bool = False) -> list[str]:
+    """Language tags like "it-IT" or "en_US.UTF-8", preferred first. Any source may be missing.
+
+    Windows and the Mac say it in their settings; Linux and Mac terminals in the environment."""
+    tags = []
+    if sys.platform == "win32":
+        try:
+            import ctypes
+
+            tags.append(locale.windows_locale[ctypes.windll.kernel32.GetUserDefaultUILanguage()])
+        except (AttributeError, OSError, KeyError):
+            pass
+    if sys.platform == "darwin":
+        try:
+            with open(Path.home() / "Library/Preferences/.GlobalPreferences.plist", "rb") as f:
+                prefs = plistlib.load(f)
+            languages = [str(t) for t in prefs.get("AppleLanguages", [])]
+            country = [str(prefs.get("AppleLocale", ""))]  # the Region setting
+            tags += country + languages if region else languages + country
+        except (OSError, ValueError, AttributeError, plistlib.InvalidFileException):
+            pass
+    tags += os.environ.get("LANGUAGE", "").split(":")
+    for name in ("LC_ALL", "LC_MESSAGES", "LANG"):  # like gettext: the first one set
+        if os.environ.get(name):
+            tags.append(os.environ[name])
+            break
+    return [t for t in tags if t]
 
 
 def pick_language(accept_language: str | None) -> str:

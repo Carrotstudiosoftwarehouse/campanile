@@ -1,7 +1,7 @@
 // DEVELOPED BY CARROTSTUDIO software house
 import qrcode from "/vendor/qrcode.mjs";
 import { api } from "/common.js";
-import { translatePage } from "/i18n.js";
+import { showEmergency, translatePage } from "/i18n.js";
 
 translatePage();
 
@@ -60,6 +60,7 @@ async function start() {
   try {
     const status = await api("/api/status");
     if (status.address) address = status.address;
+    showEmergency(status.emergency);
   } catch {
     // fall back to the page's own address
   }

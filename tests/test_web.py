@@ -41,10 +41,14 @@ class Marked(HTMLParser):
             self.found.append(("ph", attrs["data-i18n-ph"], attrs.get("placeholder", "")))
         if "data-i18n-aria" in attrs:
             self.found.append(("aria", attrs["data-i18n-aria"], attrs.get("aria-label", "")))
-        if "data-i18n" in attrs:
-            self.open.append([attrs["data-i18n"], tag, ""])
+        if "data-emergency" in attrs:  # the page puts the number in: 112 in the HTML
+            self.open.append([attrs["data-i18n"], tag, "", "emergency"])
+            if attrs["data-emergency"]:
+                self.found.append(("emergency-other", attrs["data-emergency"], ""))
+        elif "data-i18n" in attrs:
+            self.open.append([attrs["data-i18n"], tag, "", "text"])
         elif "data-i18n-title" in attrs:
-            self.open.append([attrs["data-i18n-title"], tag, ""])
+            self.open.append([attrs["data-i18n-title"], tag, "", "text"])
 
     def handle_data(self, data):
         if self.open:
@@ -52,11 +56,11 @@ class Marked(HTMLParser):
 
     def handle_endtag(self, tag):
         if self.open and self.open[-1][1] == tag:
-            key, tag, text = self.open.pop()
+            key, tag, text, kind = self.open.pop()
             text = " ".join(text.split())
             if tag == "title":
                 text = text.removesuffix(" · Campanile")
-            self.found.append(("text", key, text))
+            self.found.append((kind, key, text))
 
 
 def marked(page):
@@ -131,8 +135,21 @@ class TestStrings(unittest.TestCase):
         italian = self.strings["it"]
         for page in PAGES:
             for attribute, key, text in marked(page):
+                if attribute == "emergency-other":
+                    continue  # only in the catalog: for numbers other than 112
                 with self.subTest(page=page.name, key=key, attribute=attribute):
-                    self.assertEqual(text, italian[key])
+                    wanted = italian[key]
+                    if attribute == "emergency":
+                        wanted = wanted.replace("{n}", store.EMERGENCY)
+                    self.assertEqual(text, wanted)
+
+    def test_a_sentence_with_a_number_is_one_the_page_fills(self):
+        # translatePage() gives no values: a {n} there would show as nothing.
+        italian = self.strings["it"]
+        for page in PAGES:
+            for attribute, key, _ in marked(page):
+                if attribute == "text":
+                    self.assertNotRegex(italian[key], r"\{\w+\}", (page.name, key))
 
     def test_every_page_with_a_script_translates_itself(self):
         for page in PAGES:

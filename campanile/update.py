@@ -169,9 +169,10 @@ def main(argv=None) -> int:
         return 1
     import server  # only here: the version of the installed code
 
+    lang = messages.computer_language()
     source = find_program(Path(args[0]))
     if source is None:
-        print(messages.text("update_no_program"))
+        print(messages.text("update_no_program", lang))
         return 1
     options = []
     with contextlib.suppress(OSError):
@@ -180,12 +181,12 @@ def main(argv=None) -> int:
         try:
             folder, version = stage(source, Path(place), server.VERSION)
         except release.ReleaseError as e:
-            print(messages.text(e.args[0]))
+            print(messages.text(e.args[0], lang))
             return 1
         except copying.CopyError as e:
             print(f"{e.key}: {e.detail}")
             return 1
-        print(f"Campanile {version}, firmato da CarrotStudio: lo installo.")
+        print(messages.window("update_installing", lang, version))
         installer = ["bash", str(folder / "raspberry" / "install.sh"), *options]
         return subprocess.call(installer)  # noqa: S603 (the signed installer just checked)
 

@@ -30,4 +30,4 @@ if ! python3 -c 'import sys; sys.exit(sys.version_info < (3, 9))' >/dev/null 2>&
   exit 1
 fi
 python3 campanile/launch.py
-read -r -p "Campanile spento. Premi Invio per chiudere."
+read -r -p "  Campanile spento / Campanile is off. Premi Invio per chiudere / Press Enter to close. "

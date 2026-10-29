@@ -27,9 +27,9 @@ missing, tell us and we will add it.
   8 devices. An iPhone wouldn't. The Raspberry makes its own, untested. Battery life is an estimate.
 - **The sign.** A laptop's address changes with the network, so print the sign, or copy its
   address, once the day's network is up. A Raspberry's address never changes.
-- **Nothing beyond a few tens of meters.** No messages to faraway relatives, no calls (112 needs
-  the phone network). Campaniles don't share posts or "I'm safe" names yet. Each neighborhood is
-  an island.
+- **Nothing beyond a few tens of meters.** No messages to faraway relatives, no calls (emergency
+  calls need the phone network). Campaniles don't share posts or "I'm safe" names yet. Each
+  neighborhood is an island.
 - **Nothing new from outside.** Maps age from the day they were downloaded. Fixes and new
   languages come only on a USB stick, since over Wi-Fi only maps and Wikipedia pass.
 - **The Raspberry's clock** has no battery. Offline, it restarts at the time it was switched off.
@@ -115,7 +115,8 @@ missing, tell us and we will add it.
 - **The navigator** doesn't know the phone's position or turn bans, estimates times, is as recent
   as its map, and knows only the blocked streets someone marked. It trusts the map's one-way
   streets, though on Turin's map 60 of 8,415 point different ways at two zoom levels.
-- **A few tens of meters of range.** Not a certified emergency system. It doesn't replace 112.
+- **A few tens of meters of range.** Not a certified emergency system. It doesn't replace the
+  emergency number.
 
 ## Technical problems still to solve
 

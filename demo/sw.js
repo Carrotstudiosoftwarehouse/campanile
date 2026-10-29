@@ -199,6 +199,7 @@ async function route(request, url, state, lang) {
         signed_notices: false, setup: false,
         maps: state.maps,
         address: `${location.origin}/`,
+        emergency: "112",
       } };
     }
     if (path === "/api/maps") return { body: { maps: state.maps } };

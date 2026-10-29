@@ -25,9 +25,43 @@ function detect() {
 
 export const lang = detect();
 
+// The number to call in danger, inside sentences marked data-emergency: the Campanile's own,
+// 112 until it says. data-emergency may name a sentence for any number but 112.
+let emergency = "112";
+
+function fillEmergency(node) {
+  const key = (emergency !== "112" && node.dataset.emergency) || node.dataset.i18n;
+  node.textContent = t(key, { n: emergency });
+}
+
+export function showEmergency(number) {
+  if (typeof number === "string" && /^[0-9]{2,6}$/.test(number)) emergency = number;
+  for (const node of document.querySelectorAll("[data-emergency]")) fillEmergency(node);
+}
+
 export function t(key, params = {}) {
   const text = STRINGS[lang][key] ?? STRINGS.it[key] ?? key;
   return text.replace(/\{(\w+)\}/g, (_, name) => String(params[name] ?? ""));
+}
+
+// Distances as the phone's country measures them: feet and miles in the few that use them.
+const MILES = ["US", "LR", "MM"];
+const FOOT = 0.3048; // metres
+const MILE = 1609.344;
+const decimal = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
+const phone = (navigator.languages || [])[0] || navigator.language || ""; // like "en-US"
+const country = /^[a-z]{2,3}(?:-[a-z]{4})?-([a-z]{2})\b/i.exec(phone)?.[1].toUpperCase();
+const miles = MILES.includes(country);
+
+export function distance(metres) {
+  if (miles) {
+    return metres < MILE / 10
+      ? t("search.feet", { n: Math.max(50, Math.round(metres / FOOT / 50) * 50) })
+      : t("search.miles", { n: decimal.format(metres / MILE) });
+  }
+  return metres < 1000
+    ? t("search.meters", { n: Math.max(10, Math.round(metres / 10) * 10) })
+    : t("search.km", { n: decimal.format(metres / 1000) });
 }
 
 export function has(key) {
@@ -65,7 +99,10 @@ export function translatePage() {
   const page = document.querySelector("title[data-i18n-title]");
   if (page) document.title = `${t(page.dataset.i18nTitle)} · Campanile`;
   if (lang === "it") return;
-  for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n);
+  for (const node of document.querySelectorAll("[data-i18n]")) {
+    if ("emergency" in node.dataset) fillEmergency(node);
+    else node.textContent = t(node.dataset.i18n);
+  }
   for (const node of document.querySelectorAll("[data-i18n-ph]")) node.placeholder = t(node.dataset.i18nPh);
   for (const node of document.querySelectorAll("[data-i18n-aria]")) {
     node.setAttribute("aria-label", t(node.dataset.i18nAria));

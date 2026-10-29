@@ -101,7 +101,13 @@ tests/            tests: run on Linux, Windows and macOS at every change
   data, nothing shared between visitors and nothing to moderate. Serve it from a domain root.
 
 The code and its comments are in English. The pages are in Italian and English, picked from the
-phone's language. A few documents are only in Italian.
+phone's language; the laptop's window from the computer's. A new language is a column in
+`campanile/messages.py` and `campanile/web/strings.js`. A few documents are only in Italian.
+
+**The names at the top of the program folder never change.** A Campanile already installed
+copies an update with its own list of them (`copying.PROGRAM`): a renamed or new file there would
+never arrive, and the signature check would refuse the update. New files go inside the existing
+folders. A test guards the list.
 
 What has been tested and how: [docs/TESTING.md](docs/TESTING.md). Reporting a vulnerability:
 [SECURITY.md](SECURITY.md).

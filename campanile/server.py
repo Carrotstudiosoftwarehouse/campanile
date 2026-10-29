@@ -140,6 +140,7 @@ class Config:
         setup: preparation.Preparation | None = None,
         post_days: int = store.POST_DAYS,
         safe_days: int = store.SAFE_DAYS,
+        emergency: str = store.EMERGENCY,
     ):
         self.web = web.resolve()
         self.maps = (data / "maps").resolve()
@@ -155,6 +156,7 @@ class Config:
         self.kiwix_url = kiwix_url or None
         self.trusted_keys = signing.TrustedKeys.load(trusted_keys)
         self.require_signed = require_signed
+        self.emergency = emergency  # until the admin page sets one
         self.store = store.Store(data / "campanile.db", post_days, safe_days)
         self.write_limit = store.RateLimiter(MAX_WRITES_PER_IP, RATE_WINDOW)
         self.wrong_code_limit = store.RateLimiter(MAX_WRONG_CODES, RATE_WINDOW)
@@ -482,6 +484,7 @@ class Handler(BaseHTTPRequestHandler):
                     "setup": self.cfg.setup is not None,
                     "maps": self._maps(),
                     "address": address,
+                    "emergency": db.emergency() or self.cfg.emergency,
                 },
             )
         if path == "/api/maps":
@@ -782,6 +785,10 @@ class Handler(BaseHTTPRequestHandler):
             now = cfg.store.set_clock(real)
             self._log("clock_set", f"{now - before:+d}")  # seconds: the page says them
             return self._json(200, {"now": now})
+        if path == "/api/admin/emergency":
+            number = cfg.store.set_emergency(data.get("number"))
+            self._log("emergency_set", number)
+            return self._json(200, {"emergency": number})
         if path == "/api/admin/share/state":
             return self._json(200, cfg.share.state())
         if path == "/api/admin/list":
@@ -1135,6 +1142,12 @@ def create_server(host: str, port: int, cfg: Config, **options) -> CampanileServ
     return CampanileServer((host, port), handler, **options)
 
 
+def emergency_number(text: str) -> str:
+    if not store.EMERGENCY_FORMAT.fullmatch(text):
+        raise argparse.ArgumentTypeError("digits only, 2 to 6 of them")
+    return text
+
+
 def read_password(file: str | None) -> str | None:
     if os.environ.get("CAMPANILE_ADMIN_PASSWORD"):
         return os.environ["CAMPANILE_ADMIN_PASSWORD"]
@@ -1226,6 +1239,13 @@ def main(argv=None):
         help=f"'I'm safe' names are deleted after this many days, 0 never "
         f"(default: {store.SAFE_DAYS})",
     )
+    p.add_argument(
+        "--emergency-number",
+        type=emergency_number,
+        default=store.EMERGENCY,
+        help=f"the number to call in danger, until the admin page sets one "
+        f"(default: {store.EMERGENCY})",
+    )
     a = p.parse_args(argv)
 
     cfg = Config(
@@ -1247,6 +1267,7 @@ def main(argv=None):
         else None,
         post_days=max(0, a.post_days),
         safe_days=max(0, a.safe_days),
+        emergency=a.emergency_number,
     )
     server = create_server(a.host, a.port, cfg)
     cfg.places.refresh(now=True)  # the maps are read in the background, once

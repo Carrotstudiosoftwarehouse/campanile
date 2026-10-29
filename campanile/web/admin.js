@@ -186,6 +186,18 @@ document.getElementById("clock-set").addEventListener("click", async () => {
   }
 });
 
+document.getElementById("emergency-set").addEventListener("click", async () => {
+  const result = document.getElementById("emergency-result");
+  const number = document.getElementById("emergency-input").value.trim();
+  try {
+    const saved = await api("/api/admin/emergency", { password, number });
+    showResult(result, t("admin.emergency.done", { n: saved.emergency }));
+    await loadLog();
+  } catch (error) {
+    showResult(result, error.message, true);
+  }
+});
+
 document.getElementById("notice-form").addEventListener("submit", async (event) => {
   event.preventDefault();
   const result = document.getElementById("notice-result");
@@ -384,6 +396,7 @@ document.getElementById("login").addEventListener("submit", async (event) => {
     document.getElementById("signed-section").classList.toggle("hidden", !status.signed_notices);
     document.getElementById("setup-link").classList.toggle("hidden", !status.setup);
     document.getElementById("share-address").textContent = status.address || location.origin;
+    document.getElementById("emergency-input").value = status.emergency;
     await share("state");
     const main = me.name === "";
     document.getElementById("team-section").classList.toggle("hidden", !main);

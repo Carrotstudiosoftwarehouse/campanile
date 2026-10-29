@@ -14,7 +14,7 @@ if not defined PYTHON goto no_python
 
 %PYTHON% campanile\launch.py
 echo.
-echo Campanile spento.
+echo Campanile spento / Campanile is off.
 pause
 exit /b 0
 
