@@ -25,7 +25,7 @@ un limite, diccelo e lo aggiungiamo.
 - **Servono corrente e una rete Wi-Fi.** Il portatile ha bisogno di un router acceso (internet non
   serve) o dell'hotspot di un telefono. Nel nostro test sul campo un telefono Android (TCL 40 SE)
   l'ha creato con i dati spenti, per al massimo 8 apparecchi. Un iPhone no. Il Raspberry crea
-  la sua rete da solo, non provato. Quanto dura una batteria è una stima.
+  la sua rete da solo, provato solo su radio virtuali. Quanto dura una batteria è una stima.
 - **Il cartello.** Sul portatile l'indirizzo cambia con la rete, quindi stampa il cartello, o
   ricopia il suo indirizzo, quando la rete del giorno è pronta. L'indirizzo del Raspberry non
   cambia mai.
@@ -46,8 +46,9 @@ un limite, diccelo e lo aggiungiamo.
 ## Non provato sul campo
 
 - **Ancora nessun Raspberry Pi vero.** Installazione, nginx, systemd e firewall sono girati in
-  container Debian su un Mac. Hotspot, portale automatico e telefoni tenuti separati dal chip
-  Wi-Fi non sono mai stati provati.
+  container su un Mac, compresa la vera Raspberry Pi OS. Hotspot, portale automatico, firewall e
+  telefoni tenuti separati sono girati su radio Wi-Fi virtuali. Mai sul chip Wi-Fi di un
+  Raspberry, né con telefoni veri.
 - **L'aggiornamento da chiavetta** è girato da capo a fondo su un Mac, dalla pagina di
   preparazione con un disco FAT32 che il Mac prende per una chiavetta, e su Windows 11 ARM in una
   macchina virtuale, con il vero doppio clic (compreso un file bloccato da Windows). Mai con una
