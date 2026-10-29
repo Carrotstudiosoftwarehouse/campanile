@@ -11,7 +11,8 @@ missing, tell us and we will add it.
 
 - On the Campanile's Wi-Fi: official notices, the board, "I'm safe" and the family plan. None of
   them needs the internet.
-- Maps, search and the navigator, for the maps already downloaded.
+- Maps, search and the navigator, for the maps already downloaded. Street search, the nearest
+  pharmacy and the navigator need your area's detailed map.
 - Wikipedia's medical articles, if downloaded with the program that serves them (on a laptop, the
   *Offline medicine* button of the setup page).
 - Signed notices, if the authority's public key was added.
@@ -26,6 +27,9 @@ missing, tell us and we will add it.
   hotspot. In our field test an Android phone (TCL 40 SE) made one with mobile data off, for up to
   8 devices. An iPhone wouldn't. The Raspberry makes its own, tested only on virtual radios.
   Battery life is an estimate.
+- **Managing a Raspberry needs a computer or a screen.** The admin page opens only on the
+  Raspberry itself, or from a computer on its cable through SSH. Never from a phone: the password
+  would cross the open Wi-Fi. With only a phone, for now, you can't manage it.
 - **The sign.** A laptop's address changes with the network, so print the sign, or copy its
   address, once the day's network is up. A Raspberry's address never changes.
 - **Nothing beyond a few tens of meters.** No messages to faraway relatives, no calls (emergency
@@ -59,8 +63,9 @@ missing, tell us and we will add it.
 - **Windows** ran on Windows 11 for ARM in a virtual machine, not an ordinary Intel or AMD PC, with
   the Yes/No prompt of User Account Control off.
 - **Power cuts, half tried.** The database survived 30 hard kills of the process, losing nothing
-  confirmed to a phone. A real power cut, which also loses unwritten data, and SD cards that don't
-  write what they promised: never tried. Battery life: never measured.
+  confirmed to a phone, and an update was stopped at each of its steps. A real power cut, which also
+  loses unwritten data, and SD cards that don't write what they promised: never tried. Battery life:
+  never measured.
 
 ## Measured, but only here
 
@@ -122,6 +127,12 @@ missing, tell us and we will add it.
   before this, a deleted phone number could still be read). But SD cards and SSDs move writes
   around inside the chip, so an old copy can survive there: only an encrypted disk would close
   that.
+- **Maps are read inside Campanile itself.** A map too big for the memory stops Campanile while
+  it is read, board and notices included. A Raspberry starts it again by itself, a laptop with a
+  double click. After three tries that map is set aside and the rest works. Measured on a laptop
+  and in containers, not on a Raspberry.
+- **The Raspberry installer speaks English only**, for now, also to whoever follows the Italian
+  guide. The pages speak Italian and English.
 - **No automatic updates.** A fix reaches a Campanile only when someone brings it, on a stick
   checked against CarrotStudio's signature, or installs it.
 - **Posts and names delete themselves**: posts after 14 days, "I'm safe" names after 60. The admin

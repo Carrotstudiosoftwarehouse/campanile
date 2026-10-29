@@ -11,7 +11,8 @@ un limite, diccelo e lo aggiungiamo.
 
 - Sulla Wi-Fi del Campanile: avvisi ufficiali, bacheca, "sto bene" e piano familiare. Nessuna di
   queste cose ha bisogno di internet.
-- Mappe, ricerca e navigatore, per le mappe già scaricate.
+- Mappe, ricerca e navigatore, per le mappe già scaricate. La ricerca delle vie, la farmacia più
+  vicina e il navigatore vogliono la mappa dettagliata della tua zona.
 - Le voci mediche di Wikipedia, se scaricate con il programma che le serve (sul portatile, il
   pulsante *Medicina offline* della pagina di preparazione).
 - Gli avvisi firmati, se è stata aggiunta la chiave pubblica dell'autorità.
@@ -26,6 +27,9 @@ un limite, diccelo e lo aggiungiamo.
   serve) o dell'hotspot di un telefono. Nel nostro test sul campo un telefono Android (TCL 40 SE)
   l'ha creato con i dati spenti, per al massimo 8 apparecchi. Un iPhone no. Il Raspberry crea
   la sua rete da solo, provato solo su radio virtuali. Quanto dura una batteria è una stima.
+- **Per gestire un Raspberry serve un computer o uno schermo.** La gestione si apre solo sul
+  Raspberry stesso, o da un computer collegato al suo cavo con SSH. Mai dal telefono: la password
+  viaggerebbe sulla Wi-Fi aperta. Chi ha solo un telefono, per ora, non può gestirlo.
 - **Il cartello.** Sul portatile l'indirizzo cambia con la rete, quindi stampa il cartello, o
   ricopia il suo indirizzo, quando la rete del giorno è pronta. L'indirizzo del Raspberry non
   cambia mai.
@@ -64,9 +68,10 @@ un limite, diccelo e lo aggiungiamo.
 - **Windows** è girato su Windows 11 per ARM in una macchina virtuale, non su un normale PC Intel o
   AMD, e con la richiesta Sì/No del Controllo dell'account utente spenta.
 - **Gli stacchi di corrente, provati a metà.** Il database ha retto 30 uccisioni brutali del
-  processo, senza perdere niente di ciò che era stato confermato a un telefono. Un vero stacco,
-  che perde anche ciò che non era ancora scritto, e le schede SD che non scrivono quello che hanno
-  promesso: mai provati. Quanto dura una batteria: mai misurato.
+  processo, senza perdere niente di ciò che era stato confermato a un telefono, e un aggiornamento è
+  stato fermato a ognuno dei suoi passi. Un vero stacco, che perde anche ciò che non era ancora
+  scritto, e le schede SD che non scrivono quello che hanno promesso: mai provati. Quanto dura una
+  batteria: mai misurato.
 
 ## Misurato, ma solo qui
 
@@ -138,6 +143,12 @@ un limite, diccelo e lo aggiungiamo.
   file (misurato: prima, un numero di telefono cancellato si leggeva ancora). Però le schede SD e
   gli SSD spostano le scritture dentro il chip, e lì una copia vecchia può sopravvivere: solo un
   disco cifrato chiuderebbe il problema.
+- **Le mappe si leggono dentro il Campanile stesso.** Una mappa troppo grande per la memoria
+  ferma il Campanile mentre la legge, bacheca e avvisi compresi. Il Raspberry lo riavvia da solo,
+  il portatile con un doppio clic. Dopo tre tentativi quella mappa viene messa da parte e il resto
+  funziona. Misurato su un portatile e in container, non su un Raspberry.
+- **L'installatore del Raspberry parla solo inglese**, per ora, anche a chi segue la guida
+  italiana. Le pagine parlano italiano e inglese.
 - **Nessun aggiornamento automatico.** Una correzione arriva a un Campanile solo quando qualcuno la
   porta, su una chiavetta controllata con la firma di CarrotStudio, o la installa.
 - **Annunci e nomi si cancellano da soli**: gli annunci dopo 14 giorni, i nomi di "sto bene" dopo

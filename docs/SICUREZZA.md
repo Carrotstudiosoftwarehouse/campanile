@@ -37,11 +37,11 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 | Chiudere annunci altrui | Serve il codice di 8 caratteri (circa 40 bit) di chi ha pubblicato. 20 tentativi sbagliati in 10 minuti bloccano il dispositivo. |
 | Indovinare la password di gestione | Gestione solo in locale, stesso blocco dopo 20 tentativi, confronto a tempo costante. |
 | Una pagina di internet che parla col Campanile sotto il proprio nome (DNS rebinding) | Serve il browser del portatile che fa da Campanile, mentre è in rete. I nomi di dominio di internet ricevono 421. Indirizzi, nomi `.local` e il nome del computer funzionano, e nessuno può registrarli. Prima una pagina poteva leggere la bacheca e bloccare chi gestisce con 20 password sbagliate (provato, seconda revisione da attaccante). Ora non ottiene niente e il blocco non si muove. |
-| Leggere file del sistema | I percorsi devono risolversi nella cartella del portale o delle mappe (solo `.pmtiles`). Trucchi di Windows rifiutati: flussi nascosti (`index.html:Zone.Identifier` rivelava da dove era stato scaricato il pacchetto, provato), punto o spazio finale, barra rovesciata, `con`, `nul` e simili. |
+| Leggere file del sistema | I percorsi devono risolversi nella cartella del portale o delle mappe (solo `.pmtiles`). Trucchi di Windows rifiutati: flussi nascosti (`index.html:Zone.Identifier` rivelava da dove era stato scaricato il pacchetto, provato), punto o spazio finale, barra rovesciata, `con`, `nul` e simili (provato su Windows 11). |
 | Saturare il server | 256 connessioni, 16 per dispositivo, 10 secondi per mandare la richiesta (connessioni "a goccia", provato con un attacco reale). Sul Raspberry il firewall dell'hotspot, prima di nginx, lascia 64 connessioni per MAC. Migliaia di connessioni da un byte da un solo dispositivo facevano fallire agli altri 27 richieste su 60 e scrivevano 1,7 MB di registro al minuto. Ora 0 e 0 (provato). Una mappa intera in un colpo solo rallenta dopo 8 MB, un riquadro mai. |
 | Rallentare tutti con ricerche di nomi costose | Ogni ricerca dei nomi legge tutti i nomi sotto l'unico lucchetto del database. Ora 30 ogni 10 secondi per dispositivo, una alla volta, al massimo 4 parole diverse, e un indice che si ferma ai 50 più recenti. Con 15 telefoni che cercano senza sosta, leggere gli avvisi richiede 1,5 ms invece di 97 (provato). |
 | Fingersi un altro telefono o il Campanile | Sul Raspberry limiti, blocco e gestione solo locale poggiano sull'indirizzo che scrive nginx (`X-Real-IP`). Il "request smuggling" poteva falsificarlo: una GET con un corpo eseguiva 8 richieste nascoste su 8. Due correzioni, ciascuna sufficiente da sola (provato una per una, poi 0 su 16). nginx manda una richiesta per connessione. Il Campanile accetta un corpo solo su POST, con un solo `Content-Length`, senza `chunked`. Un test fa girare il vero nginx: un telefono che si dice `127.0.0.1` resta un telefono. |
-| Calo di corrente | Annunci e avvisi accettati sono su disco prima della risposta (SQLite `synchronous=FULL`). |
+| Calo di corrente | Annunci e avvisi accettati sono su disco prima della risposta (SQLite `synchronous=FULL`). Provato con 30 uccisioni del processo, non con veri stacchi di corrente. |
 | Pagine dentro altri siti | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |
 
 **Avvisi firmati (Ed25519):**
@@ -325,7 +325,7 @@ Campanile se ne accorge (leggere le regole non richiede l'amministratore) e prop
 ```
 telefono ──porta 80────▶ nginx ──127.0.0.1:8080──▶ Campanile (Python)
 telefono ──porta 8081──▶ nginx ──127.0.0.1:8082──▶ Kiwix (Wikipedia)
-         (firewall sull'hotspot: solo DHCP, DNS, 80 e 8081; telefoni isolati tra loro)
+         (firewall sull'hotspot: solo DHCP, DNS, ping, 80 e 8081; telefoni isolati tra loro)
 ```
 
 I punti delicati sono i **collegamenti** tra i pezzi, e ognuno ha una prova.
@@ -343,9 +343,9 @@ I punti delicati sono i **collegamenti** tra i pezzi, e ognuno ha una prova.
 - **Wikipedia su un'origine separata** (porta 8081). Un difetto in Kiwix non può leggere ciò che le
   pagine del Campanile tengono nel browser (il piano familiare aperto) né usare le API del
   Campanile a nome del telefono.
-- **Firewall sull'hotspot.** Dai telefoni passano solo DHCP, DNS, 80 e 8081. Nessun altro servizio
-  (SSH compreso), nessun inoltro. Provato da un secondo dispositivo, con la controprova a firewall
-  spento.
+- **Firewall sull'hotspot.** Dai telefoni passano solo DHCP, DNS, ping, 80 e 8081. Nessun altro
+  servizio (SSH compreso), nessun inoltro. Provato da un secondo dispositivo, con la controprova a
+  firewall spento.
 - **Telefoni isolati** (`ap-isolation`), così nessuno si finge router o DNS per gli altri. Provato
   con NetworkManager 1.42 e 1.52. Che il chip Wi-Fi del Raspberry lo rispetti va verificato sul
   campo.

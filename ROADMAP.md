@@ -95,6 +95,8 @@ An automatic check finds only some of the problems. The rest takes people.
   emergency), so phones can tell it from a fake network with the same name. The priority here,
   since a fake can also leave its pages in a phone's cache (tested). It would also let the
   navigator know where the phone is
+- [ ] **Safe admin from a phone**: today a Raspberry is managed only with a screen, or from a
+  computer over SSH, since the password would cross the open Wi-Fi in clear. It needs HTTPS first
 - [ ] **Signed notices checked on the phone**, with a key that doesn't travel on the same network
 - [ ] **Two keys for a signed notice**: it counts only when, say, 2 of 3 trusted people sign it, so
   one stolen key is not enough. Rules from multisigs read in real code (EtherFi's MultiSig, 0x
@@ -234,6 +236,9 @@ Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano l
   prima dell'emergenza), così i telefoni lo distinguono da una rete falsa con lo stesso nome. È
   la priorità di questo gruppo, perché una rete falsa può anche lasciare le sue pagine nella cache
   di un telefono (provato). Permetterebbe anche al navigatore di sapere dove si trova il telefono
+- [ ] **Gestione sicura dal telefono**: oggi un Raspberry si gestisce solo con uno schermo, o da
+  un computer via SSH, perché la password passerebbe in chiaro sulla Wi-Fi aperta. Serve prima
+  HTTPS
 - [ ] **Avvisi firmati verificati sul telefono**, con una chiave che non viaggia sulla stessa rete
 - [ ] **Due chiavi per un avviso firmato**: vale solo se lo firmano, per esempio, 2 persone fidate
   su 3, così una chiave rubata non basta. Regole prese da multisig letti nel codice vero (il

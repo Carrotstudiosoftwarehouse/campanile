@@ -34,11 +34,11 @@ We assume someone on the network wants to cause trouble.
 | Closing others' posts | Needs the poster's 8-character code (about 40 bits). 20 wrong tries in 10 minutes block the device. |
 | Guessing the admin password | Local-only admin page, same 20-try lockout, constant-time comparison. |
 | An internet page talking to the Campanile under its own name (DNS rebinding) | Needs the Campanile laptop's browser, online. Internet domain names get 421. Addresses, `.local` and the computer's name still work, and nobody can register those. A page could once read the board and lock out the admin with 20 wrong passwords (tested, second adversarial review). Now it gets nothing and the lockout doesn't move. |
-| Reading system files | Paths must resolve inside the portal or maps folder (`.pmtiles` only). Windows tricks are rejected: streams (`index.html:Zone.Identifier` leaked the download origin, tested), trailing dot or space, backslash, `con`, `nul` and similar. |
+| Reading system files | Paths must resolve inside the portal or maps folder (`.pmtiles` only). Windows tricks are rejected: streams (`index.html:Zone.Identifier` leaked the download origin, tested), trailing dot or space, backslash, `con`, `nul` and similar (tested on Windows 11). |
 | Saturating the server | 256 connections, 16 per device, 10 seconds to send a request (drip-feed, tested with a real attack). On the Raspberry the hotspot firewall caps each MAC at 64 connections, before nginx. Thousands of one-byte connections from one device made others fail 27 of 60 requests and logged 1.7 MB a minute. Now 0 and 0 (tested). A whole map in one go is paced past 8 MB, a tile never is. |
 | Slowing everyone with costly name searches | Each name search reads every name under the database's one lock. Now 30 per 10 seconds per device, one at a time, 4 different words at most, and an index that stops at the newest 50. With 15 phones searching nonstop, reading the notices takes 1.5 ms instead of 97 (tested). |
 | Posing as another phone or the Campanile | On the Raspberry, limits, lockout and local-only admin rely on the address nginx writes (`X-Real-IP`). Request smuggling could forge it: a GET with a body ran 8 of 8 hidden requests. Two fixes, each enough alone (tested one at a time, then 0 of 16). nginx sends one request per connection. The Campanile takes a body only on POST, one `Content-Length`, no `chunked`. A test runs the real nginx: a phone claiming to be `127.0.0.1` stays a phone. |
-| Power loss | Accepted posts and notices hit disk before the reply (SQLite `synchronous=FULL`). |
+| Power loss | Accepted posts and notices hit disk before the reply (SQLite `synchronous=FULL`). Tested with 30 hard kills of the process, not with real power cuts. |
 | Framing by other sites | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |
 
 **Signed notices (Ed25519):**
@@ -293,7 +293,7 @@ Campanile notices (reading rules needs no admin rights) and offers a fix.
 ```
 phone ──port 80─────▶ nginx ──127.0.0.1:8080──▶ Campanile (Python)
 phone ──port 8081───▶ nginx ──127.0.0.1:8082──▶ Kiwix (Wikipedia)
-      (hotspot firewall: only DHCP, DNS, 80 and 8081; phones isolated from each other)
+      (hotspot firewall: only DHCP, DNS, ping, 80 and 8081; phones isolated from each other)
 ```
 
 The sensitive points are the **links** between pieces, and each has a test.
@@ -308,8 +308,8 @@ The sensitive points are the **links** between pieces, and each has a test.
 - **Internal ports** 8080 and 8082 listen only on `127.0.0.1` (tested unreachable from the network).
 - **Wikipedia on its own origin** (port 8081). A Kiwix flaw can't read what Campanile pages keep in
   the browser (the open family plan) or use the Campanile's API as the phone.
-- **Hotspot firewall.** Phones reach only DHCP, DNS, 80 and 8081. No other service (SSH included),
-  no forwarding. Tested from a second device, with a control run with the firewall off.
+- **Hotspot firewall.** Phones reach only DHCP, DNS, ping, 80 and 8081. No other service (SSH
+  included), no forwarding. Tested from a second device, with a control run with the firewall off.
 - **Phones isolated** (`ap-isolation`), so none can pose as router or DNS server for the others.
   Tested with NetworkManager 1.42 and 1.52. Whether the Raspberry's Wi-Fi chip honors it must be
   checked in the field.
