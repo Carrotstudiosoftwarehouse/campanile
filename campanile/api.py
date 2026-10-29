@@ -94,10 +94,8 @@ class PublicApi:
                 },
             )
         if path == "/api/maps":
-            # A map may have arrived since the start (setup page, another Campanile): its
-            # streets are built now, and the pages wait while "building" says so. Asked before
-            # the list, so a build that ends in between is in the list. Pages ask this once,
-            # then every few seconds only while building: looking each time costs little.
+            # A map may have arrived since the start: its streets are built now, and pages wait
+            # while "building". Asked before the list, so a build ending meanwhile is in it.
             self.cfg.routes.refresh(now=True)
             building = not self.cfg.routes.ready
             return self._json(200, {"maps": self._maps(), "building": building})

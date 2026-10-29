@@ -1,7 +1,8 @@
 // DEVELOPED BY CARROTSTUDIO software house
 // The online demo: this service worker plays the Campanile for the real pages, inside the
 // visitor's browser. Nothing leaves it: nobody sees what another visitor writes, nothing to
-// moderate. Only what a visitor can try is here; the rules live in campanile/server.py.
+// moderate. Only what a visitor can try is here; the real rules are in campanile/api.py and
+// campanile/store.py.
 
 const VERSION = "0.1.0-demo";
 const STORE = "campanile-demo";

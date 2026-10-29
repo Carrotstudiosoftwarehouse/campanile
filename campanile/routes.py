@@ -64,10 +64,8 @@ MAX_TILES = 4_000  # of the most detailed zoom (an area framed on the setup page
 MAX_POINTS = 4_000_000  # points of streets
 TRIES = 3  # builds cut short (a crash, a power cut) before a map is given up
 EXTENT = 4096  # tile units: what Protomaps and most map makers write; any other, no routes
-# Finding where streets meet costs work: segments in cells, pairs compared. A file made to
-# stack thousands of lines on one spot must cost no more than a real city. Measured on the
-# Turin metropolitan area (440 tiles): at most 34,080 cells and 63,833 pairs in one tile,
-# 3.2 and 1.9 million in all.
+# Joining streets costs work: a file stacking thousands of lines on one spot must cost no more
+# than a real city. Turin's metropolitan area (440 tiles): 3.2 million cells, 1.9 million pairs.
 BUDGET = {"cells": 40_000_000, "pairs": 25_000_000}  # one map
 TILE_BUDGET = {"cells": 400_000, "pairs": 1_000_000}  # one tile: what it holds in memory
 
@@ -1094,9 +1092,8 @@ class Routes:
         raise RouteError("route_far")
 
     # -- blocked streets ----------------------------------------------------------------------
-    # The database is the only record of what is blocked. The networks never get a list from
-    # outside: they read it again themselves, under one lock, so the last one to update has
-    # always read the newest; and a version number lets them catch up by themselves.
+    # The database is the only record. Networks re-read it themselves under one lock, so the
+    # last update always has the newest list; a version number lets them catch up alone.
 
     def _blocks(self, network: Network, entries: list[dict]) -> frozenset:
         chains: set[int] = set()

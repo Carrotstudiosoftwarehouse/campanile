@@ -1,9 +1,9 @@
 # DEVELOPED BY CARROTSTUDIO software house
 """A Campanile version signed by CarrotStudio.
 
-What is signed is the hash of every program file, like a Sky spell approves the hash of its
-code: exactly those files pass, none more, none fewer, and never an older version, which would
-bring old bugs back. Check a copy where it will run, not on the stick, which can still change.
+What is signed is the hash of every program file: exactly those files pass, none more, none
+fewer, and never an older version, which would bring old bugs back. Check a copy where it will
+run, not on the stick, which can still change.
 
     python3 campanile/release.py FOLDER     says whether FOLDER is a signed release
 """

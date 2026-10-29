@@ -6,10 +6,9 @@ kiwix-serve for every computer and Python's installers. Never the database (name
 contacts) or the admin password.
 
 Programs travel only this way, handed over in person: anyone can name a Wi-Fi "Campanile".
-The stick itself may be hostile. No link on it is followed, nothing on it is read as
-instructions, and we write only inside its Campanile folder, and only into one that holds
-nothing but our own files: a file slipped in beforehand would otherwise travel inside a copy
-that people start without a second thought.
+The stick itself may be hostile: no link on it is followed, nothing on it is read as
+instructions, and we write only into a Campanile folder holding nothing but our own files
+(a file slipped in beforehand would travel inside a copy people trust).
 
     python3 campanile/copying.py /media/usb [--data /var/lib/campanile] [--keys FILE]
 """

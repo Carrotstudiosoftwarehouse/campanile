@@ -1,7 +1,7 @@
 # DEVELOPED BY CARROTSTUDIO software house
 # Firewall for the hotspot interface only (@IFACE@ is filled in by install.sh).
-# Phones get DHCP, DNS and Campanile (80, 8081): nothing else on the Raspberry, and no way
-# through it into any other network it is connected to.
+# Phones get DHCP, DNS, ping and Campanile (80, 8081): nothing else on the Raspberry, and no
+# way through it into any other network it is connected to.
 table inet campanile
 delete table inet campanile
 table inet campanile {
@@ -10,10 +10,9 @@ table inet campanile {
         iifname "@IFACE@" jump from_phones
     }
 
-    # Open connections per phone, by MAC address, which a phone can't change without leaving
-    # the network. A browser needs a dozen; 64 leaves room for tabs, or a repeater showing a few
-    # phones as one. Otherwise one device holding thousands of silent connections fills nginx
-    # for everyone (measured: 27 phone requests in 60 failed, 1.7 MB of nginx log a minute).
+    # Connections per phone, by MAC (changing it means leaving the network). A browser needs a
+    # dozen; 64 leaves room for tabs or a repeater. Without it, one device's thousands of silent
+    # connections filled nginx for everyone (measured: 27 phone requests in 60 failed).
     set connections_per_phone {
         type ether_addr
         flags dynamic
