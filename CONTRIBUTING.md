@@ -66,7 +66,7 @@ campanile/
   devices.py      per-device limits (the phone's MAC, never stored)
   signing.py      signed notices (Ed25519); ed25519.py checks them where `cryptography` is missing
   cap.py          official alerts in CAP, read from a file; pfif.py: the names as PFIF
-  messages.py     server messages in every language
+  messages.py     messages in every language: the server's and the laptop window's
   places.py       the map search: names read from the map files, with bounded costs
   routes.py       the navigator: streets from the map files, routes, blocked streets
   copying.py      the copy to a USB stick; sharing.py: maps and Wikipedia between Campaniles

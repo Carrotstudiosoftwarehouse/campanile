@@ -13,6 +13,7 @@ import plistlib
 import re
 import sys
 from pathlib import Path
+from xml.parsers.expat import ExpatError
 
 LANGUAGES = ("it", "en")
 DEFAULT = "it"
@@ -534,10 +535,12 @@ def _computer_tags(region: bool = False) -> list[str]:
         try:
             with open(Path.home() / "Library/Preferences/.GlobalPreferences.plist", "rb") as f:
                 prefs = plistlib.load(f)
-            languages = [str(t) for t in prefs.get("AppleLanguages", [])]
+            languages = prefs.get("AppleLanguages")
+            languages = [str(t) for t in languages] if isinstance(languages, list) else []
             country = [str(prefs.get("AppleLocale", ""))]  # the Region setting
             tags += country + languages if region else languages + country
-        except (OSError, ValueError, AttributeError, plistlib.InvalidFileException):
+        # Odd or damaged settings only mean no language from here, never a failed start.
+        except (OSError, ValueError, AttributeError, plistlib.InvalidFileException, ExpatError):
             pass
     tags += os.environ.get("LANGUAGE", "").split(":")
     for name in ("LC_ALL", "LC_MESSAGES", "LANG"):  # like gettext: the first one set

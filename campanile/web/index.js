@@ -31,6 +31,7 @@ let showAll = false;
 
 function drawNotices() {
   const list = document.getElementById("notices");
+  if (notices.length < 2) showAll = false; // a new second notice starts closed again
   if (notices.length === 0) {
     list.replaceChildren(el("p", { class: "meta", text: t("notices.none") }));
   } else {

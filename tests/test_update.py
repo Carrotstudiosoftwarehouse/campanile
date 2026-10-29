@@ -322,6 +322,8 @@ class TestLaptopStart(UpdateTestCase):
         source = Path(update.__file__).read_text(encoding="utf-8")
         raised = set(re.findall(r'UpdateError\(\s*"(\w+)"', source))
         self.assertEqual(raised - {"update_folder_exists"}, set(launch.STOPPED))
+        for key in raised:  # and words for the window, or it would crash just when it matters
+            self.assertIn(key, launch.messages.WINDOW, key)
 
     def test_a_tampered_prepared_copy_is_thrown_away_and_the_old_version_starts(self):
         folder, _ = self.stage()

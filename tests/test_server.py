@@ -1697,9 +1697,24 @@ class TestComputerLanguage(unittest.TestCase):
     def test_nothing_known_means_english_and_no_country(self):
         self.assertEqual(self.ask(env={"LANG": "C.UTF-8"}), ("en", ""))
         self.assertEqual(self.ask(env={"LANG": "de_DE.UTF-8"}), ("en", "DE"))
-        self.assertEqual(self.ask("darwin", mac={"AppleLanguages": "not a list"}), ("en", ""))
+        self.assertEqual(self.ask("darwin", mac={"AppleLanguages": "it"}), ("en", ""))  # not a list
         if sys.platform != "win32":  # Windows' settings missing: it must not break
             self.assertEqual(self.ask("win32"), ("en", ""))
+
+    def test_a_damaged_mac_settings_file_never_stops_the_start(self):
+        import messages
+
+        home = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, home, ignore_errors=True)
+        prefs = home / "Library" / "Preferences" / ".GlobalPreferences.plist"
+        prefs.parent.mkdir(parents=True)
+        prefs.write_bytes(b'<?xml version="1.0"?><plist><dict><key>AppleLanguages</key><array>')
+        with (
+            mock.patch.object(messages.sys, "platform", "darwin"),
+            mock.patch.object(messages.Path, "home", return_value=home),
+            mock.patch.dict(os.environ, {"LANG": "it_IT.UTF-8"}, clear=True),
+        ):
+            self.assertEqual(messages.computer_language(), "it")  # the terminal still says it
 
     def test_this_computer_answers(self):
         import messages
