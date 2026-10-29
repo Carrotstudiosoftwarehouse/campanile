@@ -24,8 +24,8 @@ missing, tell us and we will add it.
   the only way in is a USB stick someone prepared.
 - **Power and a Wi-Fi network.** A laptop needs a powered router (no internet needed) or a phone's
   hotspot. In our field test an Android phone (TCL 40 SE) made one with mobile data off, for up to
-  8 devices. An iPhone wouldn't. The Raspberry makes its own, tested only on virtual radios. Battery life is
-  an estimate.
+  8 devices. An iPhone wouldn't. The Raspberry makes its own, tested only on virtual radios.
+  Battery life is an estimate.
 - **The sign.** A laptop's address changes with the network, so print the sign, or copy its
   address, once the day's network is up. A Raspberry's address never changes.
 - **Nothing beyond a few tens of meters.** No messages to faraway relatives, no calls (emergency
