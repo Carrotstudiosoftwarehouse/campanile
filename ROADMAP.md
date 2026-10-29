@@ -46,6 +46,8 @@ field with many real people. What we tested: [docs/TESTING.md](docs/TESTING.md).
 - [x] Ready for North America: the laptop's window in the computer's language, the emergency
   number set on the admin page (911 by itself on a computer set to the US or Canada), miles,
   addresses written the American way
+- [x] A simpler home page: official notices first (one in view, the rest behind a button),
+  then "I need" and "I can give", then medicine, map and family plan
 - [x] Accessibility checked by machine: every page in both languages passes axe-core's WCAG 2.2 AA
   check and stays readable at 200% zoom without sideways scrolling. Large buttons, black on white,
   red only for warnings, ink blue only for section titles
@@ -178,6 +180,8 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
 - [x] Pronto per il Nord America: la finestra del portatile nella lingua del computer, il numero
   di emergenza impostato nella gestione (911 da solo su un computer impostato su Stati Uniti o
   Canada), le miglia, gli indirizzi scritti all'americana
+- [x] Una pagina principale più semplice: prima gli avvisi ufficiali (uno in vista, gli altri
+  dietro un bottone), poi "Ho bisogno" e "Offro", poi medicina, mappa e piano familiare
 - [x] Accessibilità controllata dalla macchina: ogni pagina nelle due lingue supera il controllo
   WCAG 2.2 AA di axe-core e resta leggibile con lo zoom al 200% senza scorrere di lato. Pulsanti
   grandi, nero su bianco, rosso solo per gli avvisi, blu inchiostro solo per i titoli delle sezioni
