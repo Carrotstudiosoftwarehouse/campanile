@@ -83,6 +83,8 @@ An automatic check finds only some of the problems. The rest takes people.
 - [ ] **Family test** on every release: five non-technical people use it with no help
 - [ ] **Screen readers**: VoiceOver and TalkBack, tried by people who use them every day
 - [ ] **Plain words**: every sentence on the pages read by someone who finds reading hard
+- [ ] **A sign that joins the Wi-Fi**: the network's real name (also with `--ssid`) and a second
+  QR code that connects the phone
 - [ ] **More languages** (Ukrainian, Arabic, French, German, Spanish...). Each is the text of
   `campanile/web/strings.js` and `campanile/messages.py`, translated, and each opens a new
   country. Right-to-left languages are ready: pages mirror by themselves, and Arabic street
@@ -225,6 +227,8 @@ Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano l
 - [ ] **Test delle famiglie** a ogni release: cinque persone non tecniche lo usano senza aiuto
 - [ ] **Lettori di schermo**: VoiceOver e TalkBack, provati da chi li usa tutti i giorni
 - [ ] **Parole semplici**: ogni frase delle pagine letta da qualcuno che fa fatica a leggere
+- [ ] **Un cartello che collega alla Wi-Fi**: il nome vero della rete (anche con `--ssid`) e un
+  secondo codice QR che collega il telefono
 - [ ] **Altre lingue** (ucraino, arabo, francese, tedesco, spagnolo...). Ognuna è il testo di
   `campanile/web/strings.js` e `campanile/messages.py`, tradotto, e ognuna apre un paese.
   Le lingue da destra a sinistra sono pronte: le pagine si rovesciano da sole, e sulla mappa i

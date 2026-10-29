@@ -140,6 +140,9 @@ missing, tell us and we will add it.
 - **The navigator** doesn't know the phone's position or turn bans, estimates times, is as recent
   as its map, and knows only the blocked streets someone marked. It trusts the map's one-way
   streets, though on Turin's map 60 of 8,415 point different ways at two zoom levels.
+- **The nearest hospital may have no emergency room.** The maps mark every hospital the same
+  way, private clinics included: the button shows the nearest, not the one that takes
+  emergencies.
 - **A few tens of meters of range.** Not a certified emergency system. It doesn't replace the
   emergency number.
 

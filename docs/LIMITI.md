@@ -157,6 +157,9 @@ un limite, diccelo e lo aggiungiamo.
   è aggiornato quanto la sua mappa e conosce solo le strade interrotte che qualcuno ha segnato. Si
   fida dei sensi unici della mappa, ma su quella di Torino 60 su 8.415 hanno verso diverso fra due
   livelli di dettaglio.
+- **L'ospedale più vicino può non avere il pronto soccorso.** Le mappe segnano tutti gli
+  ospedali allo stesso modo, cliniche private comprese: il pulsante mostra il più vicino, non
+  quello che accoglie le emergenze.
 - **Poche decine di metri di portata.** Non è un sistema di emergenza certificato. Non sostituisce
   il 112.
 
