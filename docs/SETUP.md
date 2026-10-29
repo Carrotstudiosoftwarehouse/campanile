@@ -48,7 +48,7 @@ if interrupted and are checked by SHA-256 (pinned for programs, Kiwix's for Wiki
 scripts/prepare.sh                        # libraries (already in the ready-to-use package)
 scripts/download-map.sh custom area WEST,SOUTH,EAST,NORTH   # your area, see below
 scripts/download-map.sh world             # the whole world, ~190 MB
-scripts/download-wikipedia.sh medicine    # medical articles in Italian, ~260 MB
+scripts/download-wikipedia.sh medicine-light en   # medical articles in English, ~1 GB
 ```
 
 ### Your area, in detail
@@ -78,9 +78,9 @@ A 30 km square around Turin is about 23 MB.
 | `full` (no images) | ~8.4 GB |
 | `full-images` | ~30 GB |
 
-Sizes measured on 22-24 October 2026. Other languages: add the code, as in
-`scripts/download-wikipedia.sh medicine-light en` (English, no images, ~1 GB, as on the setup
-page). Wikipedia starts by itself. On a laptop, first press an *Offline medicine* button on the
+Sizes measured on 22-24 October 2026. The word after the package is the language: `it` (the
+default), `en`, `de`, `fr`, `uk`... English is bigger: `medicine-light en` is about 1 GB, as on the
+setup page. Wikipedia starts by itself. On a laptop, first press an *Offline medicine* button on the
 setup page once, to add the program that serves it.
 
 Map search indexes each map once, in the background, into `data/places/`. It finds streets,
@@ -139,14 +139,14 @@ for a laptop, with the screen dimmed.
 ## Raspberry Pi
 
 It should run on a Raspberry Pi 3B+, 4, 5 or Zero 2 W. Tested in Raspberry Pi OS containers and
-on virtual Wi-Fi radios, not yet on a real board. It creates the open Wi-Fi **"Campanile"**: most
-phones open the page by themselves, and if one doesn't, the QR code on the sign does. It uses
-little power and runs on a power bank.
+on virtual Wi-Fi radios, not yet on a real board. It creates the open Wi-Fi **"Campanile"**:
+phones should open the page by themselves (not yet tried with real phones), and the QR code on
+the sign opens it too. It can run on a power bank, for how long we haven't measured yet.
 
-You need **Raspberry Pi OS 64-bit** (Bookworm or newer: on 32-bit the map can't be downloaded on
-the Pi) with built-in Wi-Fi, online **by cable** (the hotspot switches off the Wi-Fi you are on).
-A Zero 2 W has no network port: use a keyboard and screen, since the hotspot is the last step, or
-a USB network adapter.
+You need **Raspberry Pi OS 64-bit**, Lite or with desktop (Bookworm or newer: on 32-bit the map
+can't be downloaded on the Pi), with built-in Wi-Fi, online **by cable**: the last step turns the
+Wi-Fi into the hotspot, and an SSH session over Wi-Fi would drop there. A Zero 2 W has no network
+port: use a keyboard and screen, or a USB network adapter.
 
 First find [your area's four numbers](#your-area-in-detail) and write them in the map line, in
 place of `WEST,SOUTH,EAST,NORTH`. Then paste:
@@ -157,8 +157,8 @@ sudo apt update && sudo apt install -y git
 cd $HOME/campanile && git pull
 scripts/download-map.sh custom area WEST,SOUTH,EAST,NORTH   # your area
 scripts/download-map.sh world             # optional, ~190 MB
-scripts/download-wikipedia.sh medicine    # optional, ~260 MB
-sudo raspberry/install.sh                 # options: --ssid NAME  --country IT  --no-hotspot
+scripts/download-wikipedia.sh medicine-light en   # optional, in English, ~1 GB
+sudo raspberry/install.sh                 # options: --ssid NAME  --country XX  --no-hotspot
 ```
 
 Left as it is, the map line stops with "Invalid box" and the others carry on.
@@ -170,16 +170,18 @@ downloaded again, new ones go where the Campanile reads them, and data and passw
 The installer fetches the map libraries itself the first time, and waits if the Raspberry, just
 switched on, is still updating itself.
 
-`--country` is the two-letter country code for the Wi-Fi rules (for example `DE`, `FR`).
+`--country` is your country's two letters, for the Wi-Fi rules (for example `DE`, `FR`).
+Without it the installer keeps the country already set (Raspberry Pi Imager sets one along with
+the Wi-Fi), and asks for it if there is none.
 
 The installer:
 
 - installs `python3`, `python3-cryptography`, `kiwix-tools`, `nginx` and `nftables` from Debian,
   and creates the unprivileged service user `campanile`
 - puts the program in `/opt/campanile`, data in `/var/lib/campanile`, configuration in `/etc/campanile`
-- puts **nginx** on port 80 for pages, maps and slow or greedy clients, and on 8081 for
-  Wikipedia. The app (127.0.0.1:8080) and Wikipedia's server (127.0.0.1:8082) listen only inside
-  the Raspberry, restricted by systemd, and start at boot
+- puts **nginx** in front of the phones, on port 80 (pages and maps) and 8081 (Wikipedia), so a
+  slow or greedy phone can't hold up the others. The app (127.0.0.1:8080) and Wikipedia's server
+  (127.0.0.1:8082) listen only inside the Raspberry, restricted by systemd, and start at boot
 - creates the **open** Wi-Fi "Campanile" on `10.42.0.1` with NetworkManager, and points every
   domain name to the Campanile
 - asks the Wi-Fi chip to keep phones apart (not yet verified on a Pi's own chip). A hotspot
@@ -189,10 +191,16 @@ The installer:
 **Network changes:** the NetworkManager connection `campanile-hotspot`,
 `/etc/NetworkManager/dnsmasq-shared.d/campanile.conf` (DNS redirect, only while the hotspot is
 on), the firewall `/etc/campanile/firewall.nft` with its `campanile-firewall` service. It also
-sets the Wi-Fi country and replaces nginx's default site (restored on uninstall).
+sets the Wi-Fi country you give, and replaces nginx's default site (restored on uninstall).
 
-**To remove everything:** `cd $HOME/campanile && sudo raspberry/uninstall.sh` (keeps data and
-password), or the same with `--purge` at the end (deletes them too).
+From a computer on the same cable network, open the `.local` address the installer prints, like
+`http://raspberrypi.local/`. The Raspberry's IP address leads to the hotspot's page, which only
+phones on its Wi-Fi can reach.
+
+**To remove Campanile:** `cd $HOME/campanile && sudo raspberry/uninstall.sh` (keeps data and
+password), or the same with `--purge` at the end (deletes them too). The packages and the Wi-Fi
+country stay; nginx is stopped if it came with Campanile. The folder you cloned stays too:
+`rm -rf $HOME/campanile` removes it.
 
 The built-in Wi-Fi serves a limited number of phones: how many, we haven't measured yet. For a
 whole square, use an external access point.

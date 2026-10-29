@@ -12,10 +12,10 @@ chiaro e chiunque nei dintorni potrebbe leggerla.
 
 - **Portatile:** apri `http://localhost:8080/admin.html` sul portatile. La password è nella
   finestra nera e in `data/admin-password.txt`.
-- **Raspberry Pi:** usa il suo browser (`http://localhost/admin.html`). Se hai attivato SSH, puoi
-  usare anche un computer **via cavo** con un tunnel cifrato,
+- **Raspberry Pi:** da un computer **via cavo**, con SSH attivo e un tunnel cifrato,
   `ssh -L 8080:localhost:80 utente@<indirizzo del Raspberry sul cavo>`, poi apri
-  `http://localhost:8080/admin.html`. Dall'hotspot SSH è bloccato dal firewall. La password viene
+  `http://localhost:8080/admin.html`. Se il Raspberry ha il desktop, va bene anche il suo browser
+  (`http://localhost/admin.html`). Dall'hotspot SSH è bloccato dal firewall. La password viene
   mostrata alla fine dell'installazione ed è in `/etc/campanile/password`.
 
 Ogni annuncio e ogni nome registrato riceve un **numero e un codice** (tipo `K7M2-QX9P`), con cui

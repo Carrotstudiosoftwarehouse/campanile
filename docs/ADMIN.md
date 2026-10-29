@@ -12,10 +12,10 @@ clear text for anyone nearby to read.
 
 - **Laptop:** open `http://localhost:8080/admin.html` on the laptop. The password is in the black
   window and in `data/admin-password.txt`.
-- **Raspberry Pi:** use its own browser (`http://localhost/admin.html`). With SSH enabled, a
-  computer **by cable** can also use an encrypted tunnel,
+- **Raspberry Pi:** from a computer **by cable**, with SSH on, through an encrypted tunnel,
   `ssh -L 8080:localhost:80 user@<the Raspberry's cable address>`, then open
-  `http://localhost:8080/admin.html`. The firewall blocks SSH from the hotspot. The password is
+  `http://localhost:8080/admin.html`. With a desktop on the Raspberry, its own browser works too
+  (`http://localhost/admin.html`). The firewall blocks SSH from the hotspot. The password is
   shown at the end of installation and saved in `/etc/campanile/password`.
 
 Each post and registered name gets a **number and a code** (like `K7M2-QX9P`) that lets its
