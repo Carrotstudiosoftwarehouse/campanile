@@ -19,7 +19,7 @@ called everyone together: Campanile does the same when the network goes down.
 > security audit. Don't rely on it alone. Our limits, honestly: [docs/LIMITS.md](docs/LIMITS.md).
 
 <p align="center">
-  <img src="docs/immagini/campanile.gif" width="600" alt="Campanile with no internet: official notices, asking the neighbors for help, I'm safe, the offline map and the nearest pharmacy, a route around a closed street, offline medicine">
+  <img src="docs/immagini/campanile.gif" width="600" alt="Campanile with no internet: official notices, I need and I can give, a request on the neighborhood board, the offline map and the nearest pharmacy, a route around a closed street, offline medicine">
 </p>
 <p align="center"><em>Shown here on a computer: the pages are made for phones and work on any screen.</em></p>
 

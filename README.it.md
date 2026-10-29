@@ -20,7 +20,7 @@ raccolta: il Campanile fa lo stesso quando la rete cade.
 > [docs/LIMITI.md](docs/LIMITI.md).
 
 <p align="center">
-  <img src="docs/immagini/campanile.gif" width="600" alt="Il Campanile senza internet: avvisi ufficiali, chiedere aiuto ai vicini, sto bene, la mappa offline e la farmacia più vicina, un percorso che evita una strada interrotta, la medicina offline">
+  <img src="docs/immagini/campanile.gif" width="600" alt="Il Campanile senza internet: avvisi ufficiali, ho bisogno e offro, una richiesta nella bacheca del quartiere, la mappa offline e la farmacia più vicina, un percorso che evita una strada interrotta, la medicina offline">
 </p>
 <p align="center"><em>Qui su un computer: le pagine sono pensate per il telefono e funzionano su qualunque schermo.</em></p>
 
