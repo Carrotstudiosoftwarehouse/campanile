@@ -106,6 +106,9 @@ us, and it goes here.
   monitoring for Algeria.
 - **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: an offline-first map of aid
   points during emergencies in Chile.
+- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: a map of where emergency field teams
+  are and how they are doing, built from what they report by radio. Runs in the browser, no
+  internet needed.
 
 ## How it is built
 

@@ -108,6 +108,9 @@ Scrivicelo, e lo aggiungiamo qui.
   visti dal satellite, in tempo reale.
 - **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: una mappa offline dei punti di
   aiuto durante le emergenze in Cile.
+- **[RangerTrak](https://github.com/SteadyEOC/RangerTrak)**: una mappa di dove sono le squadre
+  dell'emergenza sul campo e di come stanno, costruita da quello che comunicano via radio. Gira nel
+  browser, senza internet.
 
 ## Come è fatto
 
