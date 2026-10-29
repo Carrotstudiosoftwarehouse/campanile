@@ -88,6 +88,32 @@ class TestRaspberryInstall(unittest.TestCase):
             self.assertRegex(run(command), r"^[A-Za-z0-9_-]{16}$")
             self.assertEqual(run(command.replace("python3 -I ", "python3 ")), "planted")
 
+    @unittest.skipIf(os.name == "nt" or not shutil.which("bash"), "bash")
+    def test_maps_and_wikipedia_are_moved_once_and_links_left_out(self):
+        step = re.search(r"shopt -s nullglob\n(.*?)\nshopt -u nullglob\n", INSTALL, re.S)[1]
+        with tempfile.TemporaryDirectory() as tmp:
+            clone, data = Path(tmp, "clone", "data"), Path(tmp, "installed")
+            stubs = Path(tmp, "bin")
+            for folder in (clone / "maps", clone / "zim", data / "maps", data / "zim", stubs):
+                folder.mkdir(parents=True)
+            (clone / "maps" / "town.pmtiles").write_bytes(b"map")
+            (clone / "zim" / "medicine.zim").write_bytes(b"zim")
+            Path(tmp, "secret").write_text("not for phones")
+            (clone / "maps" / "evil.pmtiles").symlink_to(Path(tmp, "secret"))
+            (stubs / "chown").write_text("#!/bin/sh\nexit 0\n")  # the real one needs root
+            (stubs / "chown").chmod(0o755)
+            path = f"{stubs}{os.pathsep}{os.environ['PATH']}"
+            env = {**os.environ, "PATH": path, "SOURCE": str(clone.parent), "DATA": str(data)}
+            subprocess.run(  # noqa: S603 (the data step of our own install.sh)
+                ["bash", "-c", f"set -euo pipefail\nshopt -s nullglob\n{step}"],  # noqa: S607
+                env=env,
+                check=True,
+            )
+            self.assertEqual([p.name for p in (data / "maps").iterdir()], ["town.pmtiles"])
+            self.assertEqual([p.name for p in (data / "zim").iterdir()], ["medicine.zim"])
+            self.assertFalse((clone / "maps" / "town.pmtiles").exists())  # moved: one copy
+            self.assertTrue((clone / "maps" / "evil.pmtiles").is_symlink())  # left where it was
+
     def test_what_it_runs_works_from_a_stick_without_exec_bits(self):
         # An update from a FAT32 stick loses the exec bits: what runs directly gets them back.
         units = "".join(u.read_text(encoding="utf-8") for u in REPO.glob("raspberry/*.service"))

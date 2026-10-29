@@ -14,7 +14,7 @@ Usage, from the project folder:
   --country CC    two-letter country code for the Wi-Fi rules (default: IT)
   --no-hotspot    stay on the existing network, no hotspot and no redirect
 
-The map libraries are fetched the first time. Maps and Wikipedia in data/ are copied too.
+The map libraries are fetched the first time. Maps and Wikipedia in data/ are moved in too.
 USAGE
 }
 
@@ -102,14 +102,23 @@ step "Data in $DATA"
 # folder but not list it, and the database stays readable by campanile only.
 install -d -o campanile -g campanile -m 711 "$DATA"
 install -d -o campanile -g campanile -m 755 "$DATA/maps"
-install -d -o campanile -g campanile -m 750 "$DATA/zim"
+# 751: the download script can see a Wikipedia file it names, nobody can list them.
+install -d -o campanile -g campanile -m 751 "$DATA/zim"
 shopt -s nullglob
-for f in "$SOURCE"/data/maps/*.pmtiles; do
-  [ -e "$DATA/maps/$(basename "$f")" ] || install -o campanile -g campanile -m 644 "$f" "$DATA/maps/"
+# Moved, not copied: the card holds each map and Wikipedia once, and the download scripts look
+# here too. Copied only when moving can't be done (a read-only folder). Plain files only: a
+# link would bring whatever it points to into the folder phones read.
+for f in "$SOURCE"/data/maps/*.pmtiles "$SOURCE"/data/zim/*.zim; do
+  [ -f "$f" ] && [ ! -L "$f" ] || continue
+  to="$DATA/maps"
+  [[ "$f" == *.zim ]] && to="$DATA/zim"
+  [ -e "$to/$(basename "$f")" ] || mv "$f" "$to/" 2>/dev/null || cp "$f" "$to/"
 done
-chmod 644 "$DATA"/maps/*.pmtiles 2>/dev/null || true
-for f in "$SOURCE"/data/zim/*.zim; do
-  [ -e "$DATA/zim/$(basename "$f")" ] || install -o campanile -g campanile -m 640 "$f" "$DATA/zim/"
+for f in "$DATA"/maps/*.pmtiles "$DATA"/zim/*.zim; do
+  [ -L "$f" ] && continue
+  mode=644
+  [[ "$f" == *.zim ]] && mode=640
+  chown campanile:campanile "$f" && chmod "$mode" "$f"
 done
 shopt -u nullglob
 

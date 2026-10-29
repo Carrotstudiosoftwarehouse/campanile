@@ -56,10 +56,13 @@ echo "Latest: $NAME"
 
 mkdir -p "$ZIM"
 TARGET="$ZIM/$NAME"
-if [ -f "$TARGET" ]; then
-  echo "Already there: $TARGET"
-  exit 0
-fi
+# On a Raspberry the installer has moved it to /var/lib/campanile.
+for HAVE in "$TARGET" "/var/lib/campanile/zim/$NAME"; do
+  if [ -f "$HAVE" ]; then
+    echo "Already there: $HAVE"
+    exit 0
+  fi
+done
 
 EXPECTED="$(curl -fsSL --proto =https --proto-redir =https --retry 3 "$INDEX$NAME.sha256" | cut -d' ' -f1)"
 if ! [[ "$EXPECTED" =~ ^[0-9a-f]{64}$ ]]; then

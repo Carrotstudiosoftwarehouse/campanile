@@ -59,10 +59,13 @@ PY
 
 TARGET="$MAPS/$NAME.pmtiles"
 # Like download-wikipedia.sh: running the guide again downloads nothing twice, even offline.
-if [ -f "$TARGET" ]; then
-  echo "Already there: $TARGET (delete it to download a newer one)"
-  exit 0
-fi
+# On a Raspberry the installer has moved the map to /var/lib/campanile.
+for HAVE in "$TARGET" "/var/lib/campanile/maps/$NAME.pmtiles"; do
+  if [ -f "$HAVE" ]; then
+    echo "Already there: $HAVE (delete it to download a newer one)"
+    exit 0
+  fi
+done
 
 sha256() {
   if command -v sha256sum >/dev/null; then sha256sum "$1" | cut -d' ' -f1
