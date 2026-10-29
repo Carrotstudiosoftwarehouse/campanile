@@ -542,6 +542,13 @@ class TestFiles(CampanileTestCase):
             self.assertEqual(self.request("GET", path)[0].status, 404, path)
         self.assertEqual(self.request("GET", "/sub/with%20space.js")[0].status, 200)
 
+    def test_windows_device_names_are_not_files(self):
+        # On Windows "nul" is a device in every folder: checking only that it exists served it
+        # (measured on Windows 11). Elsewhere these are just missing files.
+        for name in ("con", "nul", "aux", "prn", "com1", "lpt1", "conin$", "nul.txt", "sub/nul.js"):
+            self.assertEqual(self.request("GET", "/" + quote(name))[0].status, 404, name)
+        self.assertEqual(self.request("GET", "/maps/nul.pmtiles")[0].status, 404)
+
     def test_index_and_mime_types(self):
         r, c = self.request("GET", "/")
         self.assertEqual((r.status, c), (200, b"<h1>Campanile</h1>"))
