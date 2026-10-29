@@ -16,7 +16,7 @@ so a later install picks up where you left off.
   --purge   also delete the data, the password and the 'campanile' user
 
 If you're connected through the Campanile hotspot, you'll be disconnected.
-The packages and the Wi-Fi country stay. nginx is stopped if it came with Campanile;
+The packages and the Wi-Fi country stay. nginx is stopped if it was off before Campanile;
 otherwise Debian's default site is back.
 USAGE
 }
@@ -48,10 +48,10 @@ if [ -e /etc/campanile/nginx-default-was-enabled ] && [ -e /etc/nginx/sites-avai
   ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
   rm -f /etc/campanile/nginx-default-was-enabled
 fi
-if [ -e /etc/campanile/nginx-came-with-campanile ]; then
-  # Installed for Campanile: no web server is left answering on port 80.
+if [ -e /etc/campanile/nginx-was-off ]; then
+  # It wasn't serving before Campanile: no web server is left answering on port 80.
   systemctl disable --now nginx.service 2>/dev/null || true
-  echo "nginx came with Campanile: stopped. The package stays (sudo apt purge nginx)."
+  echo "nginx, off before Campanile, is off again. The package stays (sudo apt purge nginx)."
 elif command -v nginx >/dev/null && nginx -t -q 2>/dev/null; then
   # restart, not reload: reload is asynchronous and old workers would keep serving for a moment
   systemctl restart nginx.service 2>/dev/null || true
@@ -72,5 +72,6 @@ else
   echo "Kept: /var/lib/campanile (data) and /etc/campanile (password)."
   echo "To remove them too: sudo raspberry/uninstall.sh --purge"
 fi
-echo "Not removed: the packages kiwix-tools, nginx, nftables and python3-cryptography, the"
-echo "Wi-Fi country, and the folder you installed from."
+echo "Not removed: the packages installed with it (kiwix-tools, nginx, nftables,"
+echo "python3-cryptography and what they need), the Wi-Fi country, and the folder you"
+echo "installed from."
