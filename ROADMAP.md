@@ -43,6 +43,9 @@ field with many real people. What we tested: [docs/TESTING.md](docs/TESTING.md).
   package that matches. A Campanile updates from a USB stick only to a newer signed version, and a
   power cut halfway is finished at the next start
 - [x] Pages ready for right-to-left languages such as Arabic: only the translation is missing
+- [x] Ready for North America: the laptop's window in the computer's language, the emergency
+  number set on the admin page (911 by itself on a computer set to the US or Canada), miles,
+  addresses written the American way
 - [x] Accessibility checked by machine: every page in both languages passes axe-core's WCAG 2.2 AA
   check and stays readable at 200% zoom without sideways scrolling. Large buttons, black on white,
   red only for warnings, ink blue only for section titles
@@ -172,6 +175,9 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
   pacchetto che combacia. Un Campanile si aggiorna da chiavetta solo a una versione più nuova e
   firmata, e un blackout a metà viene completato alla riaccensione
 - [x] Pagine pronte per le lingue da destra a sinistra come l'arabo: manca solo la traduzione
+- [x] Pronto per il Nord America: la finestra del portatile nella lingua del computer, il numero
+  di emergenza impostato nella gestione (911 da solo su un computer impostato su Stati Uniti o
+  Canada), le miglia, gli indirizzi scritti all'americana
 - [x] Accessibilità controllata dalla macchina: ogni pagina nelle due lingue supera il controllo
   WCAG 2.2 AA di axe-core e resta leggibile con lo zoom al 200% senza scorrere di lato. Pulsanti
   grandi, nero su bianco, rosso solo per gli avvisi, blu inchiostro solo per i titoli delle sezioni

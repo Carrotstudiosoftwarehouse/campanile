@@ -80,6 +80,19 @@ def town(far_street: bool = True) -> dict:
     return {key: mf.vector_tile(layers) for key, layers in tiles.items()}
 
 
+def american_streets() -> dict:
+    """Streets named in full, as the map has them, where people write addresses short."""
+    tiles: dict = {}
+    for n, name in enumerate(
+        ("Vashon Highway Southwest", "Southwest 204th Street", "Saint John Road", "Beach Drive")
+    ):
+        key, p = point(7.683 + n * 0.001, 45.071)
+        tiles.setdefault(key, {}).setdefault("roads", []).append(
+            ({"name": name, "kind": "minor_road"}, [p, (p[0] + 50, p[1] + 50)])
+        )
+    return {key: mf.vector_tile(layers) for key, layers in tiles.items()}
+
+
 def vector_map(tiles: dict) -> bytes:
     return mf.pmtiles({key: mf.vector_tile(layers) for key, layers in tiles.items()})
 
@@ -116,6 +129,19 @@ class TestSearch(PlacesTestCase):
         super().setUp()
         self.write("town.pmtiles", mf.pmtiles(town()))
         self.found = self.places()
+
+    def test_an_american_address_written_short_finds_the_street(self):
+        self.write("us.pmtiles", mf.pmtiles(american_streets()))
+        found = self.places()
+        for typed, street in (
+            ("Vashon Hwy SW", "Vashon Highway Southwest"),
+            ("vashon highway", "Vashon Highway Southwest"),
+            ("SW 204th St", "Southwest 204th Street"),
+            ("St John Rd", "Saint John Road"),
+            ("Beach Dr", "Beach Drive"),
+        ):
+            names = [r["name"] for r in self.search(typed, found=found)]
+            self.assertIn(street, names, typed)
 
     def test_a_street_cut_by_a_tile_border_is_one_street(self):
         results = self.search("via roma", found=self.found)

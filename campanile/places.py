@@ -101,6 +101,18 @@ CATEGORIES = [
 ]
 
 
+# Street words as the US Postal Service shortens them, so "Vashon Hwy SW" finds "Vashon
+# Highway Southwest". Only where the short form doesn't already begin the word ("st", "ave").
+SHORT_FORMS = {
+    "highway": "hwy", "road": "rd", "drive": "dr", "boulevard": "blvd", "lane": "ln",
+    "court": "ct", "parkway": "pkwy", "trail": "trl", "expressway": "expy", "freeway": "fwy",
+    "mount": "mt", "mountain": "mtn", "fort": "ft", "saint": "st", "point": "pt",
+    "center": "ctr", "heights": "hts", "junction": "jct", "harbor": "hbr", "creek": "crk",
+    "crossing": "xing", "route": "rte",
+    "northeast": "ne", "northwest": "nw", "southeast": "se", "southwest": "sw",
+}  # fmt: skip
+
+
 class MapError(Exception):
     """The file is not a map this module can read."""
 
@@ -677,7 +689,9 @@ class MapIndex:
         for i, r in enumerate(rows):
             variants = tuple(dict.fromkeys(normalize(n) for n in (r[3], *r[4].values())))
             self.variants.append(variants)
-            own = list(dict.fromkeys(w for v in variants for w in v.split()))[:MAX_ROW_WORDS]
+            own = list(dict.fromkeys(w for v in variants for w in v.split()))
+            own = list(dict.fromkeys(own + [SHORT_FORMS[w] for w in own if w in SHORT_FORMS]))
+            own = own[:MAX_ROW_WORDS]
             for word in own:
                 listed = words.get(word)
                 if listed is None:
@@ -737,7 +751,8 @@ class MapIndex:
         return found
 
     def _starts(self, i: int, prefix: str) -> bool:
-        return any(w.startswith(prefix) for v in self.variants[i] for w in v.split())
+        words = (w for v in self.variants[i] for w in v.split())
+        return any(w.startswith(prefix) or SHORT_FORMS.get(w, "").startswith(prefix) for w in words)
 
     def matching(self, words: list[str]) -> set[int]:
         """Entries where each word starts one of the words of a name, in any order. A word on
