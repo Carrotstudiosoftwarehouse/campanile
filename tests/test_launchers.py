@@ -124,6 +124,51 @@ class TestRaspberryInstall(unittest.TestCase):
         for script in ran:
             self.assertIn(f'"$NEW/raspberry/{script}"', made_executable)
 
+    def run_with_stubs(self, script: str, stubs: dict, args=()) -> subprocess.CompletedProcess:
+        """A piece of our scripts, with the system commands it calls written as small fakes."""
+        with tempfile.TemporaryDirectory() as tmp:
+            for name, body in stubs.items():
+                stub = Path(tmp, name)
+                stub.write_text(f'#!/bin/sh\necho "{name} $*" >> "{tmp}/calls"\n{body}\n')
+                stub.chmod(0o755)
+            env = {**os.environ, "PATH": tmp + os.pathsep + os.environ["PATH"], "TMP": tmp}
+            head = 'set -euo pipefail\nfail() { echo "ERROR: $*" >&2; exit 1; }\nusage() { :; }\n'
+            done = subprocess.run(  # noqa: S603 (pieces of our own scripts, commands faked)
+                ["bash", "-c", head + script, "test", *args],  # noqa: S607
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            calls = Path(tmp, "calls")
+            done.calls = calls.read_text().splitlines() if calls.exists() else []
+            return done
+
+    @unittest.skipIf(os.name == "nt" or not shutil.which("bash"), "bash")
+    def test_the_wifi_country_is_the_one_given_or_the_one_already_set(self):
+        default = re.search(r"^COUNTRY=.*$", INSTALL, re.M)[0]
+        parse = re.search(r"while \[ \$# -gt 0 \]; do\n.*?\ndone\n", INSTALL, re.S)[0]
+        check = re.search(r"  # Wi-Fi country:.*?\n  fi\n", INSTALL, re.S)
+        script = f"{default}\nHOTSPOT=1\n{parse}{check[0] if check else ''}"
+        script += 'echo "country to set: [$COUNTRY]"\n'
+
+        def raspi(answer):  # what get_wifi_country says: a country, or nothing set
+            return {"raspi-config": f"echo {answer}" if answer else "exit 1"}
+
+        given = self.run_with_stubs(script, raspi("SE"), ["--country", "gb"])
+        self.assertIn("country to set: [GB]", given.stdout)
+        kept = self.run_with_stubs(script, raspi("SE; echo SE"))  # one per cmdline.txt line
+        self.assertEqual(kept.returncode, 0)
+        self.assertIn("Wi-Fi country: SE, as already set", kept.stdout)
+        self.assertIn("country to set: []", kept.stdout)  # nothing to change
+        unset = self.run_with_stubs(script, raspi(""))
+        self.assertNotEqual(unset.returncode, 0)
+        self.assertIn("--country", unset.stderr)
+        # And the radio is set only to a country given here, never to a default.
+        hotspot = re.search(r'step "Wi-Fi hotspot.*?\nfi\n', INSTALL, re.S)[0]
+        setting = hotspot.index("raspi-config nonint do_wifi_country")
+        self.assertIn('if [ -n "$COUNTRY" ]', hotspot[:setting])
+
     def test_the_service_ignores_packages_in_its_home(self):
         unit = (REPO / "raspberry" / "campanile.service").read_text(encoding="utf-8")
         self.assertIn("ExecStart=/usr/bin/python3 -s /opt/campanile/campanile/server.py", unit)

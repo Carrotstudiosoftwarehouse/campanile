@@ -11,7 +11,7 @@ Usage, from the project folder:
   sudo raspberry/install.sh [--ssid NAME] [--country IT] [--no-hotspot]
 
   --ssid NAME     Wi-Fi network name (default: Campanile)
-  --country CC    two-letter country code for the Wi-Fi rules (default: IT)
+  --country CC    your country's two letters, for the Wi-Fi rules (default: the one set)
   --no-hotspot    stay on the existing network, no hotspot and no redirect
 
 The map libraries are fetched the first time. Maps and Wikipedia in data/ are moved in too.
@@ -19,7 +19,7 @@ USAGE
 }
 
 SSID="Campanile"
-COUNTRY="IT"
+COUNTRY=""  # the Wi-Fi country already set, unless --country says otherwise
 HOTSPOT=1
 ADDRESS="10.42.0.1"
 CONNECTION="campanile-hotspot"
@@ -36,7 +36,7 @@ step() { echo; echo "== $*"; }
 while [ $# -gt 0 ]; do
   case "$1" in
     --ssid)       SSID="${2:?missing network name}"; shift 2 ;;
-    --country)    COUNTRY="${2:?missing country code}"; shift 2 ;;
+    --country)    COUNTRY="$(tr "[:lower:]" "[:upper:]" <<< "${2:?missing country code}")"; shift 2 ;;
     --no-hotspot) HOTSPOT=0; shift ;;
     -h|--help)    usage; exit 0 ;;
     *)            usage; fail "unknown option: $1" ;;
@@ -45,7 +45,10 @@ done
 
 [ "$(id -u)" -eq 0 ] || fail "needs root: sudo $0 $*"
 [[ "$SSID" =~ ^[A-Za-z0-9\ _.-]{1,32}$ ]] || fail "invalid network name (1-32 chars: letters, digits, space, . _ -)"
-[[ "$COUNTRY" =~ ^[A-Z]{2}$ ]] || fail "invalid country code (two capital letters, e.g. IT)"
+[ -z "$COUNTRY" ] || [[ "$COUNTRY" =~ ^[A-Z]{2}$ ]] || fail "invalid country code (two letters, e.g. GB, US, IT)"
+if [ -n "$COUNTRY" ] && [ -f /usr/share/zoneinfo/iso3166.tab ]; then
+  grep -q "^${COUNTRY}[[:space:]]" /usr/share/zoneinfo/iso3166.tab || fail "unknown country code: $COUNTRY"
+fi
 [ -f "$SOURCE/campanile/server.py" ] || fail "run this from the Campanile project folder"
 
 if [ "$HOTSPOT" -eq 1 ]; then
@@ -58,6 +61,14 @@ if [ "$HOTSPOT" -eq 1 ]; then
     if grep -q "dev $INTERFACE" <<< "$(ip route get "$CLIENT" 2>/dev/null)"; then
       fail "you're connected over SSH through Wi-Fi: the hotspot would cut you off. Use a cable or the console, then run again."
     fi
+  fi
+  # Wi-Fi country: the one given, else the one already set. Never a guess: the radio's
+  # rules are the law where it runs. Only Raspberry Pi OS keeps one (raspi-config).
+  if [ -z "$COUNTRY" ] && command -v raspi-config >/dev/null; then
+    SET_COUNTRY="$(raspi-config nonint get_wifi_country 2>/dev/null || true)"
+    SET_COUNTRY="${SET_COUNTRY%%$'\n'*}"  # its first line: one per line of cmdline.txt
+    [ -n "$SET_COUNTRY" ] || fail "the Wi-Fi country isn't set yet. Run this again adding --country and your country's two letters (GB, US, DE, IT...)."
+    echo "Wi-Fi country: $SET_COUNTRY, as already set (--country changes it)."
   fi
 fi
 
@@ -125,8 +136,11 @@ shopt -u nullglob
 step "Configuration in $CONFIG"
 install -d -o root -g campanile -m 750 "$CONFIG"
 # The next update (campanile/update.py) runs this again with the same choices.
-{ printf -- '--ssid\n%s\n--country\n%s\n' "$SSID" "$COUNTRY"; [ "$HOTSPOT" -eq 1 ] || echo --no-hotspot; } \
-  > "$CONFIG/install-options"
+{
+  printf -- '--ssid\n%s\n' "$SSID"
+  if [ -n "$COUNTRY" ]; then printf -- '--country\n%s\n' "$COUNTRY"; fi
+  if [ "$HOTSPOT" -eq 0 ]; then echo --no-hotspot; fi
+} > "$CONFIG/install-options"
 chmod 600 "$CONFIG/install-options"
 HOSTNAME_LOCAL="$(hostname).local"
 # Without a hotspot we're guests on someone else's network: no redirects.
@@ -204,7 +218,7 @@ fi
 
 if [ "$HOTSPOT" -eq 1 ]; then
   step "Wi-Fi hotspot '$SSID' on $ADDRESS"
-  if command -v raspi-config >/dev/null; then
+  if [ -n "$COUNTRY" ] && command -v raspi-config >/dev/null; then
     raspi-config nonint do_wifi_country "$COUNTRY"
   fi
   rfkill unblock wifi 2>/dev/null || true
@@ -225,7 +239,7 @@ DNS
     802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
     ipv4.method shared ipv4.addresses "$ADDRESS/24" ipv6.method disabled \
     802-11-wireless.ap-isolation yes
-  nmcli connection up "$CONNECTION" || fail "the Wi-Fi hotspot didn't start (the reason is just above). Campanile is installed and running: check that Wi-Fi isn't blocked (rfkill list), then run this again."
+  nmcli connection up "$CONNECTION" || fail "the Wi-Fi hotspot didn't start (the reason is just above). Campanile is installed and running: check that Wi-Fi isn't blocked (rfkill list), then run this again. Admin password: sudo cat $CONFIG/password"
 fi
 
 step "Done"
