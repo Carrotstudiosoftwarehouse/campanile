@@ -102,24 +102,6 @@ simile? Scrivicelo.
   internet non c'è, via Wi-Fi o, se manca, via Bluetooth. Cifrati, e con la verifica di tutte e due
   le parti.
 
-### Progetti simili
-
-Non conosciamo ancora i loro autori: li colleghiamo perché hanno la stessa idea.
-
-- **[Prometheus Station](https://github.com/Guillain-RDCDE/Prometheus-Station)**: una scatola a
-  batteria che serve tutta Wikipedia senza internet e senza rete.
-- **[ConnectBox](https://github.com/ConnectBox/connectbox-pi)**: un Raspberry Pi che condivide
-  contenuti offline. Il loro [portale offline](https://github.com/ConnectBox/simple-offline-captive-portal)
-  ci ha insegnato come si comportano i telefoni Android su una Wi-Fi senza internet.
-- **[PirateBox](https://github.com/teklynk/piratebox)**: un Raspberry Pi che diventa un punto Wi-Fi
-  offline e anonimo per scambiarsi file, tornato a nuova vita.
-- **[MeshBoard](https://github.com/VeggieVampire/MeshBoard)**: una bacheca che viaggia sulle radio
-  Meshtastic.
-- **[Algeria Fire Map](https://github.com/MoussaabBadla/algeria-fire-map)**: gli incendi in Algeria
-  visti dal satellite, in tempo reale.
-- **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: una mappa offline dei punti di
-  aiuto durante le emergenze in Cile.
-
 ## Come è fatto
 
 Fatto da CarrotStudio, con l'aiuto di un assistente IA per il codice. Ogni modifica è provata, e

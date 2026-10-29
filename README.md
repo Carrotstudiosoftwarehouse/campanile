@@ -102,23 +102,6 @@ something like this? Tell us.
   the internet is down, over Wi-Fi or, without it, Bluetooth. Encrypted, and both sides are
   checked.
 
-### Similar projects
-
-We don't know their authors yet: we link them because they share the same idea.
-
-- **[Prometheus Station](https://github.com/Guillain-RDCDE/Prometheus-Station)**: a battery box that
-  serves all of Wikipedia with no internet and no network.
-- **[ConnectBox](https://github.com/ConnectBox/connectbox-pi)**: a Raspberry Pi that shares media
-  offline. Their [offline captive portal](https://github.com/ConnectBox/simple-offline-captive-portal)
-  taught us how Android phones behave on a Wi-Fi with no internet.
-- **[PirateBox](https://github.com/teklynk/piratebox)**: a Raspberry Pi as an offline, anonymous
-  file-sharing hotspot, brought back to life.
-- **[MeshBoard](https://github.com/VeggieVampire/MeshBoard)**: a bulletin board over Meshtastic radios.
-- **[Algeria Fire Map](https://github.com/MoussaabBadla/algeria-fire-map)**: live satellite wildfire
-  monitoring for Algeria.
-- **[Donde Ayudo CL](https://github.com/P1ngu-Dev/Donde-Ayudo-CL)**: an offline-first map of aid
-  points during emergencies in Chile.
-
 ## How it is built
 
 Made by CarrotStudio, with the help of an AI coding assistant. Every change is tested, and what
