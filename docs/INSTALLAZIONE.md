@@ -112,8 +112,11 @@ Python, la finestra indica il suo installatore sulla chiavetta.
   contiene soltanto i file del Campanile. Qualunque altra cosa ferma la copia, senza toccare
   niente, e i collegamenti non si seguono. Provato con tutti i modi che conosciamo per nascondere
   lì un programma.
-- Sul Raspberry, dal terminale:
-  `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`
+- Sul Raspberry, dal terminale, con la cartella della chiavetta al posto di `/media/usb`:
+  `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`.
+  Quella chiavetta porta programma, mappe e Wikipedia, non gli installatori di Python né il
+  programma di Wikipedia per i portatili: quelli vengono da *Prepara per tutti i computer* su un
+  portatile.
 
 **Aggiornare da una chiavetta.** Nella pagina di preparazione infila una chiavetta con un
 Campanile più nuovo e premi **Aggiorna da questa chiavetta**. Viene copiato accanto a questo
@@ -136,7 +139,7 @@ condivisione si ferma dopo due ore.
 > **ore di autonomia ≈ capacità della batteria in Wh × 0,8 ÷ consumo in watt**
 > (mAh di una power bank × 3,7 ÷ 1000 = Wh)
 
-Una power bank da 20.000 mAh vale circa 74 Wh. A 4 W, un Raspberry va avanti
+Una power bank da 20.000 mAh vale circa 74 Wh. Se consuma 4 W, un Raspberry va avanti
 74 × 0,8 ÷ 4 ≈ **15 ore**. Il consumo dipende dal modello e da quanti si collegano, quindi
 **misuralo** con un misuratore USB da pochi euro. Un pannello solare pieghevole da 20-30 W con
 uscita USB può ricaricare la power bank di giorno. Sul portatile valgono le stesse regole, con lo
@@ -151,36 +154,43 @@ veri), e la apre anche il codice QR del cartello. Può andare avanti con una pow
 non l'abbiamo ancora misurato.
 
 Serve **Raspberry Pi OS a 64 bit**, Lite o con desktop (Bookworm o più recente: a 32 bit la mappa
-non si può scaricare dal Pi), con il Wi-Fi integrato, collegato a internet **via cavo**: l'ultimo
+non si può scaricare dal Pi), una scheda da 16 GB (le righe qui sotto occupano circa 1 GB), con
+il Wi-Fi integrato, collegato a internet **via cavo**: l'ultimo
 passo trasforma il Wi-Fi nell'hotspot, e una sessione SSH via Wi-Fi lì cadrebbe. Lo Zero 2 W non ha
 la porta di rete: usa tastiera e schermo, oppure un adattatore di rete USB.
 
-Prima trova [i quattro numeri della tua zona](#la-tua-zona-in-dettaglio) e scrivili nella riga
-della mappa, al posto di `OVEST,SUD,EST,NORD`. Poi incolla:
+Prima trova [i quattro numeri della tua zona](#la-tua-zona-in-dettaglio) e scrivili al posto di
+`OVEST,SUD,EST,NORD`; se non sei in Italia, cambia anche `IT` con le due lettere del tuo paese.
+Poi incolla tutto il blocco, graffe comprese: fanno leggere alla shell ogni riga prima di
+eseguirne una, così non se ne perde nessuna.
 
 ```bash
+{
 sudo apt update && sudo apt install -y git
 [ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
 cd $HOME/campanile && git pull
 scripts/download-map.sh custom area OVEST,SUD,EST,NORD   # la tua zona
 scripts/download-map.sh world             # facoltativo, ~190 MB
 scripts/download-wikipedia.sh medicine it   # facoltativo, in italiano, ~260 MB
-sudo raspberry/install.sh                 # opzioni: --ssid NOME  --country IT  --no-hotspot
+sudo raspberry/install.sh --country IT    # altre opzioni: --ssid NOME  --no-hotspot
+}
 ```
 
-Se la lasci com'è, la riga della mappa si ferma con "Invalid box" e le altre vanno avanti.
+Se lasci `OVEST,SUD,EST,NORD`, la riga della mappa si ferma con "Invalid box" e il Campanile
+resta senza ricerca delle vie e senza navigatore.
 
 Incollate di nuovo, da qualsiasi cartella, le stesse righe (opzioni comprese) riprovano dopo un
 problema, aggiornano Campanile, o portano dentro una mappa o una Wikipedia che ci aggiungi. Mappe e
 Wikipedia già presenti non si riscaricano, quelle nuove vanno dove il Campanile le legge, e dati e
-password restano.
+password restano. Per cambiare zona: `sudo rm /var/lib/campanile/maps/area.pmtiles`, poi incolla
+con i numeri nuovi.
 
 L'installatore scarica da solo le librerie delle mappe la prima volta, e aspetta se il Raspberry,
 appena acceso, si sta ancora aggiornando.
 
 `--country` sono le due lettere del tuo paese, per le regole del Wi-Fi (per esempio `IT`, `CH`).
 Senza, l'installatore tiene il paese già impostato (Raspberry Pi Imager lo imposta insieme al
-Wi-Fi), e se non ce n'è nessuno lo chiede.
+Wi-Fi); se non ce n'è nessuno, si ferma prima di cambiare qualunque cosa e lo dice.
 
 L'installazione:
 
@@ -203,13 +213,12 @@ acceso), il firewall `/etc/campanile/firewall.nft` con il servizio `campanile-fi
 anche il paese del Wi-Fi che gli dai e sostituisce il sito predefinito di nginx (rimesso com'era
 alla disinstallazione).
 
-Da un computer sulla stessa rete via cavo, apri l'indirizzo `.local` che l'installatore stampa,
-come `http://raspberrypi.local/`. L'indirizzo IP del Raspberry porta alla pagina dell'hotspot, che
-raggiunge solo chi è sulla sua Wi-Fi.
+Da un computer sulla stessa rete via cavo, apri l'indirizzo del Raspberry, o il nome `.local` che
+l'installatore stampa, come `http://raspberrypi.local/`.
 
 **Per togliere il Campanile:** `cd $HOME/campanile && sudo raspberry/uninstall.sh` (conserva dati
 e password), oppure la stessa riga con `--purge` in fondo (cancella anche quelli). Restano i
-pacchetti e il paese del Wi-Fi; nginx si ferma se è arrivato con il Campanile. Resta anche la
+pacchetti e il paese del Wi-Fi; nginx si ferma se era spento prima del Campanile. Resta anche la
 cartella clonata: `rm -rf $HOME/campanile` la toglie.
 
 Il Wi-Fi integrato regge un numero limitato di telefoni: quanti, non l'abbiamo ancora misurato.

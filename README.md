@@ -64,7 +64,8 @@ Pages in English and Italian, picked from the phone's language. Maps for any are
 - **Not a replacement for emergency services.** In danger, call your emergency number (112 in
   Europe, 911 in North America) if the phone network works.
 - **Not private.** The network is open: everything posted is public to whoever is connected.
-- **Not for a whole city.** It covers a block, a square or a gym.
+- **Not for a whole city.** A few tens of meters around it; a square or a gym needs an external
+  access point.
 - **Not yet safe from a fake "Campanile"** with the same Wi-Fi name: HTTPS for each Campanile is
   the first open problem on the [roadmap](ROADMAP.md).
 - **A civil project**, for neighborhoods, volunteers and civil protection: no tool for secret or

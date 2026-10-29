@@ -64,7 +64,8 @@ CAP, PFIF) · [navigatore ed enciclopedia](docs/FUNZIONI.md) · [sicurezza](docs
 
 - **Non sostituisce i soccorsi.** In pericolo chiama il 112, se la rete telefonica funziona.
 - **Non è riservato.** La rete è aperta: tutto ciò che si pubblica lo legge chi è collegato.
-- **Non è per una città intera.** Copre un isolato, una piazza o una palestra.
+- **Non è per una città intera.** Poche decine di metri attorno; per una piazza o una palestra
+  serve un access point esterno.
 - **Non è ancora al sicuro da un falso "Campanile"** con lo stesso nome della Wi-Fi: HTTPS per
   ogni Campanile è il primo problema aperto della [roadmap](ROADMAP.md#italiano).
 - **È un progetto civile**, per quartieri, volontari e protezione civile: non è uno strumento per

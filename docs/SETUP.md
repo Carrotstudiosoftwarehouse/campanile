@@ -109,8 +109,10 @@ missing, the window shows its installer on the stick.
 - **No stowaways.** A Campanile folder already on the stick is used only if it holds nothing but
   Campanile's files. Anything else stops the copy, untouched, and links are never followed.
   Tested against every way we know to hide a program there.
-- On a Raspberry, from the terminal:
-  `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`
+- On a Raspberry, from the terminal, with the stick's folder in place of `/media/usb`:
+  `sudo python3 /opt/campanile/campanile/copying.py /media/usb --data /var/lib/campanile --keys /etc/campanile/trusted-keys.json`.
+  That stick has the program, maps and Wikipedia, not Python's installers nor the Wikipedia
+  server for laptops: those come from a laptop's *Prepare for every computer*.
 
 **Updating from a stick.** On the setup page, plug in a stick with a newer Campanile and press
 **Update from this stick**. It is copied next to this Campanile and checked there: only a newer
@@ -131,7 +133,7 @@ stops after two hours.
 > **hours of runtime ≈ battery capacity in Wh × 0.8 ÷ consumption in watts**
 > (power bank mAh × 3.7 ÷ 1000 = Wh)
 
-A 20,000 mAh power bank is about 74 Wh. At 4 W, a Raspberry runs 74 × 0.8 ÷ 4 ≈ **15 hours**.
+A 20,000 mAh power bank is about 74 Wh. If it draws 4 W, a Raspberry runs 74 × 0.8 ÷ 4 ≈ **15 hours**.
 Consumption depends on the model and on how many connect, so **measure it** with a cheap USB
 power meter. A foldable 20-30 W USB solar panel can recharge the power bank by day. Same rules
 for a laptop, with the screen dimmed.
@@ -144,35 +146,41 @@ phones should open the page by themselves (not yet tried with real phones), and 
 the sign opens it too. It can run on a power bank, for how long we haven't measured yet.
 
 You need **Raspberry Pi OS 64-bit**, Lite or with desktop (Bookworm or newer: on 32-bit the map
-can't be downloaded on the Pi), with built-in Wi-Fi, online **by cable**: the last step turns the
+can't be downloaded on the Pi), a 16 GB card (the lines below take about 1.5 GB), with built-in
+Wi-Fi, online **by cable**: the last step turns the
 Wi-Fi into the hotspot, and an SSH session over Wi-Fi would drop there. A Zero 2 W has no network
 port: use a keyboard and screen, or a USB network adapter.
 
-First find [your area's four numbers](#your-area-in-detail) and write them in the map line, in
-place of `WEST,SOUTH,EAST,NORTH`. Then paste:
+First find [your area's four numbers](#your-area-in-detail) and write them in place of
+`WEST,SOUTH,EAST,NORTH`, and your country's two letters in place of `XX`. Then paste the whole
+block, braces included: they make the shell read every line before running any, so none is lost.
 
 ```bash
+{
 sudo apt update && sudo apt install -y git
 [ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
 cd $HOME/campanile && git pull
 scripts/download-map.sh custom area WEST,SOUTH,EAST,NORTH   # your area
 scripts/download-map.sh world             # optional, ~190 MB
 scripts/download-wikipedia.sh medicine-light en   # optional, in English, ~1 GB
-sudo raspberry/install.sh                 # options: --ssid NAME  --country XX  --no-hotspot
+sudo raspberry/install.sh --country XX    # more options: --ssid NAME  --no-hotspot
+}
 ```
 
-Left as it is, the map line stops with "Invalid box" and the others carry on.
+Left as they are, `WEST,SOUTH,EAST,NORTH` stops the map line with "Invalid box" (Campanile then
+has no street search and no navigator), and `XX` stops the installer before it changes anything.
 
 Pasted again, from any folder, the same lines (options included) retry after a problem, update
 Campanile, or bring in a map or Wikipedia you add to them. Maps and Wikipedia already there aren't
-downloaded again, new ones go where the Campanile reads them, and data and password stay.
+downloaded again, new ones go where the Campanile reads them, and data and password stay. To
+change your area: `sudo rm /var/lib/campanile/maps/area.pmtiles`, then paste with the new numbers.
 
 The installer fetches the map libraries itself the first time, and waits if the Raspberry, just
 switched on, is still updating itself.
 
-`--country` is your country's two letters, for the Wi-Fi rules (for example `DE`, `FR`).
-Without it the installer keeps the country already set (Raspberry Pi Imager sets one along with
-the Wi-Fi), and asks for it if there is none.
+`--country` is your country's two letters, for the Wi-Fi rules (`GB` for the United Kingdom,
+`UK` works too). Without it the installer keeps the country already set (Raspberry Pi Imager
+sets one along with the Wi-Fi); with none set, it stops before changing anything and says so.
 
 The installer:
 
@@ -193,13 +201,12 @@ The installer:
 on), the firewall `/etc/campanile/firewall.nft` with its `campanile-firewall` service. It also
 sets the Wi-Fi country you give, and replaces nginx's default site (restored on uninstall).
 
-From a computer on the same cable network, open the `.local` address the installer prints, like
-`http://raspberrypi.local/`. The Raspberry's IP address leads to the hotspot's page, which only
-phones on its Wi-Fi can reach.
+From a computer on the same cable network, open the Raspberry's address, or the `.local` name the
+installer prints, like `http://raspberrypi.local/`.
 
 **To remove Campanile:** `cd $HOME/campanile && sudo raspberry/uninstall.sh` (keeps data and
 password), or the same with `--purge` at the end (deletes them too). The packages and the Wi-Fi
-country stay; nginx is stopped if it came with Campanile. The folder you cloned stays too:
+country stay; nginx is stopped if it was off before Campanile. The folder you cloned stays too:
 `rm -rf $HOME/campanile` removes it.
 
 The built-in Wi-Fi serves a limited number of phones: how many, we haven't measured yet. For a

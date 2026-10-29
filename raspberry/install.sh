@@ -46,6 +46,7 @@ done
 
 [ "$(id -u)" -eq 0 ] || fail "needs root: sudo $0 $*"
 [[ "$SSID" =~ ^[A-Za-z0-9\ _.-]{1,32}$ ]] || fail "invalid network name (1-32 chars: letters, digits, space, . _ -)"
+if [ "$COUNTRY" = UK ]; then COUNTRY=GB; fi  # what people write; the standard code is GB
 [ -z "$COUNTRY" ] || [[ "$COUNTRY" =~ ^[A-Z]{2}$ ]] || fail "invalid country code (two letters, e.g. GB, US, IT)"
 if [ -n "$COUNTRY" ] && [ -f /usr/share/zoneinfo/iso3166.tab ]; then
   grep -q "^${COUNTRY}[[:space:]]" /usr/share/zoneinfo/iso3166.tab || fail "unknown country code: $COUNTRY"
