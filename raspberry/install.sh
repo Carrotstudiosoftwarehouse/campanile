@@ -21,6 +21,7 @@ USAGE
 SSID="Campanile"
 COUNTRY=""  # the Wi-Fi country already set, unless --country says otherwise
 HOTSPOT=1
+NGINX_NEW=0
 ADDRESS="10.42.0.1"
 CONNECTION="campanile-hotspot"
 INTERFACE="wlan0"
@@ -85,8 +86,13 @@ step "Packages"
 export DEBIAN_FRONTEND=noninteractive
 # A Pi just switched on often updates itself for a few minutes: wait for apt, don't fail.
 WAIT=(-o DPkg::Lock::Timeout=600)
+[ "$(dpkg-query -W -f='${Status}' nginx 2>/dev/null || true)" = "install ok installed" ] || NGINX_NEW=1
 apt-get "${WAIT[@]}" update -q
 apt-get "${WAIT[@]}" install -y -q python3 python3-cryptography kiwix-tools nginx nftables
+# nginx came with Campanile: uninstalling stops it again. Kept across reinstalls.
+if [ "$NGINX_NEW" -eq 1 ]; then
+  mkdir -p "$CONFIG" && touch "$CONFIG/nginx-came-with-campanile"
+fi
 
 step "Service user 'campanile'"
 if ! id campanile >/dev/null 2>&1; then

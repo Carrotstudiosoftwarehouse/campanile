@@ -169,6 +169,25 @@ class TestRaspberryInstall(unittest.TestCase):
         setting = hotspot.index("raspi-config nonint do_wifi_country")
         self.assertIn('if [ -n "$COUNTRY" ]', hotspot[:setting])
 
+    @unittest.skipIf(os.name == "nt" or not shutil.which("bash"), "bash")
+    def test_nginx_brought_by_campanile_is_stopped_by_the_uninstaller(self):
+        uninstall = (REPO / "raspberry" / "uninstall.sh").read_text(encoding="utf-8")
+        step = re.search(r'step "Web server \(nginx\)"\n(.*?)\nstep "Code"', uninstall, re.S)[1]
+        # From apt-get install to the note that nginx came with Campanile, if there is one.
+        packages = r"\nWAIT=.*? install [^\n]*\n(?:#[^\n]*\nif .*?\nfi\n)?"
+        install = re.search(packages, INSTALL, re.S)[0]
+        fakes = {"systemctl": "", "nginx": "", "apt-get": ""}
+        for before in ("", "install ok installed"):
+            with self.subTest(nginx_before=before or "none"):
+                uninstalling = step.replace("/etc/nginx/", "$TMP/conf/")
+                uninstalling = uninstalling.replace("/etc/campanile", "$TMP/etc")
+                script = 'CONFIG="$TMP/etc"; NGINX_NEW=0\n' + install + uninstalling
+                done = self.run_with_stubs(script, {**fakes, "dpkg-query": f"printf '{before}'"})
+                self.assertEqual(done.returncode, 0, done.stderr)
+                stopped = "systemctl disable --now nginx.service" in done.calls
+                self.assertEqual(stopped, not before)  # stopped only if it came with Campanile
+                self.assertEqual("systemctl restart nginx.service" in done.calls, bool(before))
+
     def test_the_service_ignores_packages_in_its_home(self):
         unit = (REPO / "raspberry" / "campanile.service").read_text(encoding="utf-8")
         self.assertIn("ExecStart=/usr/bin/python3 -s /opt/campanile/campanile/server.py", unit)
