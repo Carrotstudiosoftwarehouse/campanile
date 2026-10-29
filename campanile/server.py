@@ -47,6 +47,8 @@ VERSION = "0.1.0"
 HERE = Path(__file__).resolve().parent
 
 MAX_BODY = 8 * 1024
+# One CAP alert escaped in JSON (IT-alert's pass 100 kB). Admin page only; nginx-site.sh too.
+CAP_BODY = 2 * cap.MAX_BYTES + 1024
 MAX_CONNECTIONS = 256
 MAX_CONNECTIONS_PER_IP = 16
 CONNECTION_TIMEOUT = 30
@@ -82,6 +84,10 @@ SEARCHING = 1  # map searches at the same time: the others wait their turn, brie
 SEARCH_WAIT = 0.25  # a waiting search holds a connection: past this, "try again in a moment"
 _DEVICE_TAG = re.compile(r"[0-9a-f]{12}")
 CHUNK_SIZE = 64 * 1024
+# A map viewer asks one tile at a time (322 kB at most in ours). Past MAP_FREE it's a whole map
+# being downloaded: paced, so one phone can't take the Wi-Fi. nginx-site.sh too.
+MAP_FREE = 8 * 2**20
+MAP_RATE = 128 * 2**10
 
 LOCAL_ADDRESSES = {"127.0.0.1", "::1", "::ffff:127.0.0.1"}
 # A web page can make the browser call 127.0.0.1 under its own name (DNS rebinding):
@@ -400,12 +406,13 @@ class Handler(BaseHTTPRequestHandler):
             name = path.removeprefix("/maps/")
             if not _MAP_NAME.fullmatch(name):
                 raise RequestError(404, "map_not_found")
-            return self._file(safe_path(self.cfg.maps, name))
+            return self._file(safe_path(self.cfg.maps, name), rate=MAP_RATE, free=MAP_FREE)
         if path.endswith("/"):
             path += "index.html"
         return self._file(safe_path(self.cfg.web, path))
 
-    def _file(self, file: Path | None, rate: int | None = None):
+    def _file(self, file: Path | None, rate: int | None = None, free: int = 0):
+        """The file, or the part asked for. Past `free` bytes, at most `rate` a second."""
         if file is None or not file.is_file():
             raise RequestError(404, "not_found")
         stat = file.stat()
@@ -442,7 +449,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.wfile.write(chunk)
                     length -= len(chunk)
                     sent += len(chunk)
-                    if rate and (ahead := sent / rate - (time.monotonic() - began)) > 0:
+                    if rate and (ahead := (sent - free) / rate - (time.monotonic() - began)) > 0:
                         time.sleep(ahead)  # bytes per second, at most
         finally:
             self.server.done_responding(self)
@@ -621,11 +628,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def _post(self):
         path = urlsplit(self.path).path
-        # A CAP alert is bigger than anything else: room for it, escaped in JSON, but only where
-        # the admin page works at all (the body is read before the password is checked).
+        # Room for a CAP alert only where the admin page works at all (the body is read before
+        # the password is checked).
         admin_here = self.cfg.admin_from_network or self._ip in LOCAL_ADDRESSES
         big = path == "/api/admin/cap" and admin_here
-        data = self._read_json(2 * cap.MAX_BYTES + 1024 if big else MAX_BODY)
+        data = self._read_json(CAP_BODY if big else MAX_BODY)
         db = self.cfg.store
 
         if path == "/api/posts":

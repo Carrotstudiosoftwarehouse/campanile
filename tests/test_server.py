@@ -569,6 +569,24 @@ class TestFiles(CampanileTestCase):
             self.assertEqual(r.getheader("Content-Range"), f"bytes {a}-{b}/{n}", value)
             self.assertEqual(int(r.getheader("Content-Length")), b - a + 1, value)
 
+    def test_a_whole_map_is_paced_a_tile_is_not(self):
+        # The same rule as nginx's on the Raspberry, scaled down: 4 kB free, then 4 kB a second.
+        with (
+            mock.patch.object(campanile, "MAP_FREE", 4096),
+            mock.patch.object(campanile, "MAP_RATE", 4096),
+            mock.patch.object(campanile, "CHUNK_SIZE", 1024),
+        ):
+            began = time.monotonic()
+            r, tile = self.request("GET", "/maps/test.pmtiles", headers={"Range": "bytes=0-4095"})
+            tile_time = time.monotonic() - began
+            began = time.monotonic()
+            r2, whole = self.request("GET", "/maps/test.pmtiles")
+            whole_time = time.monotonic() - began
+        self.assertEqual((r.status, tile), (206, self.map_bytes[:4096]))
+        self.assertEqual((r2.status, whole), (200, self.map_bytes))
+        self.assertLess(tile_time, 0.5)
+        self.assertGreater(whole_time, 1.0)  # 6 kB past the free 4: 1.25 s at the least
+
     def test_unsatisfiable_or_ignored_ranges(self):
         n = len(self.map_bytes)
         r, c = self.request("GET", "/maps/test.pmtiles", headers={"Range": f"bytes={n}-"})
@@ -1393,6 +1411,22 @@ class TestSignedNotices(CampanileTestCase):
         self.assertEqual(self.publish(self.signed(issued=old, hours=24))[0], 400)
         self.assertEqual(self.publish(self.signed(hours=24 * 8))[0], 400)
 
+    def test_signed_far_ahead_of_the_campanile_clock_is_refused(self):
+        # A signer's clock a year ahead: a one-day notice would stay up a year.
+        status, r = self.publish(self.signed(issued=int(time.time()) + 365 * 86400))
+        self.assertEqual(status, 400)
+        self.assertEqual(r["error"], store.RequestError(400, "sig_future").text("it"))
+        # Clocks are never exact: a few hours ahead is fine.
+        self.assertEqual(self.publish(self.signed(issued=int(time.time()) + 6 * 3600))[0], 201)
+
+    def test_a_campanile_behind_is_told_to_fix_its_clock_then_publishes(self):
+        # A Raspberry restarted without internet, two days behind.
+        doc = self.signed()
+        self.cfg.store.set_clock(time.time() - 2 * 86400)
+        self.assertEqual(self.publish(doc)[0], 400)
+        self.cfg.store.set_clock(time.time())  # put right on the admin page
+        self.assertEqual(self.publish(doc)[0], 201)
+
     def test_same_notice_twice_is_refused(self):
         doc = self.signed()
         self.assertEqual(self.publish(doc)[0], 201)
@@ -1499,6 +1533,82 @@ class TestSignedNoticesWithoutTheLibrary(TestSignedNotices):
         with mock.patch.object(signing.ed25519, "verify", wraps=signing.ed25519.verify) as ours:
             self.assertEqual(self.publish(self.signed())[0], 201)
         ours.assert_called_once()
+
+
+class TestNoticeRoom(unittest.TestCase):
+    """The 50 places hold only notices still showing, whichever way they came."""
+
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.db = store.Store(Path(tmp.name) / "campanile.db")
+        self.addCleanup(self.db.close)
+        self.made = 0
+
+    def alert(self, minutes):
+        self.made += 1
+        return {
+            "title": f"Allerta {self.made}",
+            "text": "Testo",
+            "urgent": False,
+            "expires": self.db.now() + 60 * minutes,
+            "source": "Prova",
+            "key": f"k{self.made}",
+        }
+
+    def signed(self):
+        self.made += 1
+        now = self.db.now()
+        notice = {"title": "Firmato", "text": "Testo", "urgent": False}
+        notice.update(issued=now, expires=now + 3600)
+        return self.db.add_signed_notice(notice, "Prova", f"hash-{self.made}", "{}")
+
+    def count(self, expired=False):
+        sql, params = "SELECT COUNT(*) FROM notices", ()
+        if expired:
+            sql, params = sql + " WHERE expires <= ?", (self.db.now(),)
+        with self.db._lock:
+            return self.db._db.execute(sql, params).fetchone()[0]
+
+    def test_notices_whose_time_is_over_leave_room_for_every_kind(self):
+        adders = {
+            "written here": lambda: self.db.add_notice("Scritto qui", "Testo", False),
+            "signed": self.signed,
+            "cap": lambda: self.db.add_cap_notice(self.alert(60)),
+        }
+        later = 0
+        for kind, add in adders.items():
+            with self.subTest(kind):
+                while self.count() < store.MAX_NOTICES:
+                    self.db.add_cap_notice(self.alert(1))
+                with self.assertRaises(store.RequestError):  # full: the limit holds
+                    add()
+                later += 2 * 3600  # every one of them over
+                self.db.set_clock(time.time() + later)
+                add()
+                self.assertEqual(self.count(expired=True), 0)  # nothing left behind
+
+
+class TestRateLimiter(unittest.TestCase):
+    def test_whoever_went_quiet_is_forgotten(self):
+        # A phone's tag changes every day: every one ever seen must not stay in memory.
+        limiter = store.RateLimiter(5, 60)
+        with mock.patch.object(store, "MAX_KEYS", 100):
+            with mock.patch.object(store.time, "monotonic", return_value=1000.0):
+                for i in range(100):
+                    self.assertTrue(limiter.allow(f"phone-{i}"))
+                    self.assertFalse(limiter.blocked(f"just-looked-{i}"))
+            with mock.patch.object(store.time, "monotonic", return_value=1060.0):  # a window on
+                self.assertTrue(limiter.allow("today"))
+        self.assertEqual(list(limiter._events), ["today"])
+
+    def test_the_limit_still_holds(self):
+        limiter = store.RateLimiter(3, 60)
+        self.assertEqual([limiter.allow("phone") for _ in range(4)], [True, True, True, False])
+        limiter.record("route", 2.5)
+        self.assertFalse(limiter.blocked("route"))
+        limiter.record("route", 0.5)
+        self.assertTrue(limiter.blocked("route"))
 
 
 class TestStoreMigration(unittest.TestCase):

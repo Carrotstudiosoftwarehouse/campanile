@@ -57,6 +57,13 @@ if not (-180 <= w < e <= 180 and -85 <= s < n <= 85):
     sys.exit("Invalid box: WEST must be < EAST and SOUTH < NORTH.")
 PY
 
+TARGET="$MAPS/$NAME.pmtiles"
+# Like download-wikipedia.sh: running the guide again downloads nothing twice, even offline.
+if [ -f "$TARGET" ]; then
+  echo "Already there: $TARGET (delete it to download a newer one)"
+  exit 0
+fi
+
 sha256() {
   if command -v sha256sum >/dev/null; then sha256sum "$1" | cut -d' ' -f1
   else shasum -a 256 "$1" | cut -d' ' -f1; fi
@@ -108,7 +115,6 @@ print(sorted(builds)[-1])
 echo "Source map: $BUILD_BASE/$LATEST"
 
 mkdir -p "$MAPS"
-TARGET="$MAPS/$NAME.pmtiles"
 PARTIAL="$MAPS/.$NAME.pmtiles.partial"
 rm -f "$PARTIAL"
 echo "Extracting '$NAME' (box $BBOX, zoom 0-$ZOOM)..."

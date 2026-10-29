@@ -381,6 +381,13 @@ MESSAGES = {
         "en": "The notice has expired according to this Campanile's clock. If the time is wrong, "
         "fix it and try again.",
     },
+    "sig_future": {
+        "it": "Avviso firmato più di un giorno dopo l'ora di questo Campanile. Se l'ora è "
+        "sbagliata, correggila prima di riprovare; se è giusta, è sbagliato l'orologio di chi "
+        "l'ha firmato.",
+        "en": "The notice was signed over a day later than this Campanile's time. If the time is "
+        "wrong, fix it and try again; if it's right, the signer's clock is wrong.",
+    },
     "sig_unreadable": {
         "it": "L'avviso firmato non è leggibile.",
         "en": "The signed notice can't be read.",

@@ -1,6 +1,12 @@
 # DEVELOPED BY CARROTSTUDIO software house
 [Unit]
 Description=Campanile - firewall for the hotspot
+# Raspberry Pi OS starts its own nftables.service, whose "flush ruleset" wipes every table: this
+# one is loaded after it, and again whenever it is restarted or reloaded (measured on the real
+# Raspberry Pi OS: "Wants" from sysinit.target alone left the order to chance).
+After=nftables.service
+PartOf=nftables.service
+ReloadPropagatedFrom=nftables.service
 Before=network-pre.target
 Wants=network-pre.target
 
@@ -8,7 +14,10 @@ Wants=network-pre.target
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/sbin/nft -f /etc/campanile/firewall.nft
-ExecStop=/usr/sbin/nft delete table inet campanile
+ExecReload=/usr/sbin/nft -f /etc/campanile/firewall.nft
+# "-": after nftables' own stop the table is already gone, and that is no failure.
+ExecStop=-/usr/sbin/nft delete table inet campanile
 
 [Install]
-WantedBy=multi-user.target
+# Started with nftables too: "PartOf" stops it with nftables, never starts it again.
+WantedBy=multi-user.target nftables.service

@@ -32,6 +32,7 @@ FORMAT = "campanile-notice-v1"
 DOMAIN = b"campanile-notice-v1\n"
 NOTICE_FIELDS = {"title", "text", "urgent", "issued", "expires", "issuer"}
 MAX_VALIDITY = 7 * 24 * 3600
+MAX_AHEAD = 24 * 3600  # how far the signer's clock may run ahead of the Campanile's
 
 
 class SignatureError(Exception):
@@ -141,6 +142,10 @@ class TrustedKeys:
         now = time.time() if now is None else now
         if notice["expires"] <= now:
             raise SignatureError("sig_expired")
+        # From the future: one clock is wrong, and a one-day notice signed a year ahead would
+        # stay up a year.
+        if notice["issued"] > now + MAX_AHEAD:
+            raise SignatureError("sig_future")
         return notice, name
 
 

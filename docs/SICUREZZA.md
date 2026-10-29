@@ -38,9 +38,9 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 | Indovinare la password di gestione | Gestione solo in locale, stesso blocco dopo 20 tentativi, confronto a tempo costante. |
 | Una pagina di internet che parla col Campanile sotto il proprio nome (DNS rebinding) | Serve il browser del portatile che fa da Campanile, mentre è in rete. I nomi di dominio di internet ricevono 421. Indirizzi, nomi `.local` e il nome del computer funzionano, e nessuno può registrarli. Prima una pagina poteva leggere la bacheca e bloccare chi gestisce con 20 password sbagliate (provato, seconda revisione da attaccante). Ora non ottiene niente e il blocco non si muove. |
 | Leggere file del sistema | I percorsi devono risolversi nella cartella del portale o delle mappe (solo `.pmtiles`). Trucchi di Windows rifiutati: flussi nascosti (`index.html:Zone.Identifier` rivelava da dove era stato scaricato il pacchetto, provato), punto o spazio finale, barra rovesciata, `con`, `nul` e simili. |
-| Saturare il server | 256 connessioni, 16 per dispositivo, 10 secondi per mandare la richiesta (connessioni "a goccia", provato con un attacco reale). Sul Raspberry il firewall dell'hotspot, prima di nginx, lascia 64 connessioni per MAC. Migliaia di connessioni da un byte da un solo dispositivo facevano fallire agli altri 27 richieste su 60 e scrivevano 1,7 MB di registro al minuto. Ora 0 e 0 (provato). |
+| Saturare il server | 256 connessioni, 16 per dispositivo, 10 secondi per mandare la richiesta (connessioni "a goccia", provato con un attacco reale). Sul Raspberry il firewall dell'hotspot, prima di nginx, lascia 64 connessioni per MAC. Migliaia di connessioni da un byte da un solo dispositivo facevano fallire agli altri 27 richieste su 60 e scrivevano 1,7 MB di registro al minuto. Ora 0 e 0 (provato). Una mappa intera in un colpo solo rallenta dopo 8 MB, un riquadro mai. |
 | Rallentare tutti con ricerche di nomi costose | Ogni ricerca dei nomi legge tutti i nomi sotto l'unico lucchetto del database. Ora 30 ogni 10 secondi per dispositivo, una alla volta, al massimo 4 parole diverse, e un indice che si ferma ai 50 più recenti. Con 15 telefoni che cercano senza sosta, leggere gli avvisi richiede 1,5 ms invece di 97 (provato). |
-| Fingersi un altro telefono o il Campanile | Sul Raspberry limiti, blocco e gestione solo locale poggiano sull'indirizzo che scrive nginx (`X-Real-IP`). Il "request smuggling" poteva falsificarlo: una GET con un corpo eseguiva 8 richieste nascoste su 8. Due correzioni, ciascuna sufficiente da sola (provato una per una, poi 0 su 16). nginx manda una richiesta per connessione. Il Campanile accetta un corpo solo su POST, con un solo `Content-Length`, senza `chunked`. |
+| Fingersi un altro telefono o il Campanile | Sul Raspberry limiti, blocco e gestione solo locale poggiano sull'indirizzo che scrive nginx (`X-Real-IP`). Il "request smuggling" poteva falsificarlo: una GET con un corpo eseguiva 8 richieste nascoste su 8. Due correzioni, ciascuna sufficiente da sola (provato una per una, poi 0 su 16). nginx manda una richiesta per connessione. Il Campanile accetta un corpo solo su POST, con un solo `Content-Length`, senza `chunked`. Un test fa girare il vero nginx: un telefono che si dice `127.0.0.1` resta un telefono. |
 | Calo di corrente | Annunci e avvisi accettati sono su disco prima della risposta (SQLite `synchronous=FULL`). |
 | Pagine dentro altri siti | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |
 
@@ -52,7 +52,8 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
   12.000 firme casuali. Per firmare si usa sempre `cryptography`.
 - Le chiavi di fiducia si installano **prima**, su file, mai ricevute dalla rete, altrimenti chi
   falsifica l'avviso falsificherebbe anche la chiave.
-- La firma copre titolo, testo, urgenza, data e **scadenza** (massimo 7 giorni). Il prefisso
+- La firma copre titolo, testo, urgenza, data e **scadenza** (massimo 7 giorni, e mai firmato
+  più di un giorno avanti rispetto all'orologio del Campanile). Il prefisso
   `campanile-notice-v1` la lega a questo solo uso.
 - Lo stesso avviso firmato non si pubblica due volte, e sparisce alla scadenza.
 - Il testo firmato non si ripulisce. Se ha caratteri non validi, si rifiuta.
@@ -238,7 +239,8 @@ Così viaggiano i programmi, quindi le regole sono strette.
   CarrotStudio**, controllata sulla copia che ha fatto, mai sulla chiavetta: esattamente i file
   firmati, né uno in più né uno in meno, mai una versione più vecchia. Le chiavi di firma restano
   offline. La prima volta una chiavetta vale ancora come una chiave di casa: chi avvia un
-  Campanile direttamente da una chiavetta esegue quello che c'è sopra.
+  Campanile direttamente da una chiavetta esegue quello che c'è sopra. Installare da GitHub, la
+  prima volta o di nuovo, si fida allo stesso modo della copia di GitHub.
 - **Un elenco chiuso**: programma, mappe, Wikipedia, chiavi pubbliche degli avvisi firmati, Kiwix,
   Python. Mai il database (nomi, annunci, contatti) né la password. Nessuna cartella si copia così
   com'è.

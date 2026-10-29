@@ -25,6 +25,7 @@ MAX_SAFE_PER_DEVICE = 10  # a family registering its members
 MAX_NAME_WORDS = 4  # of a name search: a name is found with fewer, and each one costs a pass
 MAX_NOTICES = 50
 MAX_CLOSED_ROADS = 300
+MAX_KEYS = 10_000  # devices a rate limit keeps in mind before forgetting the quiet ones
 # Nothing stays forever: in an emergency a post two weeks old has almost always passed, while
 # someone may look for a relative for weeks. The admin can change both when starting.
 POST_DAYS = 14
@@ -232,9 +233,17 @@ class RateLimiter:
         self._lock = threading.Lock()
 
     def _recent(self, key: str, now: float) -> list[tuple[float, float]]:
-        recent = [e for e in self._events.get(key, ()) if now - e[0] < self.window]
-        self._events[key] = recent
+        """What `key` did within the window. Nothing done, nothing kept."""
+        recent = [e for e in self._events.pop(key, ()) if now - e[0] < self.window]
+        if recent:
+            self._events[key] = recent
         return recent
+
+    def _add(self, key: str, now: float, amount: float, recent: list) -> None:
+        self._events[key] = [*recent, (now, amount)]
+        # Tags change daily: forget the quiet ones, or they pile up.
+        if len(self._events) > MAX_KEYS:
+            self._events = {k: v for k, v in self._events.items() if now - v[-1][0] < self.window}
 
     def blocked(self, key: str) -> bool:
         with self._lock:
@@ -243,11 +252,7 @@ class RateLimiter:
     def record(self, key: str, amount: float = 1) -> None:
         now = time.monotonic()
         with self._lock:
-            self._recent(key, now).append((now, amount))
-            if len(self._events) > 10_000:
-                self._events = {
-                    k: v for k, v in self._events.items() if v and now - v[-1][0] < self.window
-                }
+            self._add(key, now, amount, self._recent(key, now))
 
     def allow(self, key: str) -> bool:
         """Like record(), but only if there is still room."""
@@ -256,7 +261,7 @@ class RateLimiter:
             recent = self._recent(key, now)
             if sum(a for _, a in recent) >= self.limit:
                 return False
-            recent.append((now, 1))
+            self._add(key, now, 1, recent)
             return True
 
 
@@ -619,10 +624,18 @@ class Store:
                 self._wipe()
             return result
 
+    def _room_for_a_notice(self) -> None:
+        """Expired notices go first: hidden, they must not fill the 50 places. Under the lock."""
+        gone = self._db.execute("DELETE FROM notices WHERE expires <= ?", (self.now(),)).rowcount
+        self._db.commit()
+        if gone:
+            self._wipe()
+        if self._count("SELECT COUNT(*) FROM notices") >= MAX_NOTICES:
+            raise RequestError(503, "too_many_notices")
+
     def add_notice(self, title: str, text: str, urgent: bool) -> int:
         with self._lock:
-            if self._count("SELECT COUNT(*) FROM notices") >= MAX_NOTICES:
-                raise RequestError(503, "too_many_notices")
+            self._room_for_a_notice()
             cur = self._db.execute(
                 "INSERT INTO notices (title, text, urgent, created) VALUES (?, ?, ?, ?)",
                 (title, text, int(urgent), self.now()),
@@ -632,8 +645,7 @@ class Store:
 
     def add_signed_notice(self, notice: dict, signer: str, signature_hash: str, signed: str) -> int:
         with self._lock:
-            if self._count("SELECT COUNT(*) FROM notices") >= MAX_NOTICES:
-                raise RequestError(503, "too_many_notices")
+            self._room_for_a_notice()
             try:
                 cur = self._db.execute(
                     "INSERT INTO notices (title, text, urgent, created, signer, issued, expires,"
@@ -686,8 +698,7 @@ class Store:
     def add_cap_notice(self, alert: dict) -> int:
         """An official alert in CAP (see cap.py), already checked and cleaned."""
         with self._lock:
-            if self._count("SELECT COUNT(*) FROM notices") >= MAX_NOTICES:
-                raise RequestError(503, "too_many_notices")
+            self._room_for_a_notice()
             try:
                 cur = self._db.execute(
                     "INSERT INTO notices (title, text, urgent, created, expires, source, cap_key)"

@@ -113,9 +113,16 @@ un limite, diccelo e lo aggiungiamo.
   da IT-alert verifica i suoi messaggi del 2023 ma è scaduto a giugno 2024 (vedi la roadmap).
 - **Wi-Fi aperta, niente cifratura.** Chi è nei paraggi può leggere annunci, nomi e percorsi
   chiesti.
+- **Chiunque sia sulla Wi-Fi, o vicino con una radio, può rallentarla o bloccarla.** Campanile
+  evita che un solo telefono si prenda tutta la banda per sbaglio (una mappa intera viene
+  rallentata), non chi lo fa apposta.
 - **Un falso "Campanile" non si distingue**, e può lasciare le sue pagine nella cache di un
   telefono (provato). La cura è HTTPS per ogni Campanile, nella [roadmap](../ROADMAP.md#italiano).
   Gli avvisi firmati li verifica il Campanile, non il telefono.
+- **Chi si mette fra due Campanili può bloccare la condivisione** (rete finta con lo stesso
+  nome, indirizzo o nome `.local` falsificati): tiene occupati i due download finché la
+  condivisione non viene fermata, ma non può cambiare un file. La correzione, un canale
+  autenticato con il codice, è nella [roadmap](../ROADMAP.md#italiano).
 - **Nessuno è verificato.** Chiunque può scrivere qualunque annuncio, e qualunque nome in "sto
   bene".
 - **I limiti per dispositivo si possono aggirare** con molte antenne Wi-Fi, o con un indirizzo del

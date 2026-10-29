@@ -35,9 +35,9 @@ We assume someone on the network wants to cause trouble.
 | Guessing the admin password | Local-only admin page, same 20-try lockout, constant-time comparison. |
 | An internet page talking to the Campanile under its own name (DNS rebinding) | Needs the Campanile laptop's browser, online. Internet domain names get 421. Addresses, `.local` and the computer's name still work, and nobody can register those. A page could once read the board and lock out the admin with 20 wrong passwords (tested, second adversarial review). Now it gets nothing and the lockout doesn't move. |
 | Reading system files | Paths must resolve inside the portal or maps folder (`.pmtiles` only). Windows tricks are rejected: streams (`index.html:Zone.Identifier` leaked the download origin, tested), trailing dot or space, backslash, `con`, `nul` and similar. |
-| Saturating the server | 256 connections, 16 per device, 10 seconds to send a request (drip-feed, tested with a real attack). On the Raspberry the hotspot firewall caps each MAC at 64 connections, before nginx. Thousands of one-byte connections from one device made others fail 27 of 60 requests and logged 1.7 MB a minute. Now 0 and 0 (tested). |
+| Saturating the server | 256 connections, 16 per device, 10 seconds to send a request (drip-feed, tested with a real attack). On the Raspberry the hotspot firewall caps each MAC at 64 connections, before nginx. Thousands of one-byte connections from one device made others fail 27 of 60 requests and logged 1.7 MB a minute. Now 0 and 0 (tested). A whole map in one go is paced past 8 MB, a tile never is. |
 | Slowing everyone with costly name searches | Each name search reads every name under the database's one lock. Now 30 per 10 seconds per device, one at a time, 4 different words at most, and an index that stops at the newest 50. With 15 phones searching nonstop, reading the notices takes 1.5 ms instead of 97 (tested). |
-| Posing as another phone or the Campanile | On the Raspberry, limits, lockout and local-only admin rely on the address nginx writes (`X-Real-IP`). Request smuggling could forge it: a GET with a body ran 8 of 8 hidden requests. Two fixes, each enough alone (tested one at a time, then 0 of 16). nginx sends one request per connection. The Campanile takes a body only on POST, one `Content-Length`, no `chunked`. |
+| Posing as another phone or the Campanile | On the Raspberry, limits, lockout and local-only admin rely on the address nginx writes (`X-Real-IP`). Request smuggling could forge it: a GET with a body ran 8 of 8 hidden requests. Two fixes, each enough alone (tested one at a time, then 0 of 16). nginx sends one request per connection. The Campanile takes a body only on POST, one `Content-Length`, no `chunked`. A test runs the real nginx: a phone claiming to be `127.0.0.1` stays a phone. |
 | Power loss | Accepted posts and notices hit disk before the reply (SQLite `synchronous=FULL`). |
 | Framing by other sites | `frame-ancestors 'none'`, `X-Frame-Options: DENY`. |
 
@@ -49,7 +49,8 @@ We assume someone on the network wants to cause trouble.
   on 12,000 random signatures. Signing always uses `cryptography`.
 - Trusted keys are installed **beforehand** as a file, never received from the network, or a forger
   would forge the key too.
-- The signature covers title, text, urgency, date and **expiry** (7 days max). The prefix
+- The signature covers title, text, urgency, date and **expiry** (7 days max, and never signed over a
+  day ahead of the Campanile's clock). The prefix
   `campanile-notice-v1` binds it to this use only.
 - A signed notice can't be published twice, and disappears at expiry.
 - Signed text isn't cleaned. Invalid characters are rejected.
@@ -215,7 +216,8 @@ travel this way, so the rules are strict.
 - **An installed Campanile updates only to a newer version signed by CarrotStudio**, checked on the
   copy it has made, never on the stick: exactly the signed files, none more or fewer, never an older
   version. The signing keys stay offline. The first time, a stick is still trusted like a house key:
-  whoever starts a Campanile straight from a stick runs what is on it.
+  whoever starts a Campanile straight from a stick runs what is on it. Installing from GitHub, the
+  first time or again, trusts GitHub's copy the same way.
 - **A closed list**: program, maps, Wikipedia, signed-notice public keys, Kiwix, Python. Never the
   database (names, posts, contacts) or the password. No folder is copied as it is.
 - **A hostile stick can't slip anything in.** A Campanile folder already there is used only if it

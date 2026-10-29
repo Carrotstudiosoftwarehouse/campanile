@@ -99,9 +99,16 @@ missing, tell us and we will add it.
   since none has been published. Alert signatures are not checked. IT-alert's published
   certificate verifies its 2023 messages but expired in June 2024 (see the roadmap).
 - **Open Wi-Fi, no encryption.** Anyone nearby can read posts, names and the routes asked for.
+- **Anyone on the Wi-Fi, or near it with a radio, can slow it down or jam it.** Campanile keeps
+  one phone from taking all the bandwidth by mistake (a whole map is paced), not someone doing
+  it on purpose.
 - **A fake "Campanile" can't be told apart**, and can leave its pages in a phone's cache (tested).
   The fix is HTTPS for each Campanile, on the [roadmap](../ROADMAP.md). Signed notices are checked
   by the Campanile, not the phone.
+- **Whoever stands between two Campaniles can block sharing** (a fake network with the same name,
+  a faked address or `.local` name): they can keep both downloads busy until sharing is stopped,
+  but can't change a file. The fix, a channel authenticated by the code, is on the
+  [roadmap](../ROADMAP.md).
 - **Nobody is verified.** Anyone can post anything, or write any name in "I'm safe".
 - **Per-device limits can be dodged** with many Wi-Fi adapters, or a phone address that keeps
   changing. The emergency brake holds those posts for approval, but a determined flood still

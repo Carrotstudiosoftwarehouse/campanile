@@ -145,11 +145,15 @@ l'ultimo passo, oppure un adattatore di rete USB.
 
 ```bash
 sudo apt update && sudo apt install -y git
-git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git campanile && cd campanile
+[ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
+cd $HOME/campanile && git pull
 scripts/download-map.sh italy-light       # facoltativo
 scripts/download-wikipedia.sh medicine    # facoltativo
 sudo raspberry/install.sh                 # opzioni: --ssid NOME  --country IT  --no-hotspot
 ```
+
+Incollate di nuovo, da qualsiasi cartella, le stesse righe riprovano dopo un problema o
+aggiornano Campanile: niente si scarica due volte, e dati e password restano.
 
 L'installatore scarica da solo le librerie delle mappe la prima volta, e aspetta se il Raspberry,
 appena acceso, si sta ancora aggiornando.
@@ -169,7 +173,7 @@ L'installazione:
 - isola i telefoni tra loro. Un **firewall** sull'hotspot fa raggiungere solo DHCP, DNS e il
   Campanile, niente altro del Raspberry e nessuna rete dietro di lui
 
-**Per aggiornare**, rilancialo. Dati e password restano. Le mappe aggiunte dopo vanno in
+**Per aggiornare**, incolla di nuovo le stesse righe. Dati e password restano. Le mappe aggiunte dopo vanno in
 `/var/lib/campanile/maps` (leggibili da tutti, permessi 644), i file di Wikipedia in
 `/var/lib/campanile/zim` (proprietario `campanile`). Poi `sudo systemctl restart campanile-kiwix`.
 

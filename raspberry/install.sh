@@ -217,7 +217,7 @@ DNS
     802-11-wireless.mode ap 802-11-wireless.band bg 802-11-wireless.channel 6 \
     ipv4.method shared ipv4.addresses "$ADDRESS/24" ipv6.method disabled \
     802-11-wireless.ap-isolation yes
-  nmcli connection up "$CONNECTION"
+  nmcli connection up "$CONNECTION" || fail "the Wi-Fi hotspot didn't start (the reason is just above). Campanile is installed and running: check that Wi-Fi isn't blocked (rfkill list), then run this again."
 fi
 
 step "Done"
