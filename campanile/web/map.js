@@ -14,6 +14,7 @@ const ZOOM = { country: 5, region: 7, city: 11, town: 12, village: 13, hamlet: 1
 
 let map = null;
 let marker = null;
+let routed = []; // the maps the navigator works on, once their streets are ready
 
 const route = attachRoute({
   getMap: () => map,
@@ -93,6 +94,17 @@ async function go(result) {
   const about = document.createElement("span");
   about.textContent = describe(result);
   card.append(name, about);
+  if (routed.includes(result.map)) {  // from the pharmacy found straight to the navigator
+    const directions = document.createElement("button");
+    directions.type = "button";
+    directions.textContent = t("route.here");
+    directions.addEventListener("click", () => {
+      marker?.remove();
+      marker = null;
+      route.goTo(result);
+    });
+    card.append(directions);
+  }
   marker = new maplibregl.Marker({ color: "#111111" })
     .setLngLat([result.lon, result.lat])
     .setPopup(new maplibregl.Popup({ closeButton: false, offset: 30 }).setDOMContent(card))
@@ -160,6 +172,7 @@ async function start() {
   });
   // The button shows once a map's streets are ready for routes (built in the background).
   routable({ maps, building }).then((ready) => {
+    routed = ready.map((m) => m.name);
     if (ready.length) document.getElementById("route-add").classList.remove("hidden");
   });
 }

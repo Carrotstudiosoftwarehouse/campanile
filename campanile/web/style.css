@@ -330,6 +330,7 @@ body.sheet-open .sheet { flex: 1; min-height: 0; overflow-y: auto; }
 @media (max-width: 340px) { .chips { grid-template-columns: repeat(2, 1fr); } }
 .maplibregl-popup-content { font: 15px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .maplibregl-popup-content span { display: block; color: var(--muted); }
+.maplibregl-popup-content button { display: block; width: 100%; margin-top: 8px; }
 /* Links told apart by more than their color. */
 .maplibregl-ctrl.maplibregl-ctrl-attrib a { text-decoration: underline; }
 /* The scale is a ruler drawn from the left: its label stays there, or the credits cover it. */

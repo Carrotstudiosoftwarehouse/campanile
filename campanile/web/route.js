@@ -253,8 +253,17 @@ export function attachRoute({ getMap, ui }) {
     setInterval(loadClosed, CLOSED_EVERY);
   }
 
+  // "Directions" on a place found: it is where to go, and the start is asked at once.
+  function goTo(result) {
+    ui.panel.classList.remove("hidden");
+    ui.add.classList.add("hidden");
+    stage = "to";
+    choose([result.lon, result.lat]);
+  }
+
   return {
     hook,
+    goTo,
     picking: () => stage === "to" || stage === "from",
     pick: (result) => choose([result.lon, result.lat]),
   };
