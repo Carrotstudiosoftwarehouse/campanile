@@ -83,6 +83,9 @@ un limite, diccelo e lo aggiungiamo.
 - **Nessun audit esterno né test di penetrazione professionale.** Ogni revisione finora è stata
   nostra, fatta da attaccanti: ogni difetto riprodotto, corretto e coperto da un test che fallisce
   sul codice di prima.
+- **Il server web è nostro, e nessuno l'ha rivisto da fuori.** I telefoni parlano con codice
+  scritto da noi sopra `http.server` di Python (con nginx davanti sul Raspberry): è la parte che più
+  merita uno sguardo esterno.
 - **Il lettore delle mappe è passato sotto un fuzzer solo nostro, per qualche ora.**
   `tests/fuzz_maps.py` dà alla ricerca e al navigatore pezzi di mappe vere alterati come farebbe
   un file ostile. 40.000 casi su un processore hanno trovato sei tipi di difetto, tutti corretti.

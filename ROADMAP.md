@@ -70,7 +70,9 @@ This comes before any network, roughly in this order.
   not persist)
 - [ ] **Maps made by others in the automatic tests**, not only our test generator's. Today real
   maps are tried by hand
-- [ ] **An external security audit**, by people outside the project
+- [ ] **An external security audit**, by people outside the project, starting from our web server
+- [ ] **A shorter `server.py`**: the request handling split from what each request does, a step
+  at a time, each step with the tests still green
 
 **2. Usable by everyone, starting now**
 
@@ -205,7 +207,10 @@ Viene prima di qualunque rete, più o meno in quest'ordine.
   spazio di memoria potrebbe non restare)
 - [ ] **Mappe fatte da altri nei test automatici**, non solo quelle del nostro generatore di
   prova. Oggi le mappe vere si provano a mano
-- [ ] **Un audit di sicurezza esterno**, fatto da persone fuori dal progetto
+- [ ] **Un audit di sicurezza esterno**, fatto da persone fuori dal progetto, a partire dal nostro
+  server web
+- [ ] **Un `server.py` più corto**: la gestione delle richieste separata da quello che ognuna fa,
+  un passo alla volta, ogni passo con i test ancora verdi
 
 **2. Usabile da tutti, da subito**
 

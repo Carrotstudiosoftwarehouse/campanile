@@ -74,6 +74,8 @@ missing, tell us and we will add it.
 
 - **No external audit or professional penetration test.** Every review so far was ours, done as
   attackers: each finding reproduced, fixed and covered by a test that fails on the old code.
+- **Our own web server, never reviewed from outside.** Phones talk to code we wrote on Python's
+  `http.server` (behind nginx on the Raspberry): the part most worth an outside look.
 - **The map reader was fuzzed only by us, for a few hours.** `tests/fuzz_maps.py` feeds search and
   the navigator real tiles altered like a hostile file. 40,000 cases on one processor found six
   kinds of flaw, all fixed. The worst, a few bytes, made the reader fill 2 GB of memory. A rerun of
