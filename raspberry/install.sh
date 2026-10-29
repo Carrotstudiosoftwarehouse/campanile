@@ -90,7 +90,7 @@ cp "$SOURCE/LICENSE" "$SOURCE/README.md" "$SOURCE/README.it.md" "$NEW/" 2>/dev/n
 find "$NEW" -name '__pycache__' -prune -exec rm -rf {} +
 chown -R root:root "$NEW"
 chmod -R u=rwX,go=rX "$NEW"
-chmod 755 "$NEW/raspberry/start-kiwix.sh" "$NEW/raspberry/nginx-site.sh"
+chmod 755 "$NEW/raspberry/start-kiwix.sh" "$NEW/raspberry/nginx-site.sh" "$NEW/raspberry/hotspot-off.sh"
 rm -rf "$CODE.old"
 [ -d "$CODE" ] && mv "$CODE" "$CODE.old"
 mv "$NEW" "$CODE"
@@ -186,12 +186,11 @@ if [ "$HOTSPOT" -eq 1 ]; then
   systemctl daemon-reload
   systemctl enable campanile-firewall.service >/dev/null
   systemctl restart campanile-firewall.service
-  echo "Phones on the hotspot reach only DHCP, DNS and Campanile."
+  echo "Phones on the hotspot reach only DHCP, DNS, ping and Campanile (80, 8081)."
 else
-  # Switching from hotspot to --no-hotspot: our firewall would only get in the way.
-  systemctl disable --now campanile-firewall.service 2>/dev/null || true
-  rm -f /etc/systemd/system/campanile-firewall.service "$CONFIG/firewall.nft"
-  echo "No hotspot: no firewall changes."
+  # A hotspot left from an earlier install would come back at boot without its firewall.
+  "$CODE/raspberry/hotspot-off.sh"
+  echo "No hotspot: Campanile's own Wi-Fi, its DNS redirect and its firewall are off."
 fi
 
 if [ "$HOTSPOT" -eq 1 ]; then

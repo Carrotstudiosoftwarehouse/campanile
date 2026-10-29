@@ -16,7 +16,7 @@ so a later install picks up where you left off.
   --purge   also delete the data, the password and the 'campanile' user
 
 If you're connected through the Campanile hotspot, you'll be disconnected.
-The python3, python3-cryptography, kiwix-tools and nginx packages and the Wi-Fi
+The python3, python3-cryptography, kiwix-tools, nginx and nftables packages and the Wi-Fi
 country setting are left as they are; Debian's default nginx site is restored.
 USAGE
 }
@@ -34,10 +34,12 @@ done
 
 step() { echo; echo "== $*"; }
 
+step "Hotspot, DNS redirect and firewall"
+bash "$(dirname "$0")/hotspot-off.sh"  # bash: a copy from a stick has no exec bits
+
 step "Services"
-systemctl disable --now campanile.service campanile-kiwix.service campanile-firewall.service 2>/dev/null || true
-rm -f /etc/systemd/system/campanile.service /etc/systemd/system/campanile-kiwix.service \
-  /etc/systemd/system/campanile-firewall.service
+systemctl disable --now campanile.service campanile-kiwix.service 2>/dev/null || true
+rm -f /etc/systemd/system/campanile.service /etc/systemd/system/campanile-kiwix.service
 systemctl daemon-reload
 
 step "Web server (nginx)"
@@ -50,12 +52,6 @@ if command -v nginx >/dev/null && nginx -t -q 2>/dev/null; then
   # restart, not reload: reload is asynchronous and old workers would keep serving for a moment
   systemctl restart nginx.service 2>/dev/null || true
 fi
-
-step "Hotspot and DNS redirect"
-if command -v nmcli >/dev/null; then
-  nmcli connection delete campanile-hotspot >/dev/null 2>&1 || true
-fi
-rm -f /etc/NetworkManager/dnsmasq-shared.d/campanile.conf
 
 step "Code"
 rm -rf /opt/campanile
