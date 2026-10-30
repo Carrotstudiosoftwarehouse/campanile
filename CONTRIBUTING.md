@@ -88,7 +88,8 @@ tests/            tests: run on Linux, Windows and macOS at every change
   `python3 campanile/server.py --host 0.0.0.0` (whole network). `--help` lists the options.
 - **Release package:** `scripts/build-package.sh`. A `v*` tag publishes it to Releases with its
   `SHA256SUMS` and a signed build provenance. `gh attestation verify campanile-VERSION.zip -R
-  Carrotstudiosoftwarehouse/campanile` shows which commit and which workflow built it.
+  offternet-org/campanile` shows which commit and which workflow built it. Versions 0.1.x were
+  built before the move to offternet-org: for them use `--owner Carrotstudiosoftwarehouse`.
 - **Release signature (maintainers):** CarrotStudio signs every version offline, with a key that
   never touches a network. Build the package, then `scripts/sign-release.py sign --key ...
   dist/campanile-VERSION.zip` writes `campanile/release-signature.json`: commit it and tag. The

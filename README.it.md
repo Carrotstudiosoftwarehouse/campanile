@@ -7,7 +7,7 @@
   </picture>
 </h1>
 
-[![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Tests](https://github.com/offternet-org/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/offternet-org/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/offternet-org/campanile)](https://github.com/offternet-org/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Un punto di informazione e di aiuto per il quartiere che funziona anche quando internet non c'è.
 Prende il nome dal campanile, le cui campane chiamavano a raccolta il paese nel pericolo.
@@ -45,7 +45,7 @@ del mondo.
 
 **Su un portatile**, con [Python 3](https://www.python.org/downloads/):
 
-1. Scarica il pacchetto da [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) e scompattalo.
+1. Scarica il pacchetto da [Releases](https://github.com/offternet-org/campanile/releases) e scompattalo.
 2. Doppio clic su **Avvia Campanile (Mac)** o **Avvia Campanile (Windows)**.
 3. La prima volta, con internet, la pagina di preparazione scarica la mappa e le voci mediche.
 4. Stampa il cartello: il suo QR apre il Campanile.

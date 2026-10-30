@@ -7,7 +7,7 @@
   </picture>
 </h1>
 
-[![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Tests](https://github.com/offternet-org/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/offternet-org/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/offternet-org/campanile)](https://github.com/offternet-org/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 A neighborhood information and help point that keeps working when the internet is gone. It is
 named after the campanile, the Italian bell tower whose bells called the village together in
@@ -45,7 +45,7 @@ the world.
 
 **On a laptop**, with [Python 3](https://www.python.org/downloads/):
 
-1. Download the package from [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) and unzip it.
+1. Download the package from [Releases](https://github.com/offternet-org/campanile/releases) and unzip it.
 2. Double-click **Avvia Campanile (Mac)** or **Avvia Campanile (Windows)**.
 3. The first time, with internet, the setup page downloads the map and the medical articles.
 4. Print the sign: its QR code opens the Campanile.

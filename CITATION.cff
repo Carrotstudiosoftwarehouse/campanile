@@ -5,7 +5,7 @@ abstract: "A neighborhood information and help point that keeps working when the
 type: software
 authors:
   - name: "CarrotStudio"
-repository-code: "https://github.com/Carrotstudiosoftwarehouse/campanile"
+repository-code: "https://github.com/offternet-org/campanile"
 license: MIT
 keywords:
   - emergency

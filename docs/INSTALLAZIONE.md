@@ -11,7 +11,7 @@ Serve **Python 3**, gratuito su [python.org](https://www.python.org/downloads/).
 *"Add python.exe to PATH"*. Sul Mac vanno bene anche gli strumenti per sviluppatori che macOS propone.
 Se Python manca, il file di avvio dice cosa fare.
 
-1. Scarica il **pacchetto pronto** dalla pagina [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) e scompattalo.
+1. Scarica il **pacchetto pronto** dalla pagina [Releases](https://github.com/offternet-org/campanile/releases) e scompattalo.
 2. Doppio clic su **Avvia Campanile (Mac)** o **Avvia Campanile (Windows)**.
 3. La prima volta si apre la **pagina di preparazione**. Con internet, scarica la mappa e le voci
    mediche, un clic ciascuna.
@@ -168,7 +168,7 @@ eseguirne una, così non se ne perde nessuna.
 ```bash
 {
 sudo apt update && sudo apt install -y git
-[ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
+[ -d $HOME/campanile ] || git clone https://github.com/offternet-org/campanile.git $HOME/campanile
 cd $HOME/campanile && git pull
 scripts/download-map.sh custom area OVEST,SUD,EST,NORD   # la tua zona
 scripts/download-map.sh world             # facoltativo, ~190 MB

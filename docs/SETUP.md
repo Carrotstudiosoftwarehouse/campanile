@@ -10,7 +10,7 @@ You need **Python 3**, free from [python.org](https://www.python.org/downloads/)
 tick *"Add python.exe to PATH"*. On a Mac, the developer tools macOS offers work too. If Python
 is missing, the launcher says what to do.
 
-1. Download the **ready-to-use package** from [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) and unzip it.
+1. Download the **ready-to-use package** from [Releases](https://github.com/offternet-org/campanile/releases) and unzip it.
 2. Double-click **Avvia Campanile (Mac)** or **Avvia Campanile (Windows)** (*avvia* is Italian
    for *start*). Its window speaks the computer's language, Italian or English.
 3. The **setup page** opens the first time. With internet, download the map and the medical
@@ -160,7 +160,7 @@ block, braces included: they make the shell read every line before running any, 
 ```bash
 {
 sudo apt update && sudo apt install -y git
-[ -d $HOME/campanile ] || git clone https://github.com/Carrotstudiosoftwarehouse/campanile.git $HOME/campanile
+[ -d $HOME/campanile ] || git clone https://github.com/offternet-org/campanile.git $HOME/campanile
 cd $HOME/campanile && git pull
 scripts/download-map.sh custom area WEST,SOUTH,EAST,NORTH   # your area
 scripts/download-map.sh world             # optional, ~190 MB
