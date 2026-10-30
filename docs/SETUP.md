@@ -7,8 +7,8 @@ Two ways to run it: on a laptop, or on a [Raspberry Pi](#raspberry-pi) as a fixe
 ## On a laptop (the simplest)
 
 You need **Python 3**, free from [python.org](https://www.python.org/downloads/). On Windows,
-tick *"Add python.exe to PATH"*. On a Mac, the developer tools it offers also work. If Python is
-missing, the launcher says what to do.
+tick *"Add python.exe to PATH"*. On a Mac, the developer tools macOS offers work too. If Python
+is missing, the launcher says what to do.
 
 1. Download the **ready-to-use package** from [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) and unzip it.
 2. Double-click **Avvia Campanile (Mac)** or **Avvia Campanile (Windows)** (*avvia* is Italian
@@ -35,14 +35,15 @@ Some carriers or models block it.*
 
 **On a laptop**, the setup page (`http://localhost:8080/setup.html`, opens by itself the first
 time) downloads the world map, your area in full detail (framed on your location if the browser
-can tell, or search your town) and Wikipedia's medical articles in Italian, English or both. Downloads resume
-if interrupted and are checked by SHA-256 (pinned for programs, Kiwix's for Wikipedia).
+can tell, or search your town) and Wikipedia's medical articles in Italian, English or both.
+Downloads resume if cut. Programs and Wikipedia are checked by SHA-256 (pinned in the code, and
+Kiwix's own), maps by their structure.
 
 <p align="center">
   <img src="immagini/setup.png" width="600" alt="Setup page: the area to download, framed where the computer is">
 </p>
 
-**From the terminal, or for the Raspberry**, in the Campanile folder, with internet, once:
+**From the terminal**, in the Campanile folder, with internet, once:
 
 ```bash
 scripts/prepare.sh                        # libraries (already in the ready-to-use package)
@@ -88,8 +89,8 @@ places and useful points (hospitals, pharmacies, drinking water...) in your area
 cities in the world map.
 
 **Then** fill in the family plan and test with a couple of phones. Print the sign early only for a
-Raspberry, whose address never changes. A laptop's address changes with the network, so print its
-sign (or copy the address by hand) once the day's network is up.
+Raspberry, whose hotspot address doesn't change. A laptop's address changes with the network, so
+print its sign (or copy the address by hand) once the day's network is up.
 
 ## More Campaniles, without internet
 
@@ -99,8 +100,8 @@ On the setup page, *More Campaniles*:
    Windows, Mac and Linux, and Python's official installers.
 2. Plug in a USB stick and press **Copy to the stick** (program, maps and Wikipedia).
 
-On the stick, double-click *Avvia Campanile*. No internet or installs needed. If Python is
-missing, the window shows its installer on the stick.
+On the stick, double-click *Avvia Campanile*. No internet needed: if Python is missing, the
+window points to its installer on the stick.
 
 - **Hand the stick over in person.** Never install a program from a Wi-Fi network: anyone can
   name one "Campanile".
@@ -120,23 +121,24 @@ version signed by CarrotStudio passes. Close the black window and open Campanile
 starting, it checks once more, then the new version becomes a folder of its own, "Campanile
 0.2.0", and maps, Wikipedia and posts move into it. The old double click keeps working. On a
 Raspberry: `sudo python3 /opt/campanile/campanile/update.py /media/USER/STICK` checks the stick the
-same way, then runs the new version's installer with the choices of last time.
+same way, then runs the new version's installer with the choices of last time (so far tried with
+a stand-in installer).
 
 **Maps and Wikipedia over Wi-Fi.** On the admin page, *Share with another Campanile* shows an
 address and a code. Another Campanile joins this Wi-Fi and types both on its setup page. Maps and
 Wikipedia arrive, never programs. The file list is signed with the code, so a fake Campanile with
-the same network name but no code is refused. Downloads are paced so phones keep their Wi-Fi, and sharing
-stops after two hours.
+the same network name but no code is refused. Downloads are paced to leave room for phones, and
+sharing stops after two hours.
 
 ## Keeping it powered
 
 > **hours of runtime ≈ battery capacity in Wh × 0.8 ÷ consumption in watts**
 > (power bank mAh × 3.7 ÷ 1000 = Wh)
 
-A 20,000 mAh power bank is about 74 Wh. If it draws 4 W, a Raspberry runs 74 × 0.8 ÷ 4 ≈ **15 hours**.
-Consumption depends on the model and on how many connect, so **measure it** with a cheap USB
-power meter. A foldable 20-30 W USB solar panel can recharge the power bank by day. Same rules
-for a laptop, with the screen dimmed.
+A 20,000 mAh power bank is about 74 Wh. If it draws 4 W, a Raspberry runs 74 × 0.8 ÷ 4 ≈
+**15 hours**. Consumption depends on the model and on how many connect, so **measure it** with a
+cheap USB power meter. A foldable 20-30 W USB solar panel can recharge the power bank by day.
+Same rules for a laptop, with the screen dimmed.
 
 ## Raspberry Pi
 
@@ -146,10 +148,10 @@ phones should open the page by themselves (not yet tried with real phones), and 
 the sign opens it too. It can run on a power bank, for how long we haven't measured yet.
 
 You need **Raspberry Pi OS 64-bit**, Lite or with desktop (Bookworm or newer: on 32-bit the map
-can't be downloaded on the Pi), a 16 GB card (the lines below take about 1.5 GB), with built-in
-Wi-Fi, online **by cable**: the last step turns the
-Wi-Fi into the hotspot, and an SSH session over Wi-Fi would drop there. A Zero 2 W has no network
-port: use a keyboard and screen, or a USB network adapter.
+can't be downloaded on the Pi), a 16 GB card (the lines below take about 1.5 GB), built-in Wi-Fi,
+and internet **by cable**: the last step turns the Wi-Fi into the hotspot, so an SSH session over
+Wi-Fi would drop there. A Zero 2 W has no network port: use a keyboard and screen, or a USB
+network adapter.
 
 First find [your area's four numbers](#your-area-in-detail) and write them in place of
 `WEST,SOUTH,EAST,NORTH`, and your country's two letters in place of `XX`. Then paste the whole
@@ -170,10 +172,10 @@ sudo raspberry/install.sh --country XX    # more options: --ssid NAME  --no-hots
 Left as they are, `WEST,SOUTH,EAST,NORTH` stops the map line with "Invalid box" (Campanile then
 has no street search and no navigator), and `XX` stops the installer before it changes anything.
 
-Pasted again, from any folder, the same lines (options included) retry after a problem, update
-Campanile, or bring in a map or Wikipedia you add to them. Maps and Wikipedia already there aren't
-downloaded again, new ones go where the Campanile reads them, and data and password stay. To
-change your area: `sudo rm /var/lib/campanile/maps/area.pmtiles`, then paste with the new numbers.
+Pasted again, from any folder, the same lines, options included, retry after a problem, update
+Campanile, or add a map or a Wikipedia you write in. Maps and Wikipedia already there aren't
+downloaded again; data and password stay. To change your area: `sudo rm
+/var/lib/campanile/maps/area.pmtiles`, then paste with the new numbers.
 
 The installer fetches the map libraries itself the first time, and waits if the Raspberry, just
 switched on, is still updating itself.

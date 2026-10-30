@@ -31,7 +31,7 @@ missing, tell us and we will add it.
   Raspberry itself, or from a computer on its cable through SSH. Never from a phone: the password
   would cross the open Wi-Fi. With only a phone, for now, you can't manage it.
 - **The sign.** A laptop's address changes with the network, so print the sign, or copy its
-  address, once the day's network is up. A Raspberry's address never changes.
+  address, once the day's network is up. A Raspberry's hotspot address, 10.42.0.1, doesn't change.
 - **Nothing beyond a few tens of meters.** No messages to faraway relatives, no calls (emergency
   calls need the phone network). Campaniles don't share posts or "I'm safe" names yet. Each
   neighborhood is an island.
@@ -92,7 +92,8 @@ missing, tell us and we will add it.
   (longer passwords for the people who run a Campanile); the other 5 we read in the code and
   closed, each with its reason.
 - **Other people's code** (Python, nginx, MapLibre, PMTiles, kiwix-serve) is pinned and
-  hash-checked, and kiwix-serve is sandboxed on the Raspberry. We have not audited it.
+  hash-checked; on the Raspberry kiwix-serve can't see the password or the database. We have
+  not audited it.
 
 ## By design, for now
 

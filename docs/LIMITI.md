@@ -31,8 +31,8 @@ un limite, diccelo e lo aggiungiamo.
   Raspberry stesso, o da un computer collegato al suo cavo con SSH. Mai dal telefono: la password
   viaggerebbe sulla Wi-Fi aperta. Chi ha solo un telefono, per ora, non può gestirlo.
 - **Il cartello.** Sul portatile l'indirizzo cambia con la rete, quindi stampa il cartello, o
-  ricopia il suo indirizzo, quando la rete del giorno è pronta. L'indirizzo del Raspberry non
-  cambia mai.
+  ricopia il suo indirizzo, quando la rete del giorno è pronta. L'indirizzo del Raspberry
+  sull'hotspot, 10.42.0.1, non cambia.
 - **Niente oltre poche decine di metri.** Nessun messaggio ai parenti lontani, nessuna chiamata
   (il 112 ha bisogno della rete telefonica). I Campanili non si scambiano ancora annunci né nomi
   di "sto bene". Ogni quartiere è un'isola.
@@ -104,7 +104,8 @@ un limite, diccelo e lo aggiungiamo.
   6 allarmi, uno ha portato a una correzione (password più lunghe per chi gestisce un Campanile);
   gli altri 5 li abbiamo letti nel codice e chiusi, ognuno con il motivo.
 - **Il codice di altri** (Python, nginx, MapLibre, PMTiles, kiwix-serve) ha versioni fissate e
-  impronte controllate, e sul Raspberry kiwix-serve gira isolato. Non l'abbiamo revisionato.
+  impronte controllate; sul Raspberry kiwix-serve non vede né la password né il database. Non
+  l'abbiamo revisionato.
 
 ## Per come è fatto, per ora
 

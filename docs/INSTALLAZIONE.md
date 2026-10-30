@@ -8,7 +8,7 @@ stazione fissa.
 ## Su un portatile (il più semplice)
 
 Serve **Python 3**, gratuito su [python.org](https://www.python.org/downloads/). Su Windows spunta
-*"Add python.exe to PATH"*. Sul Mac vanno bene anche gli strumenti per sviluppatori che propone.
+*"Add python.exe to PATH"*. Sul Mac vanno bene anche gli strumenti per sviluppatori che macOS propone.
 Se Python manca, il file di avvio dice cosa fare.
 
 1. Scarica il **pacchetto pronto** dalla pagina [Releases](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) e scompattalo.
@@ -36,14 +36,14 @@ l'Android no. Alcuni operatori o modelli lo bloccano.*
 **Sul portatile**, la pagina di preparazione (`http://localhost:8080/setup.html`, si apre da sola
 la prima volta) scarica la mappa del mondo, la tua zona con ogni dettaglio (inquadrata dove sei se
 il browser può dirlo, oppure cerchi il tuo comune) e le voci mediche di Wikipedia in italiano,
-inglese o tutte e due. Gli scaricamenti riprendono se interrotti e sono controllati con SHA-256
-(fissati nel codice per i programmi, quello di Kiwix per Wikipedia).
+inglese o tutte e due. Gli scaricamenti riprendono se interrotti. Programmi e Wikipedia sono
+controllati con SHA-256 (fissato nel codice, e quello di Kiwix), le mappe nella loro struttura.
 
 <p align="center">
   <img src="immagini/setup.png" width="600" alt="Pagina di preparazione: la zona da scaricare, inquadrata dove si trova il computer">
 </p>
 
-**Dal terminale, o per il Raspberry**, nella cartella del Campanile, con internet, una volta:
+**Dal terminale**, nella cartella del Campanile, con internet, una volta:
 
 ```bash
 scripts/prepare.sh                        # librerie (già incluse nel pacchetto pronto)
@@ -81,17 +81,18 @@ di 30 km attorno a Torino pesa circa 23 MB.
 
 Dimensioni misurate tra il 22 e il 24 ottobre 2026. La parola dopo il pacchetto è la lingua: `it`
 (se non la scrivi), `en`, `de`, `fr`, `uk`... L'inglese pesa di più: `medicine-light en` è circa
-1 GB, come nella pagina di preparazione. Wikipedia parte da sola. Sul portatile, prima premi una volta un pulsante
-di *Medicina offline* nella pagina di preparazione, per aggiungere il programma che la serve.
+1 GB, come nella pagina di preparazione. Wikipedia parte da sola. Sul portatile, prima premi una
+volta un pulsante di *Medicina offline* nella pagina di preparazione, per aggiungere il programma
+che la serve.
 
 La ricerca nella mappa legge ogni mappa una volta sola, in sottofondo, e mette il risultato in
 `data/places/`. Trova vie, luoghi e punti utili (ospedali, farmacie, acqua potabile...) nella tua
 zona, stati e città nella mappa del mondo.
 
 **Poi** compila il piano familiare e fai una prova con un paio di telefoni. Stampa il cartello in
-anticipo solo per il Raspberry, il cui indirizzo non cambia mai. Quello del portatile cambia con la
-rete, quindi stampa il suo cartello (o ricopia a mano l'indirizzo) quando la rete del giorno è
-pronta.
+anticipo solo per il Raspberry, il cui indirizzo sull'hotspot non cambia. Quello del portatile
+cambia con la rete, quindi stampa il suo cartello (o ricopia a mano l'indirizzo) quando la rete del
+giorno è pronta.
 
 ## Altri Campanili, senza internet
 
@@ -101,8 +102,8 @@ Nella pagina di preparazione, *Altri Campanili*:
    di Wikipedia per Windows, Mac e Linux, e gli installatori ufficiali di Python.
 2. Infila una chiavetta USB e premi **Copia sulla chiavetta** (programma, mappe e Wikipedia).
 
-Sulla chiavetta, doppio clic su *Avvia Campanile*. Non servono internet né installazioni. Se manca
-Python, la finestra indica il suo installatore sulla chiavetta.
+Sulla chiavetta, doppio clic su *Avvia Campanile*. Non serve internet: se manca Python, la
+finestra indica il suo installatore sulla chiavetta.
 
 - **La chiavetta si dà di persona.** Mai installare un programma da una rete Wi-Fi: chiunque può
   chiamarne una «Campanile».
@@ -125,14 +126,14 @@ finestra nera e riapri il Campanile: prima di partire ricontrolla, poi la versio
 cartella sua, "Campanile 0.2.0", e ci si spostano mappe, Wikipedia e annunci. Il vecchio doppio
 clic continua a funzionare. Sul Raspberry: `sudo python3 /opt/campanile/campanile/update.py
 /media/UTENTE/CHIAVETTA` controlla la chiavetta allo stesso modo, poi lancia l'installatore della
-versione nuova con le scelte dell'ultima volta.
+versione nuova con le scelte dell'ultima volta (finora provato con un installatore finto).
 
 **Mappe e Wikipedia via Wi-Fi.** Nella pagina di gestione, *Condividi con un altro Campanile*
 mostra un indirizzo e un codice. Un altro Campanile si collega a questa Wi-Fi e li scrive nella
 sua pagina di preparazione. Arrivano mappe e Wikipedia, mai programmi. L'elenco dei file è firmato
 con il codice, quindi un Campanile finto con lo stesso nome di rete ma senza codice viene
-rifiutato. Gli scaricamenti vanno piano, così i telefoni non restano senza Wi-Fi, e la
-condivisione si ferma dopo due ore.
+rifiutato. Gli scaricamenti vanno piano, per lasciare spazio ai telefoni, e la condivisione si
+ferma dopo due ore.
 
 ## Tenerlo acceso
 
@@ -154,10 +155,10 @@ veri), e la apre anche il codice QR del cartello. Può andare avanti con una pow
 non l'abbiamo ancora misurato.
 
 Serve **Raspberry Pi OS a 64 bit**, Lite o con desktop (Bookworm o più recente: a 32 bit la mappa
-non si può scaricare dal Pi), una scheda da 16 GB (le righe qui sotto occupano circa 1 GB), con
-il Wi-Fi integrato, collegato a internet **via cavo**: l'ultimo
-passo trasforma il Wi-Fi nell'hotspot, e una sessione SSH via Wi-Fi lì cadrebbe. Lo Zero 2 W non ha
-la porta di rete: usa tastiera e schermo, oppure un adattatore di rete USB.
+non si può scaricare dal Pi), una scheda da 16 GB (le righe qui sotto occupano meno di 1 GB), il
+Wi-Fi integrato e internet **via cavo**: l'ultimo passo trasforma il Wi-Fi nell'hotspot, quindi una
+sessione SSH via Wi-Fi lì cadrebbe. Lo Zero 2 W non ha la porta di rete: usa tastiera e schermo,
+oppure un adattatore di rete USB.
 
 Prima trova [i quattro numeri della tua zona](#la-tua-zona-in-dettaglio) e scrivili al posto di
 `OVEST,SUD,EST,NORD`; se non sei in Italia, cambia anche `IT` con le due lettere del tuo paese.
@@ -179,11 +180,10 @@ sudo raspberry/install.sh --country IT    # altre opzioni: --ssid NOME  --no-hot
 Se lasci `OVEST,SUD,EST,NORD`, la riga della mappa si ferma con "Invalid box" e il Campanile
 resta senza ricerca delle vie e senza navigatore.
 
-Incollate di nuovo, da qualsiasi cartella, le stesse righe (opzioni comprese) riprovano dopo un
-problema, aggiornano Campanile, o portano dentro una mappa o una Wikipedia che ci aggiungi. Mappe e
-Wikipedia già presenti non si riscaricano, quelle nuove vanno dove il Campanile le legge, e dati e
-password restano. Per cambiare zona: `sudo rm /var/lib/campanile/maps/area.pmtiles`, poi incolla
-con i numeri nuovi.
+Incollate di nuovo, da qualsiasi cartella, le stesse righe, opzioni comprese, riprovano dopo un
+problema, aggiornano Campanile, o aggiungono una mappa o una Wikipedia che ci scrivi. Mappe e
+Wikipedia già presenti non si riscaricano; dati e password restano. Per cambiare zona: `sudo rm
+/var/lib/campanile/maps/area.pmtiles`, poi incolla con i numeri nuovi.
 
 L'installatore scarica da solo le librerie delle mappe la prima volta, e aspetta se il Raspberry,
 appena acceso, si sta ancora aggiornando.

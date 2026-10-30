@@ -10,8 +10,7 @@
 [![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 Un punto di informazione e di aiuto per il quartiere che funziona anche quando internet non c'è.
-Per secoli le campane del campanile hanno avvisato il paese dei pericoli e chiamato tutti a
-raccolta: il Campanile fa lo stesso quando la rete cade.
+Prende il nome dal campanile, le cui campane chiamavano a raccolta il paese nel pericolo.
 
 > [!WARNING]
 > **La versione 0.1 è sperimentale.** Provata su Mac, Windows e Linux e in una prova sul campo del
@@ -22,7 +21,7 @@ raccolta: il Campanile fa lo stesso quando la rete cade.
 <p align="center">
   <img src="docs/immagini/campanile.gif" width="600" alt="Il Campanile senza internet: avvisi ufficiali, ho bisogno e offro, una richiesta nella bacheca del quartiere, la mappa offline e la farmacia più vicina, un percorso che evita una strada interrotta, la medicina offline">
 </p>
-<p align="center"><em>Qui su un computer: le pagine sono pensate per il telefono e funzionano su qualunque schermo.</em></p>
+<p align="center"><em>Qui su un computer: le pagine sono pensate per il telefono, e funzionano anche sugli schermi grandi.</em></p>
 
 ## Cosa fa
 
@@ -37,9 +36,10 @@ con il proprio telefono, senza app, senza account e senza credito, e trova:
 | **Mappa offline** | La tua zona via per via. Cerchi, o tocchi **Ospedale, Farmacia, Acqua, Polizia** per i più vicini. |
 | **Navigatore** | La strada per arrivarci, a piedi o in auto, evitando le strade segnate come interrotte. |
 | **Piano familiare** | Punti di ritrovo, contatti e medicinali: si compila prima e si stampa. |
-| **Cerca una persona** | In fondo alla pagina principale: chi sta bene lascia il suo nome, chi cerca qualcuno lo trova. |
+| **Cerca una persona** | In fondo alla pagina principale: chi sta bene lascia il suo nome, chi cerca qualcuno può cercarlo. |
 
-Pagine in italiano e in inglese, scelte dalla lingua del telefono. Mappe di qualunque zona del mondo.
+Pagine in italiano e in inglese: la lingua del telefono, o IT | EN in alto. Mappe di qualunque zona
+del mondo.
 
 ## Come si accende
 
@@ -73,8 +73,8 @@ CAP, PFIF) · [navigatore ed enciclopedia](docs/FUNZIONI.md) · [sicurezza](docs
 
 ## Costruiamolo insieme
 
-> **Vuoi dare una mano?** Stiamo costruendo una community di ingegneri, ethical hacker e persone
-> comuni per provare il Campanile su dispositivi veri e portarlo in altri quartieri.
+> **Vuoi dare una mano?** Cerchiamo persone che provino il Campanile su dispositivi veri, tecniche
+> o no.
 >
 > Scrivi a **[info@carrotstudio.it](mailto:info@carrotstudio.it)**: raccontaci chi sei e cosa ti piacerebbe provare.
 
@@ -108,8 +108,8 @@ simile? Scrivicelo.
 
 ## Come è fatto
 
-Fatto da CarrotStudio, con l'aiuto di un assistente IA per il codice. Ogni modifica è provata, e
-quello che abbiamo verificato è scritto in [docs/PROVE.md](docs/PROVE.md).
+Fatto da CarrotStudio, con l'aiuto di un assistente IA per il codice. I test girano a ogni modifica,
+su Linux, macOS e Windows; quello che abbiamo verificato a mano è in [docs/PROVE.md](docs/PROVE.md).
 
 ## Licenze
 

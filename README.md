@@ -9,9 +9,9 @@
 
 [![Tests](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml/badge.svg)](https://github.com/Carrotstudiosoftwarehouse/campanile/actions/workflows/ci.yml) [![Release](https://img.shields.io/github/v/release/Carrotstudiosoftwarehouse/campanile)](https://github.com/Carrotstudiosoftwarehouse/campanile/releases) [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-A neighborhood information and help point that keeps working when the internet is gone. For
-centuries the bells of the campanile, the Italian bell tower, warned the village of danger and
-called everyone together: Campanile does the same when the network goes down.
+A neighborhood information and help point that keeps working when the internet is gone. It is
+named after the campanile, the Italian bell tower whose bells called the village together in
+danger.
 
 > [!WARNING]
 > **Version 0.1 is experimental.** Tested on Mac, Windows and Linux and in one field test with no
@@ -21,7 +21,7 @@ called everyone together: Campanile does the same when the network goes down.
 <p align="center">
   <img src="docs/immagini/campanile.gif" width="600" alt="Campanile with no internet: official notices, I need and I can give, a request on the neighborhood board, the offline map and the nearest pharmacy, a route around a closed street, offline medicine">
 </p>
-<p align="center"><em>Shown here on a computer: the pages are made for phones and work on any screen.</em></p>
+<p align="center"><em>Shown here on a computer: the pages are made for phones, and work on bigger screens too.</em></p>
 
 ## What it does
 
@@ -36,9 +36,10 @@ their own phone, with no app, no account and no mobile credit, and finds:
 | **Offline map** | Your area street by street. Search, or tap **Hospital, Pharmacy, Water, Police** for the nearest. |
 | **Navigator** | The way there, on foot or by car, around the streets marked as blocked. |
 | **Family plan** | Meeting points, contacts and medicines: filled in beforehand and printed. |
-| **Look for someone** | At the bottom of the home page: whoever is safe leaves their name, whoever is looking for someone finds it. |
+| **Look for someone** | At the bottom of the home page: whoever is safe leaves their name, whoever is looking for someone can search it. |
 
-Pages in English and Italian, picked from the phone's language. Maps for any area of the world.
+Pages in English and Italian: the phone's language, or IT | EN at the top. Maps for any area of
+the world.
 
 ## Turn it on
 
@@ -73,8 +74,7 @@ Pages in English and Italian, picked from the phone's language. Maps for any are
 
 ## Build it with us
 
-> **Want to help?** We're building a community of engineers, ethical hackers and everyday people
-> to test Campanile on real devices and bring it to more neighborhoods.
+> **Want to help?** We need people to try Campanile on real devices, technical or not.
 >
 > Write to **[info@carrotstudio.it](mailto:info@carrotstudio.it)**: tell us who you are and what you'd like to try.
 
@@ -108,8 +108,8 @@ something like this? Tell us.
 
 ## How it is built
 
-Made by CarrotStudio, with the help of an AI coding assistant. Every change is tested, and what
-we checked is written down in [docs/TESTING.md](docs/TESTING.md).
+Made by CarrotStudio, with the help of an AI coding assistant. The tests run on every change, on
+Linux, macOS and Windows; what we checked by hand is in [docs/TESTING.md](docs/TESTING.md).
 
 ## Licenses
 
