@@ -10,6 +10,7 @@ export const STRINGS = {
 
     "home.title": "Internet non funziona?",
     "home.subtitle": "Qui trovi informazioni e aiuto nella tua zona.",
+    "tip.battery": "Senza campo? Attiva la modalità aereo e riaccendi il Wi-Fi: risparmi batteria e il Campanile funziona.",
     "home.notices": "Avvisi ufficiali",
     "home.actions": "Cosa vuoi fare",
     "home.need": "Ho bisogno",
@@ -559,6 +560,7 @@ export const STRINGS = {
 
     "home.title": "Internet down?",
     "home.subtitle": "Here you'll find information and help in your area.",
+    "tip.battery": "No signal? Turn on airplane mode and turn Wi-Fi back on: you save battery, and Campanile still works.",
     "home.notices": "Official notices",
     "home.actions": "What do you want to do",
     "home.need": "I need",

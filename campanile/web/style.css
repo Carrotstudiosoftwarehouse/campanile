@@ -65,6 +65,8 @@ h2::after {
   background: currentColor;
 }
 p.subtitle { color: var(--muted); margin-top: 0; }
+/* A tip under it, in black: read by people whose battery has to last. */
+p.tip { margin: 8px 0 0; font-size: 0.95rem; }
 
 a { color: var(--accent); }
 
