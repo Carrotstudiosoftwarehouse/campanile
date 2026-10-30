@@ -2,10 +2,9 @@
 
 # Comunicare quando non c'è rete
 
-Il Campanile è una bacheca pubblica di quartiere, non un sistema di messaggi privati. Per
-parlare con la propria famiglia o con un gruppo quando internet e la rete telefonica non
-funzionano, esistono strumenti già pronti e collaudati. Questa pagina dice cosa sono,
-quanto costano e cosa **non** garantiscono.
+Il Campanile è una bacheca pubblica di quartiere, non un sistema di messaggi privati. Per parlare
+con la propria famiglia o con un gruppo quando internet e la rete telefonica non funzionano,
+esistono strumenti già pronti.
 
 Regola generale: **ogni trasmissione radio si può localizzare.** Chi ha l'attrezzatura
 adatta (un radiogoniometro) può capire da dove trasmetti, cifrata o no. Teniamone conto
@@ -15,7 +14,7 @@ in situazioni di conflitto.
 
 [Briar](https://briarproject.org) è un'app di messaggistica gratuita e open source. Senza
 internet passa i messaggi via **Bluetooth o Wi-Fi** tra telefoni vicini; con internet
-passa attraverso la rete Tor. I messaggi sono cifrati e non passano da nessun server.
+passa attraverso la rete Tor. I messaggi sono cifrati e non passano da un server centrale.
 
 - **Solo Android** (Google Play o F-Droid). La FAQ del progetto, alla domanda su una
   versione per iPhone, risponde "probabilmente no", per i limiti che iOS pone alle app in
@@ -56,7 +55,8 @@ Non servono internet, credito o telefoni: si preme e si parla.
   vietati ripetitori e stazioni fisse.
 - In Italia sono di **libero uso**: niente autorizzazioni né canoni (art. 105 del Codice
   delle comunicazioni elettroniche). Sono vietati gli apparati non omologati e le
-  modifiche, come antenne diverse o potenza maggiore.
+  modifiche, come antenne diverse o potenza maggiore. Fuori dall'Italia, controlla le regole
+  del paese in cui sei.
 - Portata: da qualche centinaio di metri in città a qualche chilometro in campo aperto.
 - **Nessuna riservatezza:** chiunque sia sintonizzato sullo stesso canale ascolta.
 

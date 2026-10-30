@@ -4,17 +4,14 @@
 
 ## Where we want to go
 
-Campanile is the first brick of something bigger: open civil infrastructure, built by the
-community, that keeps working when the central one fails after an attack, a hybrid war or a
-disaster.
+Campanile is a first step toward open civil infrastructure that keeps working when the usual one
+fails: after an attack, a hybrid war or a disaster.
 
 Today a Campanile is one node: a neighborhood, a square, a gym. The goal is a **network of nodes**
-that pass notices from neighborhood to neighborhood without the internet. No company owns it and
-it tracks no one (no accounts, no analytics, no record of who connects). It belongs to whoever
-switches it on.
+that pass notices from neighborhood to neighborhood without the internet. It is MIT-licensed, with
+no accounts and no analytics.
 
-Nobody can build this alone. Everything below is an open idea, not a promise. If one speaks to
-you, open an issue.
+Everything below is an open idea, not a promise. If one speaks to you, open an issue.
 
 **The order matters.** First one node that works, that anyone can use and that is honest about
 its limits. Then many. A network nobody can rely on would only spread the problem.
@@ -40,8 +37,8 @@ field with many real people. What we tested: [docs/TESTING.md](docs/TESTING.md).
   held for approval, cleanup in batches
 - [x] One password per person on the admin page, made by the Campanile: the log says who did what
 - [x] Signed versions: every release signed offline by CarrotStudio, and GitHub publishes only a
-  package that matches. A Campanile updates from a USB stick only to a newer signed version, and a
-  power cut halfway is finished at the next start
+  package that matches. A Campanile updates from a USB stick only to a newer signed version, and an
+  update stopped halfway is finished at the next start
 - [x] Pages ready for right-to-left languages such as Arabic: only the translation is missing
 - [x] Ready for North America: the laptop's window in the computer's language, the emergency
   number set on the admin page (911 by itself on a computer set to the US or Canada), miles,
@@ -51,10 +48,12 @@ field with many real people. What we tested: [docs/TESTING.md](docs/TESTING.md).
 - [x] Accessibility checked by machine: every page in both languages passes axe-core's WCAG 2.2 AA
   check and stays readable at 200% zoom without sideways scrolling. Large buttons, black on white,
   red only for warnings, ink blue only for section titles
-- [x] Tested on a real iPhone and on Windows 11 as an ordinary person would. Installer tested on
-  Debian 12 and 13. Tests on Linux, Windows and macOS at every change
-- [x] Our own security reviews, as attackers: every finding fixed with a test that fails on the
-  old code (no external audit yet)
+- [x] Tested on a real iPhone and on Windows 11 ARM in a VM. Installer tested in containers on
+  Debian 12 and 13 and on Raspberry Pi OS. Tests on Linux, Windows and macOS at every change
+- [x] Our own security reviews, as attackers: findings fixed with a test that fails on the old
+  code, or listed in LIMITS (no external audit yet)
+- [x] **A shorter `server.py`**: the request handling split from what each request does, in
+  five modules, by moving code only, with the same tests green before and after
 
 ## First: one node you can rely on
 
@@ -73,10 +72,8 @@ This comes before any network, roughly in this order.
 - [ ] **An external security audit**, by people outside the project, starting from our web server
 - [ ] **Sharing over a channel authenticated by the code**, so whoever stands between two
   Campaniles can't hold the downloads
-- [x] **A shorter `server.py`**: the request handling split from what each request does, in
-  five modules, by moving code only, with the same tests green before and after
 
-**2. Usable by everyone, starting now**
+**2. Usable by non-technical people**
 
 An automatic check finds only some of the problems. The rest takes people.
 
@@ -86,10 +83,9 @@ An automatic check finds only some of the problems. The rest takes people.
 - [ ] **A sign that joins the Wi-Fi**: the network's real name (also with `--ssid`) and a second
   QR code that connects the phone
 - [ ] **More languages** (Ukrainian, Arabic, French, German, Spanish...). Each is the text of
-  `campanile/web/strings.js` and `campanile/messages.py`, translated, and each opens a new
-  country. Right-to-left languages are ready: pages mirror by themselves, and Arabic street
-  names come out right on the map (checked on Cairo). Only the translation is missing, by a
-  native speaker
+  `campanile/web/strings.js` and `campanile/messages.py`, translated. Right-to-left languages are
+  ready: pages mirror by themselves, and Arabic street names come out right on the map (checked on
+  Cairo). Only the translation is missing, by a native speaker
 
 **3. Trust the phone can check by itself**
 
@@ -101,12 +97,11 @@ An automatic check finds only some of the problems. The rest takes people.
   computer over SSH, since the password would cross the open Wi-Fi in clear. It needs HTTPS first
 - [ ] **Signed notices checked on the phone**, with a key that doesn't travel on the same network
 - [ ] **Two keys for a signed notice**: it counts only when, say, 2 of 3 trusted people sign it, so
-  one stolen key is not enough. Rules from multisigs read in real code (EtherFi's MultiSig, 0x
-  Settler's Safe guard): each signer counts once and only if listed, the threshold is never 0
+  one stolen key is not enough. Each signer counts once and only if listed, the threshold is never 0
   nor above the number of keys, and spare keys keep notices going if one is lost. Each signature
   already binds one notice, once (own prefix, expiry, duplicates refused)
 - [ ] **IT-alert's own signatures checked**, to mark alerts that really come from the civil
-  protection as "verified". Tried on 26 October 2026 with signxml, a proven library. The three
+  protection as "verified". Tried on 26 October 2026 with signxml. The three
   signed messages IT-alert published in summer 2023
   ([pcm-dpc/IT-alert-Hub](https://github.com/pcm-dpc/IT-alert-Hub)) verify against its published
   certificate, and one changed letter breaks them. But that certificate expired in June 2024,
@@ -141,17 +136,15 @@ Only once a single node has proven itself in the field.
 
 ## Dove vogliamo arrivare
 
-Il Campanile è il primo mattone di qualcosa di più grande: un'infrastruttura civile aperta,
-costruita dalla community, che regga quando quella centrale cade per un attacco, una guerra ibrida
-o un disastro.
+Il Campanile è un primo passo verso un'infrastruttura civile aperta che regga quando quella di
+sempre cade: per un attacco, una guerra ibrida o un disastro.
 
 Oggi un Campanile è un nodo solo: un quartiere, una piazza, una palestra. L'obiettivo è una **rete
-di nodi** che passano gli avvisi da un quartiere all'altro senza internet. Non è di nessuna
-azienda e non traccia nessuno (niente account, niente statistiche, nessun registro di chi si
-collega). È di chi lo accende.
+di nodi** che passano gli avvisi da un quartiere all'altro senza internet. È sotto licenza MIT,
+senza account né statistiche.
 
-Da soli non si costruisce. Tutto quello che segue è un'idea aperta, non una promessa. Se una di
-queste ti parla, apri una issue.
+Tutto quello che segue è un'idea aperta, non una promessa. Se una di queste ti parla, apri una
+issue.
 
 **L'ordine conta.** Prima un nodo solo che funziona, che chiunque sa usare e che dice onestamente
 i suoi limiti. Poi tanti. Una rete su cui nessuno può contare porterebbe soltanto il problema più
@@ -183,7 +176,7 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
   cosa
 - [x] Versioni firmate: ogni versione firmata offline da CarrotStudio, e GitHub pubblica solo un
   pacchetto che combacia. Un Campanile si aggiorna da chiavetta solo a una versione più nuova e
-  firmata, e un blackout a metà viene completato alla riaccensione
+  firmata, e un aggiornamento fermato a metà viene completato alla riaccensione
 - [x] Pagine pronte per le lingue da destra a sinistra come l'arabo: manca solo la traduzione
 - [x] Pronto per il Nord America: la finestra del portatile nella lingua del computer, il numero
   di emergenza impostato nella gestione (911 da solo su un computer impostato su Stati Uniti o
@@ -193,10 +186,13 @@ Cosa abbiamo provato: [docs/PROVE.md](docs/PROVE.md). I nostri limiti:
 - [x] Accessibilità controllata dalla macchina: ogni pagina nelle due lingue supera il controllo
   WCAG 2.2 AA di axe-core e resta leggibile con lo zoom al 200% senza scorrere di lato. Pulsanti
   grandi, nero su bianco, rosso solo per gli avvisi, blu inchiostro solo per i titoli delle sezioni
-- [x] Provato su un iPhone vero e su Windows 11 come farebbe una persona qualunque. Installazione
-  provata su Debian 12 e 13. Test su Linux, Windows e macOS a ogni modifica
-- [x] Revisioni di sicurezza fatte da noi, da attaccanti: ogni difetto corretto con un test che
-  fallisce sul codice di prima (nessun audit esterno, per ora)
+- [x] Provato su un iPhone vero e su Windows 11 ARM in una macchina virtuale. Installazione provata
+  in container su Debian 12 e 13 e su Raspberry Pi OS. Test su Linux, Windows e macOS a ogni
+  modifica
+- [x] Revisioni di sicurezza fatte da noi, da attaccanti: difetti corretti con un test che
+  fallisce sul codice di prima, o scritti nei LIMITI (nessun audit esterno, per ora)
+- [x] **Un `server.py` più corto**: la gestione delle richieste separata da quello che ognuna fa,
+  in cinque moduli, solo spostando codice, con gli stessi test verdi prima e dopo
 
 ## Prima di tutto: un nodo su cui contare
 
@@ -217,10 +213,8 @@ Viene prima di qualunque rete, più o meno in quest'ordine.
   server web
 - [ ] **Condivisione su un canale autenticato con il codice**, così chi si mette fra due
   Campanili non può tenerne occupati i download
-- [x] **Un `server.py` più corto**: la gestione delle richieste separata da quello che ognuna fa,
-  in cinque moduli, solo spostando codice, con gli stessi test verdi prima e dopo
 
-**2. Usabile da tutti, da subito**
+**2. Usabile da chi non è tecnico**
 
 Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano le persone.
 
@@ -230,7 +224,7 @@ Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano l
 - [ ] **Un cartello che collega alla Wi-Fi**: il nome vero della rete (anche con `--ssid`) e un
   secondo codice QR che collega il telefono
 - [ ] **Altre lingue** (ucraino, arabo, francese, tedesco, spagnolo...). Ognuna è il testo di
-  `campanile/web/strings.js` e `campanile/messages.py`, tradotto, e ognuna apre un paese.
+  `campanile/web/strings.js` e `campanile/messages.py`, tradotto.
   Le lingue da destra a sinistra sono pronte: le pagine si rovesciano da sole, e sulla mappa i
   nomi arabi escono giusti (provato sul Cairo). Manca solo la traduzione, da un madrelingua
 
@@ -245,19 +239,17 @@ Un controllo automatico trova solo una parte dei problemi. Il resto lo trovano l
   HTTPS
 - [ ] **Avvisi firmati verificati sul telefono**, con una chiave che non viaggia sulla stessa rete
 - [ ] **Due chiavi per un avviso firmato**: vale solo se lo firmano, per esempio, 2 persone fidate
-  su 3, così una chiave rubata non basta. Regole prese da multisig letti nel codice vero (il
-  MultiSig di EtherFi, la Safe guard di 0x Settler): ogni firmatario conta una volta sola e solo
+  su 3, così una chiave rubata non basta. Ogni firmatario conta una volta sola e solo
   se è in lista, la soglia non è mai 0 né più alta del numero di chiavi, e le chiavi di scorta
   tengono in piedi gli avvisi se se ne perde una. Ogni firma vale già per un solo avviso, una
   volta (prefisso proprio, scadenza, doppioni rifiutati)
-- [ ] **Firme di IT-alert verificate**, per segnare come "verificato" un allarme che arriva
-  davvero dalla protezione civile. Provato il 26 ottobre 2026 con signxml, una libreria
-  collaudata. I tre messaggi firmati pubblicati da IT-alert nell'estate 2023
-  ([pcm-dpc/IT-alert-Hub](https://github.com/pcm-dpc/IT-alert-Hub)) si verificano con il suo
-  certificato pubblicato, e una lettera cambiata li rompe. Ma quel certificato è scaduto a giugno
-  2024, i messaggi successivi non sono firmati, e il registro che dovrebbe garantirlo non si
-  verifica. Un "verificato" costruito così sarebbe falso. Servono prima le chiavi attuali della
-  protezione civile
+- [ ] **Firme di IT-alert verificate**, per segnare come "verificato" un allarme che arriva davvero
+  dalla protezione civile. Provato il 26 ottobre 2026 con signxml. I tre messaggi firmati pubblicati
+  da IT-alert nell'estate 2023 ([pcm-dpc/IT-alert-Hub](https://github.com/pcm-dpc/IT-alert-Hub)) si
+  verificano con il suo certificato pubblicato, e una lettera cambiata li rompe. Ma quel certificato
+  è scaduto a giugno 2024, i messaggi successivi non sono firmati, e il registro che dovrebbe
+  garantirlo non si verifica. Un "verificato" costruito così sarebbe falso. Servono prima le chiavi
+  attuali della protezione civile
 - [ ] **Rilevatore di reti gemelle**: una seconda antenna Wi-Fi ascolta se nei paraggi c'è un falso
   "Campanile" e pubblica un avviso. **Solo un avviso, mai una prova.** Gli sfugge un falso che non
   sente, o una copia fedele. A provare che un Campanile è vero sono HTTPS e le firme

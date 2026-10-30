@@ -2,9 +2,8 @@
 
 # Talking when there is no network
 
-Campanile is a public neighborhood board, not a private messaging system. To talk with your
-family or a group when the internet and the phone network are down, there are ready-made,
-proven tools. This page says what they are, what they cost and what they do **not** promise.
+Campanile is a public neighborhood board, not a private messaging system. To talk with your family
+or a group when the internet and the phone network are down, there are ready-made tools.
 
 General rule: **every radio transmission can be located.** Someone with the right equipment (a
 direction finder) can tell where you are transmitting from, encrypted or not. Keep it in mind in
@@ -14,7 +13,7 @@ a conflict.
 
 [Briar](https://briarproject.org) is a free, open-source messaging app. With no internet it
 passes messages over **Bluetooth or Wi-Fi** between nearby phones; with internet it goes through
-the Tor network. Messages are encrypted and never go through a server.
+the Tor network. Messages are encrypted and go through no central server.
 
 - **Android only** (Google Play or F-Droid). Asked about an iPhone version, the project's FAQ
   answers "probably not", because of the limits iOS puts on apps in the background

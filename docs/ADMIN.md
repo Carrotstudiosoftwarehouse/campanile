@@ -24,9 +24,10 @@ author remove it.
 If someone floods the board, the admin page shows new posts **waiting for approval**, and can
 close in one click all posts from one device or from the last 15 or 60 minutes.
 
-Posts expire after 14 days, "I'm safe" names after 60 (`--post-days` and `--safe-days` change
-this, 0 keeps them). The admin page also shows a log of what was done, when and by whom, and the
-Campanile's clock, which you can set there (without internet a Raspberry restarts behind).
+Posts expire after 14 days, "I'm safe" names after 60 (the `server.py` options `--post-days` and
+`--safe-days` change this, 0 keeps them). The admin page also shows a log of what was done, when and
+by whom, and the Campanile's clock, which you can set there (without internet a Raspberry restarts
+behind).
 
 ### The emergency number
 
@@ -44,11 +45,11 @@ someone leaves, remove only them: their password stops working at once.
 ### Signed notices (optional)
 
 An authority, such as civil protection, can sign its notices. Only notices signed with its key
-show *"Signed notice · Protezione Civile Torino"*.
+show *"Notice signed · Protezione Civile Torino"*.
 
 1. **The authority**, once, on its own computer (`pip install cryptography`):
    `scripts/sign-notice.py keygen --name "Protezione Civile Torino" --out keys/`.
-   The private key never leaves that computer.
+   Keep the private key on that computer only.
 2. **Each Campanile**, before the emergency, adds the public part as
    `{"keys": [ ...public.json... ]}` to `/etc/campanile/trusted-keys.json` (Raspberry) or
    `data/trusted-keys.json` (laptop).
@@ -56,7 +57,7 @@ show *"Signed notice · Protezione Civile Torino"*.
    and paste the output in the admin page. Signed notices expire (24 hours by default, 7 days at
    most) and can't be published twice.
 
-`--require-signed` makes a Campanile refuse unsigned official notices.
+The `server.py` option `--require-signed` makes a Campanile refuse unsigned official notices.
 
 ### Official alerts in CAP
 
@@ -70,9 +71,9 @@ published ([pcm-dpc/IT-alert-Hub](https://github.com/pcm-dpc/IT-alert-Hub), all 
 refused as exercises, and read in full once marked as real) and on five real alerts of the Italian
 Air Force's weather service.
 
-The reader is small and strict. Always saying why, it refuses any DTD or entity (how XML files
-attack their reader), files over 512 kB, exercises, tests, cancellations, alerts not meant for
-the public, expired ones and the same alert twice.
+With a reason each time, the reader refuses any DTD or entity (how XML files attack their
+reader), files over 512 kB, exercises, tests, cancellations, alerts not meant for the public,
+expired ones and the same alert twice.
 
 **What it doesn't do.** It doesn't check the alert's own digital signature, so the issuer shown is
 the one the file names, trusted because the Campanile's admin loaded it. It doesn't receive alerts
@@ -81,7 +82,7 @@ by itself.
 ### Handing over the "I'm safe" names (PFIF)
 
 After an emergency, the names can go to whoever gathers news of missing people. **Export the names
-(PFIF)** saves a PFIF 1.4 file, the format born after Hurricane Katrina and used by Google Person
-Finder after the Haiti and Japan earthquakes. Each record says it is not verified, since anyone
-can register any name. The codes that remove a name and the phones' tags never leave. The file
-holds names, messages and places, so it is personal data, only for those who need it.
+(PFIF)** saves a PFIF 1.4 file, the format Google Person Finder used. Each record says it is not
+verified, since anyone can register any name. The codes that remove a name and the phones' tags
+never leave. The file holds names, messages and places, so it is personal data, only for those who
+need it.

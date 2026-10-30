@@ -48,5 +48,5 @@ too, such as all of Wikipedia in any language. How to download it:
 
 - **An encyclopedia, not a doctor.** In immediate danger call the emergency number (112 in
   Europe), if the phone network works.
-- **The articles carry a date**, the day they were downloaded, and they don't update without
-  internet.
+- **The articles are as old as the Kiwix file** (its month is in the name), and they don't update
+  without internet.

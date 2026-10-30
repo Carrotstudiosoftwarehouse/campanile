@@ -47,6 +47,7 @@ scaricarla: [Installare il Campanile](INSTALLAZIONE.md).
 
 **I suoi limiti:**
 
-- **È un'enciclopedia, non un medico.** In pericolo immediato chiama il 112, se la rete telefonica
-  funziona.
-- **Le voci hanno una data**, quella del download, e senza internet non si aggiornano.
+- **È un'enciclopedia, non un medico.** In pericolo immediato chiama il numero di emergenza (112 in
+  Europa), se la rete telefonica funziona.
+- **Le voci hanno l'età del file di Kiwix** (il mese è nel nome), e senza internet non si
+  aggiornano.

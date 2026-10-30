@@ -24,10 +24,10 @@ chi l'ha pubblicato può toglierlo da solo.
 Se qualcuno inonda la bacheca, la gestione mostra i nuovi annunci **in attesa di approvazione**, e
 può chiudere in un clic tutti quelli di un dispositivo o degli ultimi 15 o 60 minuti.
 
-Gli annunci si cancellano da soli dopo 14 giorni, i nomi di "sto bene" dopo 60 (`--post-days` e
-`--safe-days` li cambiano, 0 li tiene). La gestione mostra anche il registro di cosa è stato fatto,
-quando e da chi, e l'orologio del Campanile, che lì si può correggere (senza internet il
-Raspberry riparte indietro).
+Gli annunci si cancellano da soli dopo 14 giorni, i nomi di "sto bene" dopo 60 (le opzioni di
+`server.py` `--post-days` e `--safe-days` li cambiano, 0 li tiene). La gestione mostra anche il
+registro di cosa è stato fatto, quando e da chi, e l'orologio del Campanile, che lì si può
+correggere (senza internet il Raspberry riparte indietro).
 
 ### Il numero di emergenza
 
@@ -49,7 +49,7 @@ chiave mostrano *"Avviso firmato · Protezione Civile Torino"*.
 
 1. **L'autorità**, una volta sola, sul proprio computer (`pip install cryptography`):
    `scripts/sign-notice.py keygen --name "Protezione Civile Torino" --out keys/`.
-   La chiave privata non lascia mai quel computer.
+   Tieni la chiave privata solo su quel computer.
 2. **Ogni Campanile**, prima dell'emergenza, aggiunge la parte pubblica nella forma
    `{"keys": [ ...public.json... ]}` a `/etc/campanile/trusted-keys.json` (Raspberry) o a
    `data/trusted-keys.json` (portatile).
@@ -57,7 +57,8 @@ chiave mostrano *"Avviso firmato · Protezione Civile Torino"*.
    e incolla il risultato nella pagina di gestione. Gli avvisi firmati scadono (24 ore di default,
    al massimo 7 giorni) e non si possono pubblicare due volte.
 
-Con `--require-signed` un Campanile rifiuta gli avvisi ufficiali non firmati.
+Con l'opzione `--require-signed` di `server.py` un Campanile rifiuta gli avvisi ufficiali non
+firmati.
 
 ### Allarmi ufficiali in CAP
 
@@ -71,8 +72,8 @@ messaggi pubblicati da IT-alert ([pcm-dpc/IT-alert-Hub](https://github.com/pcm-d
 tutti test pubblici, quindi rifiutati come esercitazioni, e letti per intero una volta segnati
 come reali) e su cinque allarmi veri del Servizio Meteorologico dell'Aeronautica Militare.
 
-Il lettore è piccolo e severo. Dicendo sempre perché, rifiuta qualsiasi DTD o entità (è così che
-un file XML attacca chi lo legge), i file oltre 512 kB, esercitazioni, prove, annullamenti,
+Il lettore rifiuta, dicendo sempre perché, qualsiasi DTD o entità (è così che un file XML attacca
+chi lo legge), i file oltre 512 kB, esercitazioni, prove, annullamenti,
 allarmi non destinati al pubblico, quelli scaduti e lo stesso allarme due volte.
 
 **Cosa non fa.** Non controlla la firma digitale propria dell'allarme, quindi la fonte mostrata è
@@ -81,9 +82,8 @@ riceve gli allarmi da solo.
 
 ### Consegnare i nomi di "sto bene" (PFIF)
 
-Dopo un'emergenza i nomi possono andare a chi raccoglie le notizie sulle persone disperse.
-**Esporta i nomi (PFIF)** salva un file PFIF 1.4, il formato nato dopo l'uragano Katrina e usato
-da Google Person Finder dopo i terremoti di Haiti e del Giappone. Ogni voce dice che non è
+Dopo un'emergenza i nomi possono andare a chi raccoglie le notizie sulle persone disperse. **Esporta
+i nomi (PFIF)** salva un file PFIF 1.4, il formato di Google Person Finder. Ogni voce dice che non è
 verificata, perché chiunque può registrare qualunque nome. I codici che tolgono un nome e le
 etichette dei telefoni non escono mai. Il file contiene nomi, messaggi e luoghi, quindi dati
 personali, da dare solo a chi ne ha bisogno.

@@ -2,35 +2,33 @@
 
 Per collaborare · To collaborate: **[info@carrotstudio.it](mailto:info@carrotstudio.it)**
 
-**Chiunque può contribuire, e nessuno giudica.** Una correzione, una funzione nuova, una
-traduzione, una frase scritta meglio, il resoconto di una prova. Il Campanile deve restare
-**semplice, affidabile e comprensibile da chi non è tecnico**, e ogni modifica risponde a una
-domanda: *aiuta qualcuno durante un'emergenza?*
+**Chiunque può contribuire.** Una correzione, una funzione nuova, una traduzione, una frase
+scritta meglio, il resoconto di una prova. Il Campanile deve restare **semplice per chi non è
+tecnico**, e ogni modifica risponde a una domanda: *aiuta qualcuno durante un'emergenza?*
 
-**Anyone can contribute, and nobody judges.** A fix, a new feature, a translation, a
-better-worded sentence, a test report. Campanile has to stay **simple, reliable and
-understandable for non-technical people**, and every change answers one question: *does it
-help someone during an emergency?*
+**Anyone can contribute.** A fix, a new feature, a translation, a better-worded sentence, a test
+report. Campanile has to stay **simple for non-technical people**, and every change answers one
+question: *does it help someone during an emergency?*
 
 Dove serve più aiuto: i limiti che conosciamo, in [docs/LIMITI.md](docs/LIMITI.md).
 Where help is needed most: the limits we know about, in [docs/LIMITS.md](docs/LIMITS.md).
 
 ## Il test delle famiglie · The family test
 
-Prima di ogni release: cinque persone senza competenze informatiche, di età diverse, il kit e
-una breve istruzione, nient'altro. Riescono da sole a collegarsi, leggere un avviso, chiedere
-aiuto e capire quando un'informazione non è verificata? Se no, non sono loro a dover imparare
-l'informatica. Siamo noi a dover migliorare il Campanile.
+Il test che vogliamo prima di ogni release, non ancora fatto: cinque persone senza competenze
+informatiche, di età diverse, il kit e una breve istruzione, nient'altro. Riescono da sole a
+collegarsi, leggere un avviso, chiedere aiuto e capire quando un'informazione non è verificata?
+Se no, si cambia il Campanile.
 
-Before every release: five non-technical people of different ages, the kit and a short
-instruction, nothing else. Can they connect, read a notice, ask for help and tell when
-information isn't verified, on their own? If not, it's not on them to learn computing. It's on
-us to improve Campanile.
+The test we want before every release, not yet done: five non-technical people of different
+ages, the kit and a short instruction, nothing else. Can they connect, read a notice, ask for
+help and tell when information isn't verified, on their own? If not, we change Campanile.
 
 ## Principi · Principles
 
-- **Nessuna dipendenza Python** · **No Python dependencies**: solo la libreria standard, Python 3.9
-  o più recente · standard library only, Python 3.9 or newer.
+- **Nessuna dipendenza obbligatoria** · **No required dependencies**: solo la libreria standard,
+  Python 3.9 o più recente; `cryptography` serve solo per firmare · standard library only, Python
+  3.9 or newer; `cryptography` only to sign.
 - **Tutto offline** · **Fully offline**: nessuna risorsa da internet nelle pagine; le librerie
   esterne passano da `scripts/prepare.sh`, con versione fissata e impronta SHA-256 · nothing from
   the internet in the pages; outside libraries come through `scripts/prepare.sh`, pinned and
@@ -69,7 +67,7 @@ campanile/
   store.py        data (SQLite), validation, rate limits
   devices.py      per-device limits (the phone's MAC, never stored)
   signing.py      signed notices (Ed25519); ed25519.py checks them where `cryptography` is missing
-  strictjson.py   the one JSON reader for whatever comes from outside: no key twice, no NaN
+  strictjson.py   the JSON reader for requests, signatures and share lists: no key twice, no NaN
   cap.py          official alerts in CAP, read from a file; pfif.py: the names as PFIF
   messages.py     messages in every language: the server's and the laptop window's
   places.py       the map search: names read from the map files, with bounded costs
@@ -86,16 +84,11 @@ demo/             the static online demo (a service worker plays the server)
 tests/            tests: run on Linux, Windows and macOS at every change
 ```
 
-- **No Python dependencies**: standard library only, Python 3.9 or newer.
-- **Fully offline**: the map's libraries, fonts and icons are downloaded by
-  `scripts/prepare.sh` with pinned versions and verified SHA-256 checksums.
 - **Development server:** `python3 campanile/server.py` (this computer only) or
   `python3 campanile/server.py --host 0.0.0.0` (whole network). `--help` lists the options.
-- **Tests:** `python3 -m unittest discover -s tests -v`
-- **Lint:** `ruff check campanile tests scripts/*.py && ruff format --check campanile tests scripts/*.py`
-- **Release package:** `scripts/build-package.sh`. A `v*` tag publishes it to Releases with
-  its `SHA256SUMS` and a signed build provenance. `gh attestation verify campanile-0.1.0.zip
-  -R Carrotstudiosoftwarehouse/campanile` shows which commit and which workflow built it.
+- **Release package:** `scripts/build-package.sh`. A `v*` tag publishes it to Releases with its
+  `SHA256SUMS` and a signed build provenance. `gh attestation verify campanile-VERSION.zip -R
+  Carrotstudiosoftwarehouse/campanile` shows which commit and which workflow built it.
 - **Release signature (maintainers):** CarrotStudio signs every version offline, with a key that
   never touches a network. Build the package, then `scripts/sign-release.py sign --key ...
   dist/campanile-VERSION.zip` writes `campanile/release-signature.json`: commit it and tag. The
@@ -107,7 +100,7 @@ tests/            tests: run on Linux, Windows and macOS at every change
 
 The code and its comments are in English. The pages are in Italian and English, picked from the
 phone's language; the laptop's window from the computer's. A new language is a column in
-`campanile/messages.py` and `campanile/web/strings.js`. A few documents are only in Italian.
+`campanile/messages.py` and `campanile/web/strings.js`.
 
 **The names at the top of the program folder never change.** A Campanile already installed
 copies an update with its own list of them (`copying.PROGRAM`): a renamed or new file there would
