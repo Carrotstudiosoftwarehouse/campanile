@@ -128,6 +128,10 @@ missing, tell us and we will add it.
   before this, a deleted phone number could still be read). But SD cards and SSDs move writes
   around inside the chip, so an old copy can survive there: only an encrypted disk would close
   that.
+- **The Raspberry's DHCP server keeps a list of phones.** NetworkManager's dnsmasq writes each
+  phone's MAC address, IP and device name to `/var/lib/NetworkManager/dnsmasq-wlan0.leases` on the
+  card, and to the system journal, which Raspberry Pi OS keeps in memory until reboot (tested in a
+  container). Campanile and nginx keep no connection log.
 - **Maps are read inside Campanile itself.** A map too big for the memory stops Campanile while
   it is read, board and notices included. A Raspberry starts it again by itself, a laptop with a
   double click. After three tries that map is set aside and the rest works. Measured on a laptop

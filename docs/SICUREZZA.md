@@ -6,22 +6,23 @@ English version: [THREAT-MODEL.md](THREAT-MODEL.md).
 
 - La Wi-Fi è **aperta e non cifrata**. Chiunque nei dintorni può collegarsi e vedere tutti gli
   annunci, i nomi in "sto bene" e gli avvisi.
-- **Nessun registro dei collegamenti.** Non si salvano indirizzi IP né pagine visitate.
+- **Il Campanile e nginx non registrano i collegamenti**: né indirizzi IP né pagine visitate. Il
+  server DHCP del Raspberry tiene il suo solito elenco dei telefoni ([LIMITI](LIMITI.md)).
 - Annunci chiusi o cancellati, nomi e avvisi tolti vengono **sovrascritti nel file**, non solo
   nascosti (una scheda SD o un SSD può tenere una copia vecchia dentro il chip: vedi
   [LIMITI](LIMITI.md)).
-- Il piano familiare **non arriva mai al Campanile e non resta nel telefono**. Vive nella pagina
-  aperta, e si stampa.
-- La gestione (avvisi, moderazione) funziona **solo dal Campanile stesso**, così la password non
-  passa mai sulla Wi-Fi.
-- **Niente resta per sempre.** Gli annunci si cancellano dopo 14 giorni, i nomi dopo 60
+- Il piano familiare **non arriva mai al Campanile e resta solo nella sua scheda aperta**, da
+  stampare.
+- Di norma la gestione (avvisi, moderazione) funziona **solo dal Campanile stesso**: la password
+  non passa mai sulla Wi-Fi.
+- **Annunci e nomi scadono.** Gli annunci si cancellano dopo 14 giorni, i nomi dopo 60
   (modificabili all'avvio), dal database, non nascosti (provato).
 - **Le azioni di chi gestisce restano scritte**: cosa, quando e chi, perché ogni volontario può
   avere una password sua (la crea il Campanile, e se ne tiene solo l'impronta). Si tengono le
   ultime 1.000.
 - **Chi gestisce può correggere l'orologio**, che il Raspberry perde senza internet (non ha batteria
-  per l'orologio). Al massimo a un anno dall'ora del computer, e resta scritto. Lo seguono gli orari
-  degli annunci, la cancellazione di quelli vecchi, gli avvisi firmati e l'ora dei telefoni
+  per l'orologio). Al massimo a circa 13 mesi dall'ora del computer, e resta scritto. Lo seguono gli
+  orari degli annunci, la cancellazione di quelli vecchi, gli avvisi firmati e l'ora dei telefoni
   (provato).
 
 ## Cosa può fare chi è collegato
@@ -46,19 +47,19 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 
 **Avvisi firmati (Ed25519):**
 
-- Controllati da OpenSSL, tramite la libreria standard `cryptography`, dove c'è (il Raspberry).
+- Controllati da OpenSSL, tramite il pacchetto `cryptography`, dove c'è (il Raspberry).
   Senza (i portatili), dal nostro `ed25519.py`: solo verifica, nessun segreto, segue l'RFC 8032 e
   dà la stessa risposta di OpenSSL sui vettori dell'RFC, sui 210 casi Wycheproof di Google e su
   12.000 firme casuali. Per firmare si usa sempre `cryptography`.
 - Le chiavi di fiducia si installano **prima**, su file, mai ricevute dalla rete, altrimenti chi
   falsifica l'avviso falsificherebbe anche la chiave.
-- La firma copre titolo, testo, urgenza, data e **scadenza** (massimo 7 giorni, e mai firmato
-  più di un giorno avanti rispetto all'orologio del Campanile). Il prefisso
+- La firma copre titolo, testo, urgenza, data e **scadenza** (massimo 7 giorni, e l'avviso si
+  rifiuta se è firmato più di un giorno avanti rispetto all'orologio del Campanile). Il prefisso
   `campanile-notice-v1` la lega a questo solo uso.
 - Lo stesso avviso firmato non si pubblica due volte, e sparisce alla scadenza.
 - Il testo firmato non si ripulisce. Se ha caratteri non validi, si rifiuta.
-- Chiavi JSON duplicate rifiutate ovunque, e si salva il documento verificato, riscritto, così due
-  programmi non leggono due avvisi diversi.
+- Chiavi JSON duplicate rifiutate nelle richieste e negli avvisi firmati, e si salva il documento
+  verificato, riscritto, così due programmi non leggono due avvisi diversi.
 - Un file delle chiavi rotto spegne solo gli avvisi firmati, non il Campanile.
 - La scadenza segue l'orologio del Raspberry, che senza internet può sbagliare.
 
@@ -66,8 +67,8 @@ Diamo per scontato che sulla rete ci sia anche chi vuole disturbare.
 
 - Il nostro lettore (`campanile/cap.py`, sul parser di Python) rifiuta qualsiasi DTD o entità, e
   così ferma la "billion laughs" e le entità esterne che leggono file del computer. Entrambi
-  provati, con file oltre 512 kB (i messaggi veri di IT-alert, con i poligoni delle zone, arrivano a
-  108 kB).
+  provati; i file oltre 512 kB si rifiutano (i messaggi veri di IT-alert, con i poligoni delle zone,
+  arrivano a 108 kB).
 - Solo dalla pagina di gestione, quindi solo dal Campanile stesso. I telefoni non possono mandare la
   richiesta più grande che serve a un allarme e restano al limite di 8 kB (provato).
 - Ogni blocco dev'essere CAP 1.1 o 1.2 valido, in qualunque lingua. Esercitazioni, prove,
@@ -98,34 +99,37 @@ gestione, e resta scritto. I codici che tolgono un nome e le etichette dei telef
 - **Un falso Campanile** (stesso nome di Wi-Fi, portale finto) non si distingue. Per il browser è
   *lo stesso sito* (`http://10.42.0.1`), quindi può leggere ciò che il vero ha lasciato nel telefono
   e lasciare in cache pagine e script che poi girano anche sulla rete vera, perfino dopo un
-  ricaricamento (provato con Chrome). Per questo il piano familiare non resta nel telefono. Restano
-  solo numeri e codici dei propri annunci, che al massimo permettono di chiuderli. La soluzione vera
+  ricaricamento (provato con Chrome). Per questo il piano familiare resta solo nella sua scheda
+  aperta: un falso Campanile caricato in quella scheda può leggerlo, una scheda nuova no (provato).
+  Il telefono tiene solo i propri annunci e nomi (numero, codice, primi 120 caratteri) e la lingua
+  scelta; al massimo i codici permettono di cancellarli. La soluzione vera
   è HTTPS con un certificato per ogni Campanile, che il telefono verifica da solo offline, più un
   rilevatore di reti gemelle (roadmap). Senza HTTPS i browser non offrono rimedi, perché i comandi
   per svuotare la cache di un sito funzionano solo in HTTPS.
 - **Il registro si può leggere quasi tutto** cercando molti nomi (almeno 2 lettere). È il suo scopo,
   far trovare le persone, e la pagina lo dice a chi si registra.
-- **I codici degli annunci viaggiano in chiaro.** Chi intercetta potrebbe chiudere un annuncio
-  altrui. Danno limitato e reversibile.
+- **I codici viaggiano in chiaro.** Chi intercetta potrebbe cancellare un annuncio o un nome
+  altrui. Danno limitato.
 - **I codici salvati sono SHA-256 senza "sale"**, ricavabili in pochi minuti da un database rubato.
   Il database lo legge solo il Campanile (nemmeno `kiwix-serve`, provato), quindi rubarlo vuol dire
   aver già preso il Campanile.
-- **Le pagine `https://` aperte prima di collegarsi danno un errore di certificato**, perché il
-  captive portal usa `http://`. È normale. Non va "accettato".
+- **Le pagine `https://` aperte prima di collegarsi falliscono subito**: il portale è solo
+  `http://`. È normale.
 
 ## La pagina di preparazione (solo portatile)
 
 L'unica parte che scarica da internet ed esegue programmi, quindi la più chiusa.
 
-- **Solo sul portatile** (`--setup`, lo accende `launch.py`). Sul Raspberry non è raggiungibile.
+- **Solo sul portatile** (`--setup`, lo accende `launch.py`). Spenta sul Raspberry (le sue API
+  rispondono 404).
 - **Solo da questo computer, con la password.** Mai dalla rete, nemmeno con `--admin-from-network`.
   Solo se il browser la chiama `localhost` o `127.0.0.1`, il che sventa il DNS rebinding verso
   127.0.0.1.
-- **Nessun indirizzo arriva dalla pagina.** Tre operazioni fisse. La zona è un rettangolo di numeri
-  controllato, al massimo 0,25 gradi quadrati.
-- **Solo HTTPS**, anche nei reindirizzamenti verso i mirror. I certificati si verificano con quelli
-  del sistema più l'elenco di Mozilla (certifi, fissato con SHA-256), perché il Python di python.org
-  sul Mac non ne ha e a un Windows appena installato ne mancano alcuni.
+- **Nessun indirizzo di internet arriva dalla pagina.** Operazioni fisse. La zona è un rettangolo di
+  numeri controllato, al massimo 0,25 gradi quadrati.
+- **Solo HTTPS verso internet**, anche nei reindirizzamenti verso i mirror. I certificati si
+  verificano con quelli del sistema più l'elenco di Mozilla (certifi, fissato con SHA-256), perché
+  il Python di python.org sul Mac non ne ha e a un Windows appena installato ne mancano alcuni.
 - **Programmi verificati.** Lo SHA-256 di `pmtiles` e `kiwix-serve` è scritto nel codice. Si
   estraggono solo i file nominati, col loro nome semplice. Niente shell, argomenti in lista, e
   "Annulla" li ferma.
@@ -148,13 +152,13 @@ L'unica parte che scarica da internet ed esegue programmi, quindi la più chiusa
   Campanile.
 - **Non si registra niente.**
 - **Costa poco.** Due lettere possono corrispondere a decine di migliaia di nomi (Milano, 101.425
-  nomi: 65 ms a ricerca), quindi se ne valutano al massimo 500. Una parola ripetuta conta una volta,
-  al massimo 4 parole, prima la più rara. Una parola che compare in più di 30.000 nomi vale solo per
-  i nomi che cominciano con ciò che si è scritto. Una lettera ripetuta quaranta volte, su 250.000
-  nomi, è passata da 162 a 5 ms, e nessuna ricerca su una mappa così costa più di qualche
-  millisecondo. 30 ricerche ogni 10 secondi per dispositivo, una alla volta. La successiva aspetta
-  al massimo un quarto di secondo, poi riceve "riprova tra un attimo". Con 30 telefoni che cercano
-  senza sosta, le ricerche degli altri richiedono 14 ms (provato).
+  nomi: 65 ms, ora 3,5 ms), quindi se ne valutano al massimo 500. Una parola ripetuta conta una
+  volta, al massimo 4 parole, prima la più rara. Una parola che compare in più di 30.000 nomi vale
+  solo per i nomi che cominciano con ciò che si è scritto. Una lettera ripetuta quaranta volte, su
+  250.000 nomi, è passata da 162 a 5 ms, e la ricerca più cara trovata costa 7,6 ms. 30 ricerche
+  ogni 10 secondi per dispositivo, una alla volta. La successiva aspetta al massimo un quarto di
+  secondo, poi riceve "riprova tra un attimo". Con 30 telefoni che cercano senza sosta, le ricerche
+  degli altri richiedono 14 ms di mediana (provato).
 - **I nomi restano testo** (`textContent`), quindi un nome ostile in una mappa non diventa codice.
 - **Mappe ostili.** Una mappa che arriva da un altro Campanile può essere fatta per tenerlo occupato
   o riempirgli la memoria, quindi leggere qualunque file costa un lavoro limitato. Una directory ha
@@ -168,8 +172,8 @@ L'unica parte che scarica da internet ed esegue programmi, quindi la più chiusa
     costavano un tempo che cresceva col file (uno stesso flusso letto 3.000 volte: 1,7 s) o tenevano
     1.000 paesi con lo stesso nome invece di 256. Le mappe vere danno gli stessi nomi.
   - Il fuzzing di 40.000 mappe alterate (`tests/fuzz_maps.py`) ha trovato sei tipi di difetto, il
-    peggiore pochi byte che facevano riempire 2 GB di memoria. Tutti corretti, e ogni file rovinato
-    ora finisce in un rifiuto pulito ([PROVE.md](PROVE.md)).
+    peggiore pochi byte che facevano riempire 2 GB di memoria. Tutti corretti; una seconda corsa di
+    15.000 casi non ne ha trovati ([PROVE.md](PROVE.md)).
 
 ## Il navigatore
 
@@ -201,8 +205,8 @@ L'unica parte che scarica da internet ed esegue programmi, quindi la più chiusa
   Misurato in un container con un telefono che chiede percorsi lunghi senza sosta. Su Torino con un
   quarto di processore, più o meno un Raspberry, i rifiuti "occupato" dell'altro telefono sono scesi
   da 9 su 15 a 1 su 19, e su una mappa ai tetti qui sotto da 16 su 17 a 5 su 20. Sul portatile delle
-  prove l'area metropolitana di Torino (129.326 tratti, 88.091 incroci) dà un percorso in auto di
-  20-30 km da un capo all'altro in 30-118 ms. Su un Raspberry è più lento, non ancora misurato.
+  prove l'area metropolitana di Torino (129.459 tratti, 88.112 incroci) dà un percorso in auto di
+  16-25 km da un capo all'altro in 84-111 ms. Su un Raspberry è più lento, non ancora misurato.
 - **Mappe ostili**, come per la ricerca. Le strade vengono solo dai pezzi più dettagliati: al
   massimo 4.000 (una zona della pagina di preparazione ne ha circa 2.900), 4 milioni di punti, e un
   tetto di lavoro (segmenti nelle celle, coppie di segmenti confrontate, per pezzo e per mappa) di
@@ -244,13 +248,13 @@ Così viaggiano i programmi, quindi le regole sono strette.
 - **Un elenco chiuso**: programma, mappe, Wikipedia, chiavi pubbliche degli avvisi firmati, Kiwix,
   Python. Mai il database (nomi, annunci, contatti) né la password. Nessuna cartella si copia così
   com'è.
-- **Una chiavetta ostile non può infilare niente.** Una cartella Campanile già presente si usa solo
-  se contiene esattamente ciò che la copia scrive. Un modulo, una libreria accanto a `kiwix-serve`,
-  un installatore, un database o una password nota infilati lì verrebbero usati da chi avvia la
-  copia. Qualunque altra cosa ferma la copia senza toccare niente (provati 10 tipi, compreso
-  l'attacco della nostra seconda revisione da attaccante, che faceva girare il suo codice dalla
-  copia e ora viene rifiutato). Si tolgono solo gli avanzi: copie interrotte, la cache di Python, i
-  file che aggiunge un Mac.
+- **La copia su una chiavetta manomessa viene rifiutata.** Una cartella Campanile già presente si
+  usa solo se contiene esattamente ciò che la copia scrive. Un modulo, una libreria accanto a
+  `kiwix-serve`, un installatore, un database o una password nota infilati lì verrebbero usati da
+  chi avvia la copia. Qualunque altra cosa ferma la copia senza toccare niente (provati 10 tipi,
+  compreso l'attacco della nostra seconda revisione da attaccante, che faceva girare il suo codice
+  dalla copia e ora viene rifiutato). Si tolgono solo gli avanzi: copie interrotte, la cache di
+  Python, i file che aggiunge un Mac.
 - **Nessun collegamento si segue o si accetta.** Una "mappa" che punta al database resta fuori
   (provato). Le cartelle si creano una per una, e ogni file, anche il leggimi e l'elenco, si scrive
   a parte e prende il suo posto solo completo. Un collegamento sulla chiavetta deviava due scritture
@@ -266,7 +270,7 @@ Così viaggiano i programmi, quindi le regole sono strette.
   Sigstore di python.org. Windows controlla la firma della Python Software Foundation (provato:
   valida), il Mac quella di Apple.
 - **Una copia incompleta si riconosce.** L'elenco delle impronte si scrive per ultimo, e all'avvio
-  un file del programma mancante o di dimensione sbagliata viene segnalato.
+  un file del programma mancante o cambiato (SHA-256) viene segnalato.
 
 ## Mappe e Wikipedia via Wi-Fi fra Campanili
 
@@ -344,13 +348,12 @@ I punti delicati sono i **collegamenti** tra i pezzi, e ognuno ha una prova.
   pagine del Campanile tengono nel browser (il piano familiare aperto) né usare le API del
   Campanile a nome del telefono.
 - **Firewall sull'hotspot.** Dai telefoni passano solo DHCP, DNS, ping, 80 e 8081. Nessun altro
-  servizio (SSH compreso), nessun inoltro. Provato da un secondo dispositivo, con la controprova a
+  servizio (SSH compreso), nessun inoltro. Provato da un secondo container, con la controprova a
   firewall spento.
 - **Telefoni isolati** (`ap-isolation`), così nessuno si finge router o DNS per gli altri. Provato
   con NetworkManager 1.42 e 1.52. Che il chip Wi-Fi del Raspberry lo rispetti va verificato sul
   campo.
-- **nginx non registra gli accessi.** Nessun indirizzo dei telefoni su disco, e un'inondazione non
-  riempie la scheda SD.
+- **nginx non registra gli accessi**: un'inondazione non riempie la scheda SD.
 - **Limiti per telefono in nginx**: 16 connessioni, 10 secondi per la richiesta, 20 richieste al
   secondo alle API. Quelli sulle pubblicazioni restano nel Campanile, per indirizzo vero. Provato
   con 300 connessioni lente: gli altri dispositivi continuano a funzionare.
@@ -365,7 +368,7 @@ I punti delicati sono i **collegamenti** tra i pezzi, e ognuno ha una prova.
 
 - Il servizio gira come utente `campanile`, senza privilegi, con le protezioni di systemd
   (`ProtectSystem=strict`, `NoNewPrivileges`, `PrivateTmp`, filesystem in sola lettura tranne
-  `/var/lib/campanile`, solo il permesso di aprire la porta 80).
+  `/var/lib/campanile`, nessuna capability: la porta 80 è di nginx).
 - `/opt/campanile` appartiene a root. Il servizio non può modificarlo.
 - La password di gestione, `/etc/campanile/password`, la leggono solo root e il servizio.
 - Kiwix ha le stesse restrizioni più `--blockexternal`, che blocca i link verso internet.

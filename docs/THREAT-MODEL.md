@@ -6,20 +6,20 @@ Italian version: [SICUREZZA.md](SICUREZZA.md).
 
 - The Wi-Fi is **open and unencrypted**. Anyone nearby can join and see all posts, "sto bene" (I'm
   safe) names and notices.
-- **No connection log.** No IP addresses or visited pages are saved.
+- **Campanile and nginx keep no connection log**: no IP addresses, no visited pages. The
+  Raspberry's own DHCP server keeps its usual list of phones ([LIMITS](LIMITS.md)).
 - Deleted or closed posts, names and notices are **overwritten in the file**, not just hidden (an
   SD card or SSD can still keep an old copy inside the chip: see [LIMITS](LIMITS.md)).
-- The family plan **never reaches the Campanile and isn't kept on the phone**. It lives in the open
-  page, and you print it.
-- Management (notices, moderation) works **only on the Campanile itself**, so the password never
-  crosses the Wi-Fi.
-- **Nothing stays forever.** Posts go after 14 days, names after 60 (adjustable at start), deleted
+- The family plan **never reaches the Campanile and stays only in its open tab**, to print.
+- By default, management (notices, moderation) works **only on the Campanile itself**: the password
+  never crosses the Wi-Fi.
+- **Posts and names expire.** Posts go after 14 days, names after 60 (adjustable at start), deleted
   from the database, not hidden (tested).
 - **Admin actions are logged**: what, when and who, since each volunteer can have a password of
   their own (made by the Campanile, kept only as a hash). The last 1,000 are kept.
-- **The admin can fix the clock**, which a Raspberry loses offline (no clock battery). Up to a year
-  from the computer's clock, and logged. Post times, deletion of old posts, signed notices and the
-  phones' time follow it (tested).
+- **The admin can fix the clock**, which a Raspberry loses offline (no clock battery). Up to about
+  13 months from the computer's clock, and logged. Post times, deletion of old posts, signed notices
+  and the phones' time follow it (tested).
 
 ## What anyone connected can do
 
@@ -43,27 +43,27 @@ We assume someone on the network wants to cause trouble.
 
 **Signed notices (Ed25519):**
 
-- Checked by OpenSSL, through the standard `cryptography` library, where it is installed (the
+- Checked by OpenSSL, through the `cryptography` package, where it is installed (the
   Raspberry). Without it (laptops), by our `ed25519.py`: checking only, no secrets, following
   RFC 8032, and giving OpenSSL's answer on the RFC vectors, on Google's 210 Wycheproof cases and
   on 12,000 random signatures. Signing always uses `cryptography`.
 - Trusted keys are installed **beforehand** as a file, never received from the network, or a forger
   would forge the key too.
-- The signature covers title, text, urgency, date and **expiry** (7 days max, and never signed over a
-  day ahead of the Campanile's clock). The prefix
-  `campanile-notice-v1` binds it to this use only.
+- The signature covers title, text, urgency, date and **expiry** (7 days max, and refused if signed
+  over a day ahead of the Campanile's clock). The prefix `campanile-notice-v1` binds it to this use
+  only.
 - A signed notice can't be published twice, and disappears at expiry.
 - Signed text isn't cleaned. Invalid characters are rejected.
-- Duplicate JSON keys are rejected everywhere, and the verified document is stored, rewritten, so
-  two parsers can't see two notices.
+- Duplicate JSON keys are rejected in requests and signed notices, and the verified document is
+  stored, rewritten, so two parsers can't see two notices.
 - A broken keys file disables only signed notices, not the Campanile.
 - Expiry follows the Raspberry's clock, which can be wrong offline.
 
 **Official CAP alerts, from a file on the admin page:**
 
 - Our reader (`campanile/cap.py`, on Python's parser) refuses any DTD or entity, which stops
-  "billion laughs" and external entities reading local files. Both tested, with files over 512 kB
-  (real IT-alert messages with area polygons reach 108 kB).
+  "billion laughs" and external entities reading local files. Both tested; files over 512 kB are
+  refused (real IT-alert messages with area polygons reach 108 kB).
 - Admin page only, so only from the Campanile itself. Phones can't send the larger request an alert
   needs and keep the 8 kB limit (tested).
 - Valid CAP 1.1 or 1.2 per block, any language. Exercises, tests, cancellations, non-public, expired
@@ -90,32 +90,32 @@ random name (`campanile-1a2b3c4d.invalid`) that reveals no location.
 - **A fake Campanile** (same Wi-Fi name, fake portal) can't be told apart. To the browser it is *the
   same site* (`http://10.42.0.1`), so it can read what the real one left on the phone and plant
   cached pages and scripts that then run on the real network, even after a reload (tested with
-  Chrome). Hence the family plan isn't kept on the phone. Only your posts' numbers and codes stay,
-  and at most they allow closing those posts. The real fix is HTTPS with a per-Campanile certificate
-  the phone checks offline, plus a twin-network detector (roadmap). Without HTTPS browsers have no
-  remedy, as cache-clearing commands need HTTPS.
+  Chrome). Hence the family plan lives only in its open tab: a fake Campanile loaded in that tab can
+  read it, a new tab can't (tested). The phone keeps only your own posts and names (number, code,
+  first 120 characters) and the language chosen; at most the codes allow deleting them. The real fix
+  is HTTPS with a per-Campanile certificate the phone checks offline, plus a twin-network detector
+  (roadmap). Without HTTPS browsers have no remedy, as cache-clearing commands need HTTPS.
 - **The registry can be read almost whole** by searching many names (2 letters minimum). That is its
   purpose, finding people, and the page tells whoever registers.
-- **Post codes travel in clear.** An eavesdropper could close someone's post. Limited, reversible
-  damage.
+- **Codes travel in clear.** An eavesdropper could delete someone's post or name. Limited damage.
 - **Stored codes are unsalted SHA-256**, recoverable in minutes from a stolen database. Only the
   Campanile can read it (not even `kiwix-serve`, tested), so stealing it means already owning the
   Campanile.
-- **`https://` pages opened before connecting show a certificate error**, since the portal uses
-  `http://`. That is normal. Don't "accept" it.
+- **`https://` pages opened before connecting fail at once**: the portal is `http://` only. That
+  is normal.
 
 ## The setup page (laptop only)
 
 The only part that downloads from the internet and runs programs, so the most locked down.
 
-- **Laptop only** (`--setup`, set by `launch.py`). Unreachable on the Raspberry.
+- **Laptop only** (`--setup`, set by `launch.py`). Off on the Raspberry (its API answers 404).
 - **Local, with the password.** Never from the network, not even with `--admin-from-network`. Only
   as `localhost` or `127.0.0.1`, which defeats DNS rebinding to 127.0.0.1.
-- **No address comes from the page.** Three fixed operations. The area is a checked rectangle of
+- **No internet address comes from the page.** Fixed operations. The area is a checked rectangle of
   numbers, at most 0.25 square degrees.
-- **HTTPS only**, mirror redirects too. Certificates are checked against the system's plus Mozilla's
-  (certifi, pinned by SHA-256), since python.org's Mac Python has none and a fresh Windows lacks
-  some.
+- **HTTPS only to the internet**, mirror redirects too. Certificates are checked against the
+  system's plus Mozilla's (certifi, pinned by SHA-256), since python.org's Mac Python has none and a
+  fresh Windows lacks some.
 - **Verified programs.** The SHA-256 of `pmtiles` and `kiwix-serve` is in the code. Only named files
   are extracted, under plain names. No shell, arguments as a list, and "Annulla" (Cancel) stops
   them.
@@ -136,13 +136,13 @@ The only part that downloads from the internet and runs programs, so the most lo
   drinking water...). Tested in a container with no network and in the browser: no request leaves
   the Campanile.
 - **Not logged.**
-- **Cheap.** Two letters can match tens of thousands of names (Milan, 101,425 names: 65 ms a
-  search), so at most 500 are ranked. Repeated words count once, 4 words at most, rarest first. A
-  word in over 30,000 names only matches names starting with the typed text. Forty copies of one
-  letter on 250,000 names went from 162 to 5 ms, and no search on such a map takes more than a few
-  milliseconds. 30 searches per 10 seconds per device, one at a time. The next waits up to a quarter
-  second, then gets "try again in a moment". With 30 phones searching nonstop, others' searches take
-  14 ms (tested).
+- **Cheap.** Two letters can match tens of thousands of names (Milan, 101,425 names: 65 ms, now 3.5
+  ms), so at most 500 are ranked. Repeated words count once, 4 words at most, rarest first. A word
+  in over 30,000 names only matches names starting with the typed text. Forty copies of one letter
+  on 250,000 names went from 162 to 5 ms, and the costliest search we found takes 7.6 ms. 30
+  searches per 10 seconds per device, one at a time. The next waits up to a quarter second, then
+  gets "try again in a moment". With 30 phones searching nonstop, others' searches take 14 ms at the
+  median (tested).
 - **Names stay text** (`textContent`), so a hostile name never becomes code.
 - **Hostile maps.** A map from another Campanile may be built to stall it or fill its memory, so
   reading any file costs a bounded amount. A directory holds a million entries at most and is read
@@ -155,7 +155,7 @@ The only part that downloads from the internet and runs programs, so the most lo
     growing with the file (one stream read 3,000 times: 1.7 s) or kept 1,000 same-name towns instead
     of 256. Real maps give the same names.
   - Fuzzing 40,000 altered maps (`tests/fuzz_maps.py`) found six kinds of flaw, the worst a few
-    bytes that filled 2 GB of memory. All fixed, and damaged files now end in a clean refusal
+    bytes that filled 2 GB of memory. All fixed; a rerun of 15,000 found none
     ([TESTING.md](TESTING.md)).
 
 ## The navigator
@@ -184,8 +184,8 @@ The only part that downloads from the internet and runs programs, so the most lo
   seconds stop and ask for nearer points. Measured in a container with one phone requesting long
   routes nonstop. On Turin with a quarter CPU, about a Raspberry, the other phone's "busy" refusals
   fell from 9 of 15 to 1 of 19, and on a map at the limits below from 16 of 17 to 5 of 20. On the
-  test laptop, metropolitan Turin (129,326 stretches, 88,091 junctions) gives a 20-30 km car route
-  across the whole map in 30-118 ms. A Raspberry is slower, not yet measured.
+  test laptop, metropolitan Turin (129,459 stretches, 88,112 junctions) gives a 16-25 km car route
+  across the whole map in 84-111 ms. A Raspberry is slower, not yet measured.
 - **Hostile maps**, as for search. Streets come only from the most detailed tiles: 4,000 at most (a
   setup-page area has about 2,900), 4 million points, and a work budget (segments into cells,
   segment pairs compared, per tile and per map) about 12 times metropolitan Turin's. Odd-sized tiles
@@ -220,7 +220,7 @@ travel this way, so the rules are strict.
   first time or again, trusts GitHub's copy the same way.
 - **A closed list**: program, maps, Wikipedia, signed-notice public keys, Kiwix, Python. Never the
   database (names, posts, contacts) or the password. No folder is copied as it is.
-- **A hostile stick can't slip anything in.** A Campanile folder already there is used only if it
+- **Copying onto a tampered stick is refused.** A Campanile folder already there is used only if it
   holds exactly what the copy writes. A planted module, library beside `kiwix-serve`, installer,
   database or known password would be used by whoever starts the copy. Anything else stops the copy
   untouched (10 kinds tested, including our second adversarial review's attack, which ran its code
@@ -239,7 +239,7 @@ travel this way, so the rules are strict.
   signature. Windows checks the Python Software Foundation's signature (tested: valid), the Mac
   Apple's.
 - **Incomplete copies are caught.** The hash list is written last, and at start a missing or
-  wrong-size program file is reported.
+  changed program file (SHA-256) is reported.
 
 ## Maps and Wikipedia over Wi-Fi between Campaniles
 
@@ -309,11 +309,12 @@ The sensitive points are the **links** between pieces, and each has a test.
 - **Wikipedia on its own origin** (port 8081). A Kiwix flaw can't read what Campanile pages keep in
   the browser (the open family plan) or use the Campanile's API as the phone.
 - **Hotspot firewall.** Phones reach only DHCP, DNS, ping, 80 and 8081. No other service (SSH
-  included), no forwarding. Tested from a second device, with a control run with the firewall off.
+  included), no forwarding. Tested from a second container, with a control run with the firewall
+  off.
 - **Phones isolated** (`ap-isolation`), so none can pose as router or DNS server for the others.
   Tested with NetworkManager 1.42 and 1.52. Whether the Raspberry's Wi-Fi chip honors it must be
   checked in the field.
-- **No nginx access log.** No phone addresses on disk, and floods can't fill the SD card.
+- **No nginx access log**: a flood can't fill the SD card.
 - **Per-phone limits in nginx**: 16 connections, 10 seconds per request, 20 API requests a second.
   Submission limits stay in the Campanile, per real address. Tested with 300 slow connections: other
   devices keep working.
@@ -327,8 +328,8 @@ The sensitive points are the **links** between pieces, and each has a test.
 ## Raspberry Pi: the rest
 
 - The service runs as `campanile`, unprivileged, under systemd protections (`ProtectSystem=strict`,
-  `NoNewPrivileges`, `PrivateTmp`, read-only filesystem except `/var/lib/campanile`, only the right
-  to open port 80).
+  `NoNewPrivileges`, `PrivateTmp`, read-only filesystem except `/var/lib/campanile`, no
+  capabilities: nginx holds port 80).
 - `/opt/campanile` belongs to root. The service can't modify it.
 - The admin password, `/etc/campanile/password`, is readable only by root and the service.
 - Kiwix has the same restrictions plus `--blockexternal`, which blocks internet links.

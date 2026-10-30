@@ -144,6 +144,11 @@ un limite, diccelo e lo aggiungiamo.
   file (misurato: prima, un numero di telefono cancellato si leggeva ancora). Però le schede SD e
   gli SSD spostano le scritture dentro il chip, e lì una copia vecchia può sopravvivere: solo un
   disco cifrato chiuderebbe il problema.
+- **Il server DHCP del Raspberry tiene un elenco dei telefoni.** Il dnsmasq di NetworkManager
+  scrive MAC, indirizzo IP e nome del dispositivo di ogni telefono in
+  `/var/lib/NetworkManager/dnsmasq-wlan0.leases`, sulla scheda, e nel journal di sistema, che
+  Raspberry Pi OS tiene in memoria fino al riavvio (provato in un container). Il Campanile e nginx
+  non registrano i collegamenti.
 - **Le mappe si leggono dentro il Campanile stesso.** Una mappa troppo grande per la memoria
   ferma il Campanile mentre la legge, bacheca e avvisi compresi. Il Raspberry lo riavvia da solo,
   il portatile con un doppio clic. Dopo tre tentativi quella mappa viene messa da parte e il resto
